@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Request | RA-Kh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body class="bg-light">
+    <header class="navbar navbar-compact glass">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="index.html" class="logo text-decoration-none">RA-Kh</a>
+            <div class="nav-actions" style="display: flex; align-items: center; gap: 16px;">
+                <a href="https://t.me/RakoKenzz" target="_blank" aria-label="Contact us on Telegram" style="color: #2AABEE; display: flex; align-items: center; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-1.94 9.12c-.14.62-.5.77-1.01.48l-2.8-2.06-1.35 1.3c-.15.15-.28.28-.57.28l.2-2.85 5.18-4.68c.23-.2-.05-.31-.35-.11l-6.4 4.03-2.76-.86c-.6-.19-.61-.6.13-.89l10.79-4.16c.5-.18.94.12.78.8l.1.6z"/>
+                    </svg>
+                </a>
+                <a href="index.html" class="btn btn-outline-secondary">Go Back</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="form-container-wrapper">
+        <div class="container container-sm">
+            
+            <div id="progress-container" class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="step-indicators">
+                    <span class="step-indicator active" data-step="1">Business</span>
+                    <span class="step-indicator" data-step="2">System</span>
+                    <span class="step-indicator" data-step="3">Features</span>
+                    <span class="step-indicator" data-step="4">Platform</span>
+                    <span class="step-indicator" data-step="5">Design</span>
+                    <span class="step-indicator" data-step="6">Requirements</span>
+                    <span class="step-indicator" data-step="7">References</span>
+                    <span class="step-indicator" data-step="8">Review</span>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <form id="request-form">
+                    
+                    <!-- STEP 1: BUSINESS -->
+                    <div class="form-step active" data-step="1">
+                        <h2 class="step-title">Business Information / ព័ត៌មានអាជីវកម្ម</h2>
+                        <p class="step-desc">Tell us a bit about your business. / សូមប្រាប់យើងបន្តិចអំពីអាជីវកម្មរបស់អ្នក។</p>
+
+                        <div class="form-group">
+                            <label for="business_name">Business / Store Name / ឈ្មោះអាជីវកម្មឬហាង *</label>
+                            <input type="text" id="business_name" name="business_name" required>
+                            <div class="error-msg" id="error-business_name"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner_name">Owner Name / ឈ្មោះម្ចាស់ *</label>
+                            <input type="text" id="owner_name" name="owner_name" required>
+                            <div class="error-msg" id="error-owner_name"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number / លេខទូរស័ព្ទ *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                            <div class="error-msg" id="error-phone"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telegram_username">Telegram Username / ឈ្មោះតេឡេក្រាម (Optional)</label>
+                            <input type="text" id="telegram_username" name="telegram_username" placeholder="@username">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="business_type">Business Type / ប្រភេទអាជីវកម្ម *</label>
+                            <select id="business_type" name="business_type" required>
+                                <option value="">Select a type...</option>
+                                <option value="Restaurant">Restaurant</option>
+                                <option value="Coffee Shop">Coffee Shop</option>
+                                <option value="Grocery Store">Grocery Store</option>
+                                <option value="Clothing Store">Clothing Store</option>
+                                <option value="Pharmacy">Pharmacy</option>
+                                <option value="School">School</option>
+                                <option value="Hotel">Hotel</option>
+                                <option value="Service Business">Service Business</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="error-msg" id="error-business_type"></div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: SYSTEM TYPE -->
+                    <div class="form-step" data-step="2">
+                        <h2 class="step-title">System Type / ប្រភេទប្រព័ន្ធ</h2>
+                        <p class="step-desc">What kind of system do you need? / តើអ្នកត្រូវការប្រព័ន្ធប្រភេទណា?</p>
+                        
+                        <div class="error-msg mb-1" id="error-system_type"></div>
+                        
+                        <div class="selectable-grid system-type-grid" id="system_type_grid">
+                            <div class="selectable-card" data-value="POS System">POS System</div>
+                            <div class="selectable-card" data-value="Inventory / Stock Management">Inventory Management</div>
+                            <div class="selectable-card" data-value="Restaurant Management">Restaurant Management</div>
+                            <div class="selectable-card" data-value="Booking System">Booking System</div>
+                            <div class="selectable-card" data-value="Customer Management">Customer Management</div>
+                            <div class="selectable-card" data-value="School Management">School Management</div>
+                            <div class="selectable-card" data-value="Hotel Management">Hotel Management</div>
+                            <div class="selectable-card" data-value="Employee Management">Employee Management</div>
+                            <div class="selectable-card" data-value="Custom System">Custom System</div>
+                            <div class="selectable-card" data-value="Other">Other</div>
+                        </div>
+                        <input type="hidden" name="system_type" id="system_type" required>
+                    </div>
+
+                    <!-- STEP 3: FEATURES -->
+                    <div class="form-step" data-step="3">
+                        <h2 class="step-title">Features / លក្ខណៈពិសេស</h2>
+                        <p class="step-desc">What features do you need? / តើអ្នកត្រូវការលក្ខណៈពិសេសអ្វីខ្លះ?</p>
+                        
+                        <div id="features_empty_state" class="text-center text-muted mt-2 hidden">
+                            Select a system type first to see available features.
+                        </div>
+                        <div id="system_type_change_warning" class="info-alert hidden mt-2">
+                            <strong>Note:</strong> You changed the system type. Some previously selected features were no longer available for this system and have been removed.
+                        </div>
+                        <div class="selectable-grid features-grid" id="features_grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                        <div id="custom_feature_container" class="form-group mt-2 hidden">
+                            <label for="custom_features">Other Feature / លក្ខណៈពិសេសផ្សេងទៀត</label>
+                            <input type="text" id="custom_features" name="custom_features" placeholder="Describe another feature you need...">
+                        </div>
+                        <input type="hidden" name="features" id="features">
+                    </div>
+
+                    <!-- STEP 4: PLATFORM -->
+                    <div class="form-step" data-step="4">
+                        <h2 class="step-title">Platform / វេទិកា</h2>
+                        <p class="step-desc">Where do you want to use the system? / តើអ្នកចង់ប្រើប្រាស់ប្រព័ន្ធនៅទីណា?</p>
+
+                        <div class="error-msg mb-1" id="error-platforms"></div>
+
+                        <div class="selectable-grid" id="platforms_grid">
+                            <div class="selectable-card multi" data-value="computer">
+                                <div class="platform-icon" style="font-size: 24px; margin-bottom: 8px;">🖥️</div>
+                                <strong>Computer</strong>
+                                <small class="d-block text-muted" style="display: block; margin-top: 4px;">Desktop / PC application</small>
+                            </div>
+                            <div class="selectable-card multi" data-value="phone">
+                                <div class="platform-icon" style="font-size: 24px; margin-bottom: 8px;">📱</div>
+                                <strong>Phone</strong>
+                                <small class="d-block text-muted" style="display: block; margin-top: 4px;">Mobile application</small>
+                            </div>
+                        </div>
+                        <input type="hidden" name="platforms" id="platforms" required>
+
+                        <!-- Computer Platform Options -->
+                        <div id="computer_options_container" class="mt-2 hidden">
+                            <h3 class="mb-1">Computer Platform</h3>
+                            <div class="selectable-grid" id="computer_platform_grid">
+                                <div class="selectable-card" data-value="windows">✓ Windows</div>
+                                <div class="selectable-card disabled" data-value="macos" style="opacity: 0.5; cursor: not-allowed; border-style: dashed;">
+                                    ○ macOS <br><small>Coming Soon</small>
+                                </div>
+                                <div class="selectable-card disabled" data-value="linux" style="opacity: 0.5; cursor: not-allowed; border-style: dashed;">
+                                    ○ Linux <br><small>Coming Soon</small>
+                                </div>
+                            </div>
+                            <input type="hidden" name="computer_platform" id="computer_platform">
+                            <div class="error-msg" id="error-computer_platform"></div>
+                        </div>
+
+                        <!-- Phone Platform Options -->
+                        <div id="phone_options_container" class="mt-2 hidden">
+                            <h3 class="mb-1">Phone Platform</h3>
+                            <div class="selectable-grid" id="phone_platform_grid">
+                                <div class="selectable-card" data-value="android">✓ Android</div>
+                                <div class="selectable-card disabled" data-value="ios" style="opacity: 0.5; cursor: not-allowed; border-style: dashed;">
+                                    ○ iOS <br><small>Coming Soon</small>
+                                </div>
+                            </div>
+                            <input type="hidden" name="phone_platform" id="phone_platform">
+                            <div class="error-msg" id="error-phone_platform"></div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: DESIGN -->
+                    <div class="form-step" data-step="5">
+                        <h2 class="step-title">Design Preference / ចំណូលចិត្តការរចនា</h2>
+                        <p class="step-desc">What design style do you prefer? / តើអ្នកចូលចិត្តការរចនាបែបណា?</p>
+
+                        <div class="form-group">
+                            <label>Theme Preference</label>
+                            <div class="theme-toggle">
+                                <label class="theme-option">
+                                    <input type="radio" name="theme" value="light" checked>
+                                    <span class="theme-card light-theme-preview">Light UI</span>
+                                </label>
+                                <label class="theme-option">
+                                    <input type="radio" name="theme" value="dark">
+                                    <span class="theme-card dark-theme-preview">Dark UI</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label>Primary Color</label>
+                            <div class="color-options" id="color_options">
+                                <div class="color-circle selected" data-color="#2563EB" style="background-color: #2563EB;"></div>
+                                <div class="color-circle" data-color="#7C3AED" style="background-color: #7C3AED;"></div>
+                                <div class="color-circle" data-color="#10B981" style="background-color: #10B981;"></div>
+                                <div class="color-circle" data-color="#EF4444" style="background-color: #EF4444;"></div>
+                                <div class="color-circle" data-color="#F59E0B" style="background-color: #F59E0B;"></div>
+                                <div class="color-circle" data-color="#111827" style="background-color: #111827;"></div>
+                                
+                                <div class="custom-color-picker">
+                                    <input type="color" id="custom_color_input" title="Choose Custom Color">
+                                </div>
+                            </div>
+                            <input type="hidden" name="primary_color" id="primary_color" value="#2563EB">
+                            
+                            <div class="mt-1" style="margin-top: 16px;">
+                                <span class="color-preview-box" id="color_preview_text" style="background-color: #2563EB;">Selected Color Preview</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 6: REQUIREMENTS -->
+                    <div class="form-step" data-step="6">
+                        <h2 class="step-title">Requirements / តម្រូវការ</h2>
+                        <p class="step-desc">Tell us what you want your system to do. / ប្រាប់យើងពីអ្វីដែលអ្នកចង់ឱ្យប្រព័ន្ធរបស់អ្នកធ្វើ។</p>
+
+                        <div class="form-group">
+                            <label for="requirements">Requirements Details / ព័ត៌មានលម្អិតនៃតម្រូវការ *</label>
+                            <textarea id="requirements" name="requirements" rows="6" placeholder="Example:&#10;I have a restaurant with 5 staff.&#10;I want a system to manage orders, products, stock and daily sales." required></textarea>
+                            <div class="error-msg" id="error-requirements"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="budget">Budget (Optional)</label>
+                            <select id="budget" name="budget">
+                                <option value="">Select a budget range...</option>
+                                <option value="Under $100">Under $100</option>
+                                <option value="$100 - $300">$100 - $300</option>
+                                <option value="$300 - $500">$300 - $500</option>
+                                <option value="$500+">$500+</option>
+                                <option value="Not sure">Not sure</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deadline">Deadline (Optional)</label>
+                            <select id="deadline" name="deadline">
+                                <option value="">Select a deadline...</option>
+                                <option value="As soon as possible">As soon as possible</option>
+                                <option value="1 Week">1 Week</option>
+                                <option value="2 Weeks">2 Weeks</option>
+                                <option value="1 Month">1 Month</option>
+                                <option value="Flexible">Flexible</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- STEP 7: REFERENCES -->
+                    <div class="form-step" data-step="7">
+                        <h2 class="step-title">References / ឯកសារយោង</h2>
+                        <p class="step-desc">Optionally provide links to references. / ជម្រើសក្នុងការផ្តល់តំណភ្ជាប់យោង។</p>
+                        
+                        <div class="form-group">
+                            <label for="logo_path">Business Logo Link</label>
+                            <input type="url" id="logo_path" name="logo_path" placeholder="https://example.com/logo.png">
+                            <small class="text-muted">Link to your current logo if available online.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="logo_file">Upload Logo / បញ្ចូលរូបសញ្ញា</label>
+                            <input type="file" id="logo_file" name="logo_file" accept="image/*">
+                            <small class="text-muted">Upload your logo directly from your device.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reference_files">Reference Example Link</label>
+                            <input type="url" id="reference_files" name="reference_files" placeholder="https://example.com/system-i-like">
+                            <small class="text-muted">Link to a system you like or an example UI.</small>
+                        </div>
+                        
+                        <div class="info-alert">
+                            <strong>Note:</strong> You can provide a link to your reference examples. We will ask for additional actual files during the consultation phase!
+                        </div>
+                    </div>
+
+                    <!-- STEP 8: REVIEW -->
+                    <div class="form-step" data-step="8">
+                        <h2 class="step-title">Review Your Request / ពិនិត្យមើលការស្នើសុំរបស់អ្នក</h2>
+                        <p class="step-desc">Please review your information before submitting. / សូមពិនិត្យមើលព័ត៌មានរបស់អ្នកមុនពេលបញ្ជូន។</p>
+
+                        <div class="review-section">
+                            <h3>BUSINESS</h3>
+                            <p><strong>Business Name:</strong> <span id="rev_business_name"></span></p>
+                            <p><strong>Owner:</strong> <span id="rev_owner_name"></span></p>
+                            <p><strong>Phone:</strong> <span id="rev_phone"></span></p>
+                            <p><strong>Telegram:</strong> <span id="rev_telegram"></span></p>
+                            <p><strong>Business Type:</strong> <span id="rev_business_type"></span></p>
+                        </div>
+
+                        <div class="review-section">
+                            <h3>SYSTEM</h3>
+                            <p><span id="rev_system_type" style="font-weight: 600;"></span></p>
+                        </div>
+
+                        <div class="review-section">
+                            <h3>FEATURES</h3>
+                            <ul id="rev_features" class="feature-list-review"></ul>
+                            <p id="rev_custom_features_container" class="hidden"><strong>Custom Features:</strong> <span id="rev_custom_features"></span></p>
+                        </div>
+
+                        <div class="review-section">
+                            <h3>PLATFORM</h3>
+                            <div id="rev_platform_info"></div>
+                        </div>
+
+                        <div class="review-section">
+                            <h3>DESIGN</h3>
+                            <p><strong>Theme:</strong> <span id="rev_theme"></span></p>
+                            <p><strong>Color:</strong> <span id="rev_color" class="color-badge"></span></p>
+                        </div>
+
+                        <div class="review-section">
+                            <h3>REQUIREMENTS</h3>
+                            <p class="req-text" id="rev_requirements"></p>
+                            <p><strong>Budget:</strong> <span id="rev_budget"></span></p>
+                            <p><strong>Deadline:</strong> <span id="rev_deadline"></span></p>
+                        </div>
+                        
+                        <div id="submit-error" class="error-msg text-center mb-1 hidden"></div>
+                    </div>
+
+                    <!-- SUCCESS STATE -->
+                    <div id="success-state" class="form-step hidden">
+                        <div class="text-center">
+                            <div class="success-icon">&check;</div>
+                            <h2 class="step-title">Request Submitted Successfully!</h2>
+                            <p class="step-desc mx-auto max-w-m">Your request has been received successfully. Your request is now waiting for our review.</p>
+                        </div>
+                        
+                        <div class="receipt-card mt-3">
+                            <div class="receipt-header text-center">
+                                <h3>RA-Kh</h3>
+                                <h4>SYSTEM REQUEST RECEIPT</h4>
+                                <div class="receipt-meta">
+                                    <p><strong>Request #:</strong> <span id="receipt_request_number" class="text-primary">REQ-XXXXXX</span></p>
+                                    <p><strong>Status:</strong> <span class="status-badge new">🟢 NEW</span></p>
+                                    <p><strong>Submitted:</strong> <span id="receipt_date"></span></p>
+                                </div>
+                            </div>
+                            
+                            <hr class="receipt-divider">
+                            
+                            <div class="receipt-section">
+                                <h5 class="receipt-section-title">BUSINESS INFORMATION</h5>
+                                <div class="receipt-grid">
+                                    <span>Business:</span> <strong id="receipt_business_name"></strong>
+                                    <span>Owner:</span> <strong id="receipt_owner_name"></strong>
+                                    <span>Phone:</span> <strong id="receipt_phone"></strong>
+                                    <span>Telegram:</span> <strong id="receipt_telegram"></strong>
+                                    <span>Business Type:</span> <strong id="receipt_business_type"></strong>
+                                </div>
+                            </div>
+
+                            <hr class="receipt-divider">
+
+                            <div class="receipt-section">
+                                <h5 class="receipt-section-title">SYSTEM</h5>
+                                <p class="mb-1"><strong>System Type:</strong> <span id="receipt_system_type"></span></p>
+                                <p class="mb-1 mt-2"><strong>Platform:</strong></p>
+                                <div id="receipt_platform_info" class="pl-2"></div>
+                            </div>
+
+                            <hr class="receipt-divider">
+
+                            <div class="receipt-section">
+                                <h5 class="receipt-section-title">FEATURES</h5>
+                                <ul id="receipt_features" class="feature-list-receipt"></ul>
+                            </div>
+
+                            <hr class="receipt-divider">
+
+                            <div class="receipt-section">
+                                <h5 class="receipt-section-title">DESIGN</h5>
+                                <div class="receipt-grid">
+                                    <span>Theme:</span> <strong id="receipt_theme"></strong>
+                                    <span>Color:</span> <strong><span id="receipt_color" class="color-badge-small"></span> <span id="receipt_color_text"></span></strong>
+                                </div>
+                            </div>
+
+                            <hr class="receipt-divider">
+
+                            <div class="receipt-section">
+                                <h5 class="receipt-section-title">REQUIREMENTS</h5>
+                                <p class="receipt-req-text" id="receipt_requirements"></p>
+                            </div>
+
+                            <hr class="receipt-divider">
+
+                            <div class="receipt-section">
+                                <div class="receipt-grid">
+                                    <span>Budget:</span> <strong id="receipt_budget"></strong>
+                                    <span>Deadline:</span> <strong id="receipt_deadline"></strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <p class="text-muted">Thank you for choosing RA-Kh.</p>
+                            <p class="text-muted mb-2">We'll review your requirements and contact you soon.</p>
+                            <a href="index.html" class="btn btn-primary">Back to Home</a>
+                        </div>
+                    </div>
+
+                    <!-- FORM NAVIGATION BUTTONS -->
+                    <div class="form-navigation" id="form_navigation">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-prev" disabled>Back</button>
+                        <button type="button" class="btn btn-primary" id="btn-next">Next &rarr;</button>
+                        <button type="submit" class="btn btn-success hidden" id="btn-submit">Submit Request &check;</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/form.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

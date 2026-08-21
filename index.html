@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RA-Kh | Custom Business System Development</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header class="navbar glass">
+        <div class="container">
+            <a href="index.html" class="logo text-decoration-none">RA-Kh</a>
+            <nav class="nav-links" id="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#what-we-build">What We Build</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#why-choose-us">Why Choose Us</a>
+                <a href="#footer">Contact</a>
+                <a href="request.html" class="btn btn-primary mobile-only-nav-item mt-1">Start Your Request &rarr;</a>
+            </nav>
+            <div class="nav-actions" style="display: flex; align-items: center; gap: 16px;">
+                <a href="https://t.me/RakoKenzz" target="_blank" aria-label="Contact us on Telegram" style="color: #2AABEE; display: flex; align-items: center; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">
+                    <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                        <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.56 8.16l-1.94 9.12c-.14.62-.5.77-1.01.48l-2.8-2.06-1.35 1.3c-.15.15-.28.28-.57.28l.2-2.85 5.18-4.68c.23-.2-.05-.31-.35-.11l-6.4 4.03-2.76-.86c-.6-.19-.61-.6.13-.89l10.79-4.16c.5-.18.94.12.78.8l.1.6z"/>
+                    </svg>
+                </a>
+                <a href="request.html" class="btn btn-primary">Start Your Request &rarr;</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero text-center">
+            <div class="container">
+                <div class="hero-centered mx-auto max-w-m">
+                    <span class="badge mx-auto">Custom Software Development</span>
+                    <h1>Build the System Your Business Needs</h1>
+                    <p class="subtitle mx-auto">Custom software designed around your business workflow.</p>
+                </div>
+                
+                <div class="hero-carousel-container mx-auto mt-2 mb-2" id="hero-carousel">
+                    <!-- Carousel images injected by JS -->
+                    <img src="assets/images/hero-mockup.jpg" alt="System Preview" class="hero-carousel-img active">
+                    
+                    <!-- Carousel Controls -->
+                    <button class="carousel-btn prev" id="carousel-prev" aria-label="Previous image">&lsaquo;</button>
+                    <button class="carousel-btn next" id="carousel-next" aria-label="Next image">&rsaquo;</button>
+                    
+                    <!-- Carousel Dots -->
+                    <div class="carousel-dots" id="carousel-dots"></div>
+                </div>
+
+                <div class="hero-centered mx-auto max-w-m">
+                    <div class="hero-buttons justify-center">
+                        <a href="request.html" class="btn btn-primary btn-large">Start Your Request &rarr;</a>
+                        <a href="#what-we-build" class="btn btn-secondary btn-large">Explore Services</a>
+                    </div>
+                    <span class="trust-text mx-auto mt-2">Built around your workflow &bull; Designed for your business</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHAT WE BUILD -->
+        <section id="what-we-build" class="section">
+            <div class="container text-center">
+                <h2>What We Build</h2>
+                <p class="subtitle mx-auto" style="margin-bottom: 0;">Solutions designed for different types of businesses.</p>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-icon">💳</div>
+                        <h3>POS Systems</h3>
+                        <p>Manage sales, products, customers and receipts with a fast, modern interface.</p>
+                        <span class="card-arrow">&rarr;</span>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📦</div>
+                        <h3>Inventory Management</h3>
+                        <p>Track products, stock levels, suppliers and inventory movements automatically.</p>
+                        <span class="card-arrow">&rarr;</span>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📅</div>
+                        <h3>Booking Systems</h3>
+                        <p>Manage appointments, reservations and schedules for your services.</p>
+                        <span class="card-arrow">&rarr;</span>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">👥</div>
+                        <h3>Customer Management</h3>
+                        <p>Organize customer information, history, and interactions in one place.</p>
+                        <span class="card-arrow">&rarr;</span>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">👔</div>
+                        <h3>Employee Management</h3>
+                        <p>Manage staff, roles, permissions, and daily operations securely.</p>
+                        <span class="card-arrow">&rarr;</span>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">⚙️</div>
+                        <h3>Custom Business Systems</h3>
+                        <p>Build exactly what your unique business process needs from the ground up.</p>
+                        <span class="card-arrow">&rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SYSTEMS FOR YOUR BUSINESS -->
+        <section class="section bg-light">
+            <div class="container text-center">
+                <h2>Systems For Your Business</h2>
+                <p class="subtitle mx-auto">We adapt to your industry.</p>
+                <div class="tags-grid">
+                    <div class="tag-card">Restaurant</div>
+                    <div class="tag-card">Coffee Shop</div>
+                    <div class="tag-card">Retail Store</div>
+                    <div class="tag-card">Supermarket</div>
+                    <div class="tag-card">School</div>
+                    <div class="tag-card">Clinic</div>
+                    <div class="tag-card">Warehouse</div>
+                    <div class="tag-card">Service Business</div>
+                    <div class="tag-card">+ And More</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section id="how-it-works" class="section">
+            <div class="container text-center">
+                <div class="mb-2">
+                    <h2>How It Works</h2>
+                    <p class="subtitle mx-auto">A simple process to get your perfect system.</p>
+                </div>
+                
+                <div class="steps-container">
+                    <div class="step-row">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h3>Tell Us</h3>
+                            <p>Tell us about your business and what system you need.</p>
+                        </div>
+                    </div>
+                    <div class="step-row">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h3>We Plan</h3>
+                            <p>We analyze your requirements and workflow to design a solution.</p>
+                        </div>
+                    </div>
+                    <div class="step-row">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h3>We Build</h3>
+                            <p>We design and develop your custom system with regular updates.</p>
+                        </div>
+                    </div>
+                    <div class="step-row">
+                        <div class="step-number">04</div>
+                        <div class="step-content">
+                            <h3>You Launch</h3>
+                            <p>Your system is delivered, installed, and ready for your business.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURE HIGHLIGHT -->
+        <section class="section bg-light">
+            <div class="container text-center">
+                <div class="split-layout mx-auto">
+                    <div>
+                        <h2>Everything Your Business Needs</h2>
+                        <p class="mb-2 mx-auto">We build complete ecosystems so you don't need multiple disconnected apps.</p>
+                        
+                        <ul class="checklist justify-center">
+                            <li><span class="check-icon">&check;</span> Sales Management</li>
+                            <li><span class="check-icon">&check;</span> Inventory Management</li>
+                            <li><span class="check-icon">&check;</span> Customer Management</li>
+                            <li><span class="check-icon">&check;</span> Employee Management</li>
+                            <li><span class="check-icon">&check;</span> Reports & Analytics</li>
+                            <li><span class="check-icon">&check;</span> Notifications</li>
+                            <li><span class="check-icon">&check;</span> Custom Features</li>
+                            <li><span class="check-icon">&check;</span> Mobile / Web Support</li>
+                        </ul>
+                        
+                        <a href="request.html" class="btn btn-outline-primary mt-1">Tell Us What You Need &rarr;</a>
+                    </div>
+
+                    <div class="feature-preview mx-auto" style="max-width: 600px; margin-top: 2rem;">
+                        <!-- Pseudo Image using CSS -->
+                        <div style="background: white; border-radius: 8px; border: 1px solid #E2E8F0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-align: left;">
+                            <div style="background: #F8FAFC; padding: 10px; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; gap: 10px;">
+                                <div style="width: 30px; height: 30px; background: #2563EB; border-radius: 6px;"></div>
+                                <div style="flex: 1; height: 20px; background: #E2E8F0; border-radius: 4px; max-width: 200px;"></div>
+                            </div>
+                            <div style="padding: 20px; display: flex; gap: 20px;">
+                                <div style="width: 150px; display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="height: 15px; background: #E2E8F0; border-radius: 4px;"></div>
+                                    <div style="height: 15px; background: #E2E8F0; border-radius: 4px; width: 80%;"></div>
+                                    <div style="height: 15px; background: #E2E8F0; border-radius: 4px; width: 90%;"></div>
+                                </div>
+                                <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div style="height: 80px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px;"></div>
+                                    <div style="height: 80px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px;"></div>
+                                    <div style="height: 150px; background: rgba(37,99,235,0.05); border: 1px dashed rgba(37,99,235,0.3); border-radius: 6px; grid-column: span 2;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY CHOOSE US -->
+        <section id="why-choose-us" class="section">
+            <div class="container">
+                <div class="text-center mb-2">
+                    <h2>Why Choose Us</h2>
+                    <p class="subtitle mx-auto">We combine technical excellence with business understanding.</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Built For Your Business</h3>
+                        <p>Not a generic system. We build precisely around your unique workflow.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✨</div>
+                        <h3>Modern & Easy To Use</h3>
+                        <p>Clean interfaces designed to be simple and intuitive for your staff.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Reliable & Secure</h3>
+                        <p>Your business data and system are designed with security in mind from day one.</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🤝</div>
+                        <h3>Support After Delivery</h3>
+                        <p>We help you keep your system running and improve it when needed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA SECTION -->
+        <div class="container">
+            <section class="cta-section text-center">
+                <div class="cta-content mx-auto max-w-m">
+                    <h2>Ready to build your system?</h2>
+                    <p>Tell us what your business needs.</p>
+                    <a href="request.html" class="btn btn-primary btn-large" style="background: white; color: #0B1020;">Start Your Request &rarr;</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="footer-grid text-center">
+                <div>
+                    <a href="index.html" class="footer-logo">RA-Kh</a>
+                    <p class="footer-desc mx-auto">Custom software systems for modern businesses. We design and build exactly what you need.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#what-we-build">Services</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#why-choose-us">Why Choose Us</a></li>
+                        <li><a href="request.html">Start Your Request</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="#">Telegram</a></li>
+                        <li><a href="#">Phone</a></li>
+                        <li><a href="#">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 RA-Kh. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+/* Responsive CSS */
+
+/* Tablet (1024px and down) */
+@media (max-width: 1024px) {
+    .mockup-body {
+        grid-template-columns: 140px 1fr;
+    }
+}
+
+/* Tablet (768px and down) */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--white);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        padding: 20px;
+        border-top: 1px solid var(--border);
+        text-align: center;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+    .nav-links a {
+        margin: 15px 0;
+        font-size: 1.1rem;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+    .nav-actions {
+        display: none;
+    }
+    .mobile-only-nav-item {
+        display: inline-flex !important;
+        margin: 15px auto !important;
+        justify-content: center;
+        width: 100%;
+        max-width: 300px;
+    }
+    .hero .subtitle {
+        margin: 0 auto 2rem;
+    }
+    .hero-buttons {
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+    .mockup-window {
+        transform: none;
+    }
+    .mockup-window:hover {
+        transform: none;
+    }
+    
+    .split-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+    .footer-desc {
+        margin: 0 auto;
+    }
+    
+    .step-indicators {
+        display: none; /* Hide full text steps on small screens */
+    }
+    
+    /* Show just a counter on mobile */
+    .progress-container::after {
+        content: "Step " attr(data-current-step) " of 7";
+        display: block;
+        text-align: center;
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-top: 10px;
+        font-weight: 500;
+    }
+    
+    .form-card {
+        padding: 30px 20px;
+    }
+}
+
+/* Mobile Layout Helpers */
+@media (max-width: 480px) {
+    .container {
+        padding-inline: 16px;
+    }
+    .hero-buttons {
+        flex-direction: column;
+    }
+    .hero-carousel-container {
+        width: calc(100vw - 32px);
+        max-width: 100%;
+    }
+    .btn-large {
+        width: 100%;
+    }
+    .mockup-body {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+    .mockup-sidebar {
+        display: none;
+    }
+    .mockup-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+    .floating-card {
+        display: none;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .steps-container {
+        flex-direction: column;
+    }
+    .selectable-grid {
+        grid-template-columns: 1fr;
+    }
+    .form-navigation {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .form-navigation .btn {
+        width: 100%;
+    }
+    .theme-toggle {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .checklist {
+        grid-template-columns: 1fr;
+    }
+    .cta-section {
+        padding: 60px 20px;
+    }
+    h1 {
+        font-size: 2.5rem;
+    }
+    h2 {
+        font-size: 2rem;
+    }
+}
