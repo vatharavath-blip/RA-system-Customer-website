@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Fire Top Up | R1ckky Store</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kantumruy+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="icon" type="image/png" href="images/Newlogo.png">
+  
+  <style>
+    body {
+      background-color: #060b13;
+      background-image: radial-gradient(rgba(0, 112, 243, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: #fff;
+      font-family: 'Inter', 'Kantumruy Pro', sans-serif;
+    }
+
+    .topup-wrapper {
+      max-width: 1240px;
+      margin: 30px auto 100px;
+      padding: 0 20px;
+    }
+
+    /* Back link */
+    .back-nav {
+      margin-bottom: 24px;
+    }
+
+    .back-nav a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .back-nav a:hover {
+      color: #38bdf8;
+    }
+
+    /* Game Header Card */
+    .game-header-card {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 35px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .game-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(255, 215, 0, 0.35);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+      flex-shrink: 0;
+      background: #0d1424;
+    }
+
+    .game-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .game-meta {
+      flex: 1;
+    }
+
+    .game-publisher {
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .game-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin: 0 0 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .game-region-warning {
+      color: #fbbf24;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .game-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .game-pill {
+      padding: 4px 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .game-pill.instant {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    /* Main 2-Column Grid */
+    .topup-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Step Sections */
+    .step-section {
+      margin-bottom: 40px;
+    }
+
+    .step-title-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .step-number {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #050b14;
+      font-weight: 900;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .step-text h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin: 0;
+      color: #fff;
+    }
+
+    .step-text span {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Step 1 Card: Account Info */
+    .account-card {
+      background: rgba(13, 20, 36, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .account-field {
+      margin-bottom: 16px;
+    }
+
+    .account-field label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      margin-bottom: 8px;
+    }
+
+    .account-input-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    .account-input {
+      width: 100%;
+      background: rgba(18, 28, 48, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .account-input:focus {
+      border-color: #0070f3;
+      background: rgba(18, 28, 48, 1);
+      box-shadow: 0 0 18px rgba(0, 112, 243, 0.35);
+    }
+
+    .btn-verify {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-verify:hover {
+      background: rgba(0, 112, 243, 0.2);
+      border-color: #0070f3;
+      color: #fff;
+    }
+
+    .verify-result {
+      margin-top: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: none;
+      padding: 10px 14px;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .verify-result.loading {
+      display: flex;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+    }
+
+    .verify-result.success {
+      display: flex;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+
+    .verify-result.error {
+      display: flex;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+
+    .verify-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .account-input.is-verified {
+      border-color: #10b981;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .account-input.is-invalid {
+      border-color: #ef4444;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+    }
+
+    .package-skeleton {
+      background: rgba(18, 28, 48, 0.6);
+      border: 1.5px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      animation: skeleton-pulse 1.4s ease-in-out infinite;
+    }
+
+    .package-skeleton-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .package-skeleton-line {
+      width: 65%;
+      height: 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .package-skeleton-price {
+      width: 40%;
+      height: 14px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 0.85; }
+    }
+
+    /* Server/Variant Selector Tabs */
+    .variant-selector-container {
+      margin-bottom: 20px;
+      background: rgba(13, 20, 36, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .variant-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #94a3b8;
+      display: block;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    .variant-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .variant-tabs {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .variant-tab {
+      background: rgba(18, 28, 48, 0.85);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 10px;
+      cursor: pointer;
+      text-align: center;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      color: #cbd5e1;
+      font-family: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .variant-tab:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(22, 36, 62, 0.95);
+      transform: translateY(-2px);
+    }
+
+    .variant-tab.active {
+      border-color: #0070f3;
+      background: linear-gradient(135deg, rgba(0, 112, 243, 0.25), rgba(56, 189, 248, 0.15));
+      color: #fff;
+      box-shadow: 0 0 16px rgba(0, 112, 243, 0.35);
+    }
+
+    .variant-tab .tab-badge {
+      position: absolute;
+      top: -7px;
+      right: 8px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: #10b981;
+      color: #050b14;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .variant-tab .tab-badge.special {
+      background: #f59e0b;
+      color: #000;
+    }
+
+    .variant-tab .tab-title {
+      font-weight: 700;
+      font-size: 0.88rem;
+      display: block;
+      color: #fff;
+    }
+
+    .variant-tab .tab-sub {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      display: block;
+      font-weight: 600;
+    }
+
+    /* Step 2: Package Grid */
+    .package-category-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 24px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .package-category-title span {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .package-item {
+      background: rgba(13, 22, 41, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px 12px 16px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    }
+
+    .package-item:hover {
+      border-color: rgba(0, 150, 255, 0.5);
+      background: rgba(18, 30, 56, 0.85);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 112, 243, 0.25);
+    }
+
+    .package-item.selected {
+      border-color: #0070f3;
+      background: linear-gradient(180deg, rgba(0, 112, 243, 0.15) 0%, rgba(13, 22, 41, 0.9) 100%);
+      box-shadow: 0 0 25px rgba(0, 112, 243, 0.4), inset 0 0 15px rgba(0, 112, 243, 0.15);
+      transform: translateY(-3px);
+    }
+
+    .package-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .package-badge.hot {
+      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      color: #fff;
+    }
+
+    .package-badge.best {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+    }
+
+    .diamond-icon-box {
+      width: 54px;
+      height: 54px;
+      margin: 8px auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .diamond-icon-box svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 10px rgba(0, 195, 255, 0.6));
+      transition: transform 0.3s ease;
+    }
+
+    .package-item:hover .diamond-icon-box svg {
+      transform: scale(1.1);
+    }
+
+    .package-amount {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+
+    .package-price {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.3px;
+    }
+
+    /* Step 3: Payment Cards */
+    .payments-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .payment-option {
+      background: rgba(13, 22, 41, 0.7);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .payment-option:hover {
+      border-color: rgba(0, 150, 255, 0.4);
+      background: rgba(18, 30, 56, 0.8);
+    }
+
+    .payment-option.selected {
+      border-color: #0070f3;
+      background: rgba(0, 112, 243, 0.15);
+      box-shadow: 0 0 20px rgba(0, 112, 243, 0.3);
+    }
+
+    .payment-icon-wrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .payment-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .payment-sub {
+      font-size: 0.75rem;
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    /* Right Column: Sticky Order Summary */
+    .summary-card {
+      position: sticky;
+      top: 100px;
+      background: rgba(13, 20, 36, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .summary-header h3 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .summary-header span {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* Empty state */
+    .summary-empty-box {
+      border: 1.5px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      padding: 35px 20px;
+      text-align: center;
+      margin-bottom: 24px;
+      background: rgba(5, 11, 20, 0.4);
+    }
+
+    .summary-empty-box h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin: 0 0 6px;
+    }
+
+    .summary-empty-box p {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* Selected state */
+    .summary-selected-box {
+      display: none;
+      margin-bottom: 24px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+
+    .summary-row.total {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+
+    .summary-row.total .price {
+      color: #00e5ff;
+    }
+
+    /* Top Up Action Button */
+    .btn-topup-now {
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 14px;
+      border: none;
+      background: #475569;
+      color: #94a3b8;
+      font-weight: 800;
+      font-size: 1.05rem;
+      cursor: not-allowed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-topup-now.active {
+      background: linear-gradient(135deg, #0070f3, #00c6ff);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 25px rgba(0, 112, 243, 0.45);
+    }
+
+    .btn-topup-now.active:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 112, 243, 0.6);
+    }
+
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* Floating Telegram Button */
+    .floating-telegram {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #29b6f6, #0288d1);
+      box-shadow: 0 8px 25px rgba(41, 182, 246, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-decoration: none;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+    }
+
+    .floating-telegram:hover {
+      transform: translateY(-4px) scale(1.08);
+      box-shadow: 0 12px 30px rgba(41, 182, 246, 0.65);
+    }
+
+    .floating-telegram svg {
+      width: 32px;
+      height: 32px;
+      fill: #fff;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .topup-grid {
+        grid-template-columns: 1fr;
+      }
+      .packages-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .summary-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .packages-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .payments-grid {
+        grid-template-columns: 1fr;
+      }
+      .game-header-card {
+        flex-direction: column;
+        text-align: center;
+      }
+      .game-badges {
+        justify-content: center;
+      }
+      .game-region-warning {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/Newlogo.png" alt="R1ckky Store Logo" style="height: 40px; width: auto;">
+        <span>R1ckky Store</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="games.html" style="color: var(--primary-color)">Game Top Up</a></li>
+        <li><a href="coming-soon.html">Coming Soon</a></li>
+        <li><a href="track-order.html">Track Order</a></li>
+      </ul>
+      
+      <div class="header-actions">
+        <button class="icon-btn" title="Search">🔍</button>
+        <button class="icon-btn" title="Cart">🛒</button>
+        <a href="signin.html" class="btn btn-primary" id="headerSignIn">Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="topup-wrapper">
+    
+    <!-- Back to all games -->
+    <div class="back-nav">
+      <a href="games.html">← All games</a>
+    </div>
+
+    <!-- Game Header Card -->
+    <div class="game-header-card">
+      <div class="game-avatar">
+        <img id="gameImage" src="images/Freefiver.jpg" alt="Free Fire">
+      </div>
+      <div class="game-meta">
+        <div class="game-publisher" id="gamePublisher">GARENA</div>
+        <h1 class="game-title" id="gameTitle">Free Fire (KH/MY/SG)</h1>
+        <div class="game-region-warning">
+          <span>⚠️ Use an account registered in this region. Wrong region will fail.</span>
+        </div>
+        <div class="game-badges">
+          <span class="game-pill">Top up Diamonds</span>
+          <span class="game-pill instant">⚡ INSTANT</span>
+          <span class="game-pill">KHQR</span>
+          <span class="game-pill">24/7</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-Column Grid -->
+    <div class="topup-grid">
+      
+      <!-- Left: Form Steps -->
+      <div class="topup-steps">
+        
+        <!-- Step 1: Enter Account Info -->
+        <section class="step-section">
+          <div class="step-title-box">
+            <div class="step-number">1</div>
+            <div class="step-text">
+              <h2>Enter Account Info</h2>
+              <span>បញ្ចូលព័ត៌មានគណនី</span>
+            </div>
+          </div>
+          
+          <div class="account-card">
+            <div class="account-field">
+              <label for="playerIdInput" id="playerIdLabel">Player ID</label>
+              <div class="account-input-group">
+                <input type="text" id="playerIdInput" class="account-input" placeholder="Enter your player ID" autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Server/Zone ID for games like MLBB -->
+            <div class="account-field" id="zoneIdField" style="display: none;">
+              <label for="zoneIdInput" id="zoneIdLabel">Zone / Server ID</label>
+              <input type="text" id="zoneIdInput" class="account-input" placeholder="e.g. 1234" autocomplete="off">
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 6px;">
+              <button type="button" class="btn-verify" id="btnVerify">
+                <span>🔍</span> ពិនិត្យមើលឈ្មោះ
+              </button>
+              <span id="autoCheckHint" style="font-size: 0.8rem; color: #64748b;">(ត្រួតពិនិត្យឈ្មោះស្វ័យប្រវត្តិ • Live name check)</span>
+            </div>
+
+            <div class="verify-result" id="verifyResult">
+              <span id="verifySpinner" class="verify-spinner" style="display: none;"></span>
+              <span id="verifyText">ឈ្មោះគណនី: <strong id="verifiedName"></strong></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 2: Choose Package -->
+        <section class="step-section">
+          <div class="step-title-box">
+            <div class="step-number">2</div>
+            <div class="step-text">
+              <h2>Choose Package</h2>
+              <span id="stepPackagesSubtitle">ជ្រើសរើសកញ្ចប់</span>
+            </div>
+          </div>
+
+          <!-- Packages Title -->
+          <div class="package-category-title" id="packageCategoryTitle">
+            Available Packages
+            <span id="packagesCountBadge" style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px; display: none;"></span>
+          </div>
+
+          <div class="packages-grid" id="packagesGrid">
+            <!-- Dynamic packages loaded from provider API -->
+            <div class="package-skeleton">
+              <div class="package-skeleton-icon"></div>
+              <div class="package-skeleton-line"></div>
+              <div class="package-skeleton-price"></div>
+            </div>
+            <div class="package-skeleton">
+              <div class="package-skeleton-icon"></div>
+              <div class="package-skeleton-line"></div>
+              <div class="package-skeleton-price"></div>
+            </div>
+            <div class="package-skeleton">
+              <div class="package-skeleton-icon"></div>
+              <div class="package-skeleton-line"></div>
+              <div class="package-skeleton-price"></div>
+            </div>
+            <div class="package-skeleton">
+              <div class="package-skeleton-icon"></div>
+              <div class="package-skeleton-line"></div>
+              <div class="package-skeleton-price"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 3: Payment Method -->
+        <section class="step-section">
+          <div class="step-title-box">
+            <div class="step-number">3</div>
+            <div class="step-text">
+              <h2>Payment Method</h2>
+              <span>ជ្រើសរើសវិធីសាស្ត្រទូទាត់</span>
+            </div>
+          </div>
+
+          <div class="payments-grid">
+            <div class="payment-option selected" data-method="ABA Pay">
+              <div class="payment-icon-wrap" style="color: #00bcd4;">ABA</div>
+              <div>
+                <div class="payment-title">ABA Pay</div>
+                <div class="payment-sub">⚡ Instant QR</div>
+              </div>
+            </div>
+
+            <div class="payment-option" data-method="KHQR">
+              <div class="payment-icon-wrap" style="color: #e11d48;">KH</div>
+              <div>
+                <div class="payment-title">KHQR (Bakong)</div>
+                <div class="payment-sub">⚡ All Banks</div>
+              </div>
+            </div>
+
+            <div class="payment-option" data-method="ACLEDA">
+              <div class="payment-icon-wrap" style="color: #3b82f6;">AC</div>
+              <div>
+                <div class="payment-title">ACLEDA</div>
+                <div class="payment-sub">⚡ Direct Pay</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right: Sticky Order Summary -->
+      <div class="topup-summary-col">
+        <div class="summary-card">
+          <div class="summary-header">
+            <h3>Order Summary</h3>
+            <span>ការបញ្ជាទិញ</span>
+          </div>
+
+          <!-- Empty state -->
+          <div class="summary-empty-box" id="summaryEmpty">
+            <h4>No package selected</h4>
+            <p>ជ្រើសរើសកញ្ចប់ខាងឆ្វេងដើម្បីបន្ត</p>
+          </div>
+
+          <!-- Selected state -->
+          <div class="summary-selected-box" id="summarySelected">
+            <div class="summary-row">
+              <span style="color: #94a3b8;">Game</span>
+              <strong id="summaryGameName">Free Fire</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: #94a3b8;">Item</span>
+              <strong id="summaryItemName">-</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: #94a3b8;">Player ID</span>
+              <strong id="summaryPlayerId">-</strong>
+            </div>
+            <div class="summary-row" id="summaryNickRow" style="display: none;">
+              <span style="color: #94a3b8;">Player Name</span>
+              <strong id="summaryPlayerNick" style="color: #34d399;">-</strong>
+            </div>
+            <div class="summary-row">
+              <span style="color: #94a3b8;">Payment</span>
+              <strong id="summaryPayment">ABA Pay</strong>
+            </div>
+            <div class="summary-row total">
+              <span>Total:</span>
+              <span class="price" id="summaryTotalPrice">$0.00</span>
+            </div>
+          </div>
+
+          <button class="btn-topup-now" id="btnTopUpNow" disabled>
+            Top Up Now →
+          </button>
+
+          <div class="secure-badge">
+            🔒 ទូទាត់ប្រាក់ដោយសុវត្ថិភាព • Instant Delivery
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Floating Telegram Support Button -->
+  <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="floating-telegram" title="Contact Support on Telegram">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+    </svg>
+  </a>
+
+  <script>
+    // Game Catalog Configuration & API Slugs
+    const GAMES_DATA = {
+      freefire: {
+        slug: "free-fire-kh-sg",
+        title: "Free Fire (KH/MY/SG)",
+        publisher: "GARENA",
+        image: "images/Freefiver.jpg",
+        currency: "Diamonds",
+        requiresZone: false,
+        idLabel: "Player ID",
+        idPlaceholder: "Enter your Free Fire Player ID (e.g. 1029384756)",
+        fallbackPackages: [
+          { package_id: 5123, name: "20 Diamonds", price: 0.19, tag: null },
+          { package_id: 5124, name: "40 Diamonds", price: 0.37, tag: null },
+          { package_id: 5131, name: "60 Diamonds", price: 0.53, tag: null },
+          { package_id: 5125, name: "100 Diamonds", price: 0.78, tag: "HOT" },
+          { package_id: 5126, name: "310 Diamonds", price: 2.87, tag: null },
+          { package_id: 5127, name: "520 Diamonds", price: 3.97, tag: "BEST" },
+          { package_id: 5128, name: "1060 Diamonds", price: 7.80, tag: "HOT" },
+          { package_id: 5129, name: "2180 Diamonds", price: 15.76, tag: "BEST" }
+        ]
+      },
+      mlbb: {
+        slug: "mobile-legends",
+        title: "Mobile Legends Cambodia",
+        publisher: "MOONTON",
+        image: "images/mobilelegends-1696089976653.webp",
+        currency: "Diamonds",
+        requiresZone: true,
+        idLabel: "User ID",
+        idPlaceholder: "Enter MLBB User ID (e.g. 12345678)",
+        zoneLabel: "Zone ID",
+        zonePlaceholder: "e.g. 1234",
+        fallbackPackages: [
+          { package_id: 268, name: "55 Diamonds", price: 0.77, tag: null },
+          { package_id: 269, name: "86 Diamonds", price: 1.23, tag: null },
+          { package_id: 270, name: "165 Diamonds", price: 2.30, tag: "HOT" },
+          { package_id: 271, name: "172 Diamonds", price: 2.38, tag: null }
+        ]
+      },
+      mlbb_exclusive: {
+        slug: "mobile-legends-exclusive",
+        title: "Mobile Legends Exclusive Cambodia",
+        publisher: "MOONTON",
+        image: "images/mobilelegends-1696089976653.webp",
+        currency: "Diamonds",
+        requiresZone: true,
+        idLabel: "User ID",
+        idPlaceholder: "Enter MLBB User ID (e.g. 12345678)",
+        zoneLabel: "Zone ID",
+        zonePlaceholder: "e.g. 1234",
+        fallbackPackages: [
+          { package_id: 691, name: "5 Diamonds", price: 0.11, tag: "CHEAPEST" },
+          { package_id: 692, name: "11 Diamonds", price: 0.19, tag: null },
+          { package_id: 693, name: "22 Diamonds", price: 0.37, tag: null }
+        ]
+      },
+      mlbb_special: {
+        slug: "mobile-legends-special",
+        title: "Mobile Legends Special",
+        publisher: "MOONTON",
+        image: "images/mobilelegends-1696089976653.webp",
+        currency: "Diamonds",
+        requiresZone: true,
+        idLabel: "User ID",
+        idPlaceholder: "Enter MLBB User ID (e.g. 12345678)",
+        zoneLabel: "Zone ID",
+        zonePlaceholder: "e.g. 1234",
+        fallbackPackages: [
+          { package_id: 569, name: "14 Diamonds", price: 0.25, tag: "PROMO" },
+          { package_id: 570, name: "28 Diamonds", price: 0.50, tag: null }
+        ]
+      },
+      mlbb_global: {
+        slug: "mobile-legends-global",
+        title: "Mobile Legends Global",
+        publisher: "MOONTON",
+        image: "images/mobilelegends-1696089976653.webp",
+        currency: "Diamonds",
+        requiresZone: true,
+        idLabel: "User ID",
+        idPlaceholder: "Enter MLBB User ID (e.g. 12345678)",
+        zoneLabel: "Zone ID",
+        zonePlaceholder: "e.g. 1234",
+        fallbackPackages: [
+          { package_id: 4321, name: "5 Diamonds", price: 0.11, tag: null },
+          { package_id: 4322, name: "12 Diamonds", price: 0.24, tag: null }
+        ]
+      },
+      bloodstrike: {
+        slug: "blood-strike",
+        title: "Blood Strike",
+        publisher: "NETEASE",
+        image: "images/blood strick.jpg",
+        currency: "Gold",
+        requiresZone: false,
+        idLabel: "Player ID",
+        idPlaceholder: "Enter Blood Strike Player ID",
+        fallbackPackages: [
+          { package_id: 452, name: "51 Gold", price: 0.42, tag: null },
+          { package_id: 453, name: "105 Gold", price: 0.76, tag: null },
+          { package_id: 454, name: "260 Gold", price: 1.90, tag: "HOT" },
+          { package_id: 455, name: "530 Gold", price: 3.75, tag: "BEST" },
+          { package_id: 456, name: "1100 Gold", price: 7.45, tag: null }
+        ]
+      },
+      deltaforce: {
+        slug: "delta-force",
+        title: "Delta Force",
+        publisher: "TIAMI STUDIOS",
+        image: "images/Deltafors.png",
+        currency: "Delta Coins",
+        requiresZone: false,
+        idLabel: "Player ID",
+        idPlaceholder: "Enter Delta Force Player ID",
+        fallbackPackages: [
+          { package_id: 2068, name: "18 Delta Coins", price: 0.23, tag: null },
+          { package_id: 2069, name: "30 Delta Coins", price: 0.39, tag: null },
+          { package_id: 2070, name: "60 Delta Coins", price: 0.79, tag: "HOT" },
+          { package_id: 2071, name: "300 Delta Coins", price: 3.85, tag: null },
+          { package_id: 2072, name: "600 Delta Coins", price: 7.60, tag: "BEST" }
+        ]
+      }
+    };
+
+    let selectedPackage = null;
+    let selectedPayment = 'ABA Pay';
+    let currentGameKey = 'freefire';
+    let currentGameData = null;
+    let currentSlug = 'free-fire-kh-sg';
+    let verifiedNickname = null;
+    let verifyDebounceTimer = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Identify Target Game
+      const params = new URLSearchParams(window.location.search);
+      const g = params.get('game');
+      const slugParam = params.get('slug');
+
+      if (slugParam) {
+        currentSlug = slugParam;
+        const matchKey = Object.keys(GAMES_DATA).find(k => GAMES_DATA[k].slug === slugParam);
+        if (matchKey) {
+          currentGameKey = matchKey;
+          currentGameData = GAMES_DATA[matchKey];
+        } else {
+          const isML = slugParam.includes('mobile-legends') || slugParam.includes('mlbb');
+          currentGameKey = isML ? 'mlbb' : 'freefire';
+          currentGameData = {
+            slug: slugParam,
+            title: slugParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            publisher: isML ? "MOONTON" : "GARENA",
+            image: isML ? "images/mobilelegends-1696089976653.webp" : "images/Freefiver.jpg",
+            currency: "Diamonds",
+            requiresZone: isML,
+            idLabel: isML ? "User ID" : "Player ID",
+            idPlaceholder: isML ? "Enter MLBB User ID (e.g. 12345678)" : "Enter Player ID",
+            zoneLabel: "Zone ID",
+            zonePlaceholder: "e.g. 1234"
+          };
+        }
+      } else if (g && GAMES_DATA[g]) {
+        currentGameKey = g;
+        currentGameData = GAMES_DATA[g];
+        currentSlug = currentGameData.slug;
+      } else {
+        currentGameData = GAMES_DATA['freefire'];
+        currentSlug = currentGameData.slug;
+      }
+
+      // Update static header information
+      document.getElementById('gameTitle').textContent = currentGameData.title;
+      document.getElementById('gamePublisher').textContent = currentGameData.publisher;
+      document.getElementById('gameImage').src = currentGameData.image;
+      document.getElementById('summaryGameName').textContent = currentGameData.title;
+
+      // Update input labels & zone requirement
+      const playerIdLabel = document.getElementById('playerIdLabel');
+      const playerIdInput = document.getElementById('playerIdInput');
+      const zoneIdField = document.getElementById('zoneIdField');
+      const zoneIdLabel = document.getElementById('zoneIdLabel');
+      const zoneIdInput = document.getElementById('zoneIdInput');
+
+      if (playerIdLabel && currentGameData.idLabel) {
+        playerIdLabel.textContent = currentGameData.idLabel;
+      }
+      if (playerIdInput && currentGameData.idPlaceholder) {
+        playerIdInput.placeholder = currentGameData.idPlaceholder;
+      }
+
+      if (currentGameData.requiresZone) {
+        zoneIdField.style.display = 'block';
+        if (zoneIdLabel && currentGameData.zoneLabel) {
+          zoneIdLabel.textContent = currentGameData.zoneLabel;
+        }
+        if (zoneIdInput && currentGameData.zonePlaceholder) {
+          zoneIdInput.placeholder = currentGameData.zonePlaceholder;
+        }
+      } else {
+        zoneIdField.style.display = 'none';
+      }
+
+      // 2. Load Dynamic Packages from Backend
+      loadGamePackages(currentSlug);
+
+      // 3. Set Up Live Automatic Player ID Verification
+      setupAutoPlayerVerification();
+
+      // 4. Payment Option Selection
+      document.querySelectorAll('.payment-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+          document.querySelectorAll('.payment-option').forEach(p => p.classList.remove('selected'));
+          opt.classList.add('selected');
+          selectedPayment = opt.getAttribute('data-method');
+          document.getElementById('summaryPayment').textContent = selectedPayment;
+        });
+      });
+
+      // 5. Place Order Button
+      const btnTopUpNow = document.getElementById('btnTopUpNow');
+      btnTopUpNow.addEventListener('click', handlePlaceOrder);
+    });
+
+    // ── Load Live Game Packages ──────────────────────────────
+    async function loadGamePackages(slug) {
+      const packagesGrid = document.getElementById('packagesGrid');
+      const countBadge = document.getElementById('packagesCountBadge');
+      const categoryTitle = document.getElementById('packageCategoryTitle');
+
+      try {
+        const res = await fetch(`/api/topup/game/${encodeURIComponent(slug)}`);
+        if (!res.ok) {
+          throw new Error('Provider returned status ' + res.status);
+        }
+        const data = await res.json();
+        const packages = data.packages || [];
+
+        if (data.name) {
+          document.getElementById('gameTitle').textContent = data.name;
+          document.getElementById('summaryGameName').textContent = data.name;
+          document.title = `${data.name} Top Up | R1ckky Store`;
+        }
+        if (data.image) {
+          const fullImg = data.image.startsWith('http') ? data.image : ('https://khmer-topup.com' + data.image);
+          document.getElementById('gameImage').src = fullImg;
+        }
+        if (data.category) {
+          document.getElementById('gamePublisher').textContent = data.category.toUpperCase();
+        }
+        if (data.id_label) {
+          const pLabel = document.getElementById('playerIdLabel');
+          const pInput = document.getElementById('playerIdInput');
+          if (pLabel) pLabel.textContent = data.id_label;
+          if (pInput) pInput.placeholder = `Enter your ${data.id_label}`;
+        }
+        if (data.server_label) {
+          const zField = document.getElementById('zoneIdField');
+          const zLabel = document.getElementById('zoneIdLabel');
+          const zInput = document.getElementById('zoneIdInput');
+          if (zField) zField.style.display = 'block';
+          if (zLabel) zLabel.textContent = data.server_label;
+          if (zInput) zInput.placeholder = `Enter ${data.server_label}`;
+          if (currentGameData) currentGameData.requiresZone = true;
+        }
+
+        if (packages.length > 0) {
+          renderPackages(packages, data.currency || currentGameData.currency);
+          if (countBadge) {
+            countBadge.textContent = `${packages.length} items`;
+            countBadge.style.display = 'inline-block';
+          }
+          if (categoryTitle) {
+            categoryTitle.innerHTML = `${data.name || currentGameData.title} Packages <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">${packages.length} items</span>`;
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn('Using curated fallback packages:', err.message);
+      }
+
+      // Fallback
+      const fallbackList = currentGameData.fallbackPackages || [];
+      renderPackages(fallbackList, currentGameData.currency);
+      if (countBadge) {
+        countBadge.textContent = `${fallbackList.length} items`;
+        countBadge.style.display = 'inline-block';
+      }
+    }
+
+    // ── Render Packages to HTML ─────────────────────────────
+    function renderPackages(packages, currencyName) {
+      const grid = document.getElementById('packagesGrid');
+      grid.innerHTML = '';
+
+      packages.forEach(pkg => {
+        const card = document.createElement('div');
+        card.className = 'package-item';
+        card.setAttribute('data-id', pkg.package_id || pkg.id);
+        card.setAttribute('data-name', pkg.name);
+        card.setAttribute('data-price', pkg.price);
+
+        // Tag badge (HOT, BEST, etc.)
+        let badgeHtml = '';
+        const tag = (pkg.tag || '').toUpperCase();
+        if (tag.includes('HOT')) {
+          badgeHtml = '<span class="package-badge hot">HOT</span>';
+        } else if (tag.includes('BEST')) {
+          badgeHtml = '<span class="package-badge best">BEST</span>';
+        } else if (tag) {
+          badgeHtml = `<span class="package-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">${tag}</span>`;
+        }
+
+        card.innerHTML = `
+          ${badgeHtml}
+          <div class="diamond-icon-box">
+            <svg viewBox="0 0 64 64">
+              <polygon points="32,4 56,22 32,60 8,22" fill="#00d4ff"/>
+              <polygon points="32,4 46,22 32,38 18,22" fill="#80eaff"/>
+              <polygon points="32,38 46,22 32,60" fill="#0099e6"/>
+              <polygon points="32,38 18,22 32,60" fill="#0077b6"/>
+            </svg>
+          </div>
+          <div class="package-amount">${escapeHtml(pkg.name)}</div>
+          <div class="package-price">$${Number(pkg.price).toFixed(2)}</div>
+        `;
+
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.package-item').forEach(p => p.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedPackage = {
+            id: pkg.package_id || pkg.id,
+            amount: pkg.name,
+            price: Number(pkg.price)
+          };
+          updateSummary();
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // ── Setup Automatic Player ID Verification ──────────────
+    function setupAutoPlayerVerification() {
+      const playerIdInput = document.getElementById('playerIdInput');
+      const zoneIdInput = document.getElementById('zoneIdInput');
+      const btnVerify = document.getElementById('btnVerify');
+
+      // Auto-detect combined format: e.g. "1264663279 (14037)" pasted into User ID
+      playerIdInput.addEventListener('input', () => {
+        const val = playerIdInput.value.trim();
+        const combinedMatch = val.match(/^([^(]+)\s*\(([^)]+)\)$/);
+        if (combinedMatch) {
+          playerIdInput.value = combinedMatch[1].replace(/[\s()\[\]]/g, '');
+          if (zoneIdInput) {
+            zoneIdInput.value = combinedMatch[2].replace(/[\s()\[\]]/g, '');
+          }
+        }
+      });
+
+      // Auto-strip parentheses from Zone ID if user types or pastes "(14037)"
+      if (zoneIdInput) {
+        zoneIdInput.addEventListener('input', () => {
+          if (zoneIdInput.value.includes('(') || zoneIdInput.value.includes(')')) {
+            zoneIdInput.value = zoneIdInput.value.replace(/[()]/g, '').trim();
+          }
+        });
+      }
+
+      const triggerCheckDebounced = () => {
+        updateSummary();
+        clearTimeout(verifyDebounceTimer);
+
+        const rawPlayerId = playerIdInput.value.trim();
+        const rawZoneId = zoneIdInput ? zoneIdInput.value.trim() : '';
+
+        // Strip parentheses, brackets, and spaces
+        const playerId = rawPlayerId.replace(/[\s()\[\]]/g, '');
+        const zoneId = rawZoneId.replace(/[\s()\[\]]/g, '');
+
+        // If field is cleared, reset state
+        if (!playerId) {
+          resetVerifyState();
+          return;
+        }
+
+        // Only auto-check when length is sufficient
+        if (playerId.length < 3) {
+          return;
+        }
+
+        if (currentGameData.requiresZone && !zoneId) {
+          return; // Wait until zone ID is also provided
+        }
+
+        verifyDebounceTimer = setTimeout(() => {
+          performPlayerCheck(playerId, zoneId);
+        }, 500);
+      };
+
+      playerIdInput.addEventListener('input', triggerCheckDebounced);
+      if (zoneIdInput) {
+        zoneIdInput.addEventListener('input', triggerCheckDebounced);
+      }
+
+      // Manual click on verify button triggers check immediately
+      btnVerify.addEventListener('click', () => {
+        const playerId = playerIdInput.value.replace(/[\s()\[\]]/g, '').trim();
+        const zoneId = zoneIdInput ? zoneIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
+
+        if (!playerId) {
+          alert('សូមបញ្ចូល Player ID របស់អ្នកជាមុនសិន!');
+          playerIdInput.focus();
+          return;
+        }
+
+        if (currentGameData.requiresZone && !zoneId) {
+          alert('សូមបញ្ចូល Zone / Server ID ផងដែរ!');
+          zoneIdInput.focus();
+          return;
+        }
+
+        clearTimeout(verifyDebounceTimer);
+        performPlayerCheck(playerId, zoneId);
+      });
+    }
+
+    // ── Execute Player ID Check with Backend ────────────────
+    async function performPlayerCheck(rawPlayerId, rawZoneId) {
+      const verifyBox = document.getElementById('verifyResult');
+      const verifyText = document.getElementById('verifyText');
+      const verifySpinner = document.getElementById('verifySpinner');
+      const playerIdInput = document.getElementById('playerIdInput');
+
+      // Sanitize inputs (remove any parentheses like "(14037)")
+      const playerId = String(rawPlayerId || '').replace(/[\s()\[\]]/g, '');
+      const zoneId = String(rawZoneId || '').replace(/[\s()\[\]]/g, '');
+
+      // Set Loading UI
+      verifyBox.className = 'verify-result loading';
+      verifySpinner.style.display = 'inline-block';
+      verifyText.innerHTML = 'កំពុងត្រួតពិនិត្យឈ្មោះគណនី... (Verifying...)';
+      playerIdInput.classList.remove('is-verified', 'is-invalid');
+
+      try {
+        const response = await fetch('/api/topup/check-id', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug: currentSlug,
+            game: currentGameKey,
+            playerId: playerId,
+            zoneId: zoneId
+          })
+        });
+
+        const data = await response.json();
+        verifySpinner.style.display = 'none';
+
+        if (data.valid && data.nickname) {
+          // Success state
+          verifiedNickname = data.nickname;
+          verifyBox.className = 'verify-result success';
+          verifyText.innerHTML = `✓ ឈ្មោះគណនី: <strong style="color: #38bdf8;">${escapeHtml(data.nickname)}</strong> (Verified)`;
+          playerIdInput.classList.add('is-verified');
+          playerIdInput.classList.remove('is-invalid');
+        } else if (data.result === 'invalid' || !data.valid) {
+          // Invalid account
+          verifiedNickname = null;
+          verifyBox.className = 'verify-result error';
+          const zoneMsg = currentGameData.requiresZone ? ' និង Zone ID ' : ' ';
+          verifyText.innerHTML = `❌ រកមិនឃើញគណនី (Player ID${zoneMsg}មិនត្រឹមត្រូវ)`;
+          playerIdInput.classList.add('is-invalid');
+          playerIdInput.classList.remove('is-verified');
+        } else {
+          // Fallback or simulated result
+          const nick = data.nickname || ('Player_' + playerId.slice(-4));
+          verifiedNickname = nick;
+          verifyBox.className = 'verify-result success';
+          verifyText.innerHTML = `✓ ឈ្មោះគណនី: <strong style="color: #38bdf8;">${escapeHtml(nick)}</strong>`;
+          playerIdInput.classList.add('is-verified');
+        }
+      } catch (err) {
+        console.error('Check ID network error:', err);
+        verifySpinner.style.display = 'none';
+        verifyBox.className = 'verify-result error';
+        verifyText.innerHTML = '⚠️ មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ។ សូមសាកល្បងម្ដងទៀត។';
+      }
+
+      updateSummary();
+    }
+
+    function resetVerifyState() {
+      const verifyBox = document.getElementById('verifyResult');
+      const playerIdInput = document.getElementById('playerIdInput');
+      verifyBox.className = 'verify-result';
+      verifyBox.style.display = 'none';
+      playerIdInput.classList.remove('is-verified', 'is-invalid');
+      verifiedNickname = null;
+      updateSummary();
+    }
+
+    // ── Update Order Summary Card ───────────────────────────
+    function updateSummary() {
+      const playerIdInput = document.getElementById('playerIdInput');
+      const zoneIdInput = document.getElementById('zoneIdInput');
+      const playerId = playerIdInput.value.trim();
+      const zoneId = zoneIdInput ? zoneIdInput.value.trim() : '';
+
+      const emptyBox = document.getElementById('summaryEmpty');
+      const selectedBox = document.getElementById('summarySelected');
+      const topUpBtn = document.getElementById('btnTopUpNow');
+      const nickRow = document.getElementById('summaryNickRow');
+      const playerNickText = document.getElementById('summaryPlayerNick');
+
+      if (selectedPackage) {
+        emptyBox.style.display = 'none';
+        selectedBox.style.display = 'block';
+
+        document.getElementById('summaryItemName').textContent = selectedPackage.amount;
+        document.getElementById('summaryTotalPrice').textContent = '$' + selectedPackage.price.toFixed(2);
+        
+        const displayId = playerId ? (playerId + (zoneId ? ` (${zoneId})` : '')) : 'Not entered yet';
+        document.getElementById('summaryPlayerId').textContent = displayId;
+
+        // Nickname row
+        if (verifiedNickname) {
+          nickRow.style.display = 'flex';
+          playerNickText.textContent = verifiedNickname;
+        } else {
+          nickRow.style.display = 'none';
+        }
+
+        // Enable button if package is chosen and player ID is filled
+        if (playerId) {
+          topUpBtn.classList.add('active');
+          topUpBtn.disabled = false;
+        } else {
+          topUpBtn.classList.remove('active');
+          topUpBtn.disabled = true;
+        }
+      } else {
+        emptyBox.style.display = 'block';
+        selectedBox.style.display = 'none';
+        topUpBtn.classList.remove('active');
+        topUpBtn.disabled = true;
+      }
+    }
+
+    // ── Handle Order Submission ─────────────────────────────
+    async function handlePlaceOrder() {
+      const playerId = document.getElementById('playerIdInput').value.replace(/[\s()\[\]]/g, '').trim();
+      const zoneIdInput = document.getElementById('zoneIdInput');
+      const zoneId = zoneIdInput ? zoneIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
+
+      if (!playerId) {
+        alert('សូមបញ្ចូល Player ID របស់អ្នក!');
+        document.getElementById('playerIdInput').focus();
+        return;
+      }
+
+      if (currentGameData.requiresZone && !zoneId) {
+        alert('សូមបញ្ចូល Zone / Server ID!');
+        zoneIdInput.focus();
+        return;
+      }
+
+      if (!selectedPackage) {
+        alert('សូមជ្រើសរើសកញ្ចប់ដែលអ្នកចង់បញ្ចូល!');
+        return;
+      }
+
+      const btn = document.getElementById('btnTopUpNow');
+      btn.innerHTML = '⚡ កំពុងដំណើរការ...';
+      btn.disabled = true;
+
+      const orderRef = 'R1CKKY-' + Date.now().toString().slice(-8);
+      const orderData = {
+        orderId: orderRef,
+        game: currentGameData.title,
+        slug: currentSlug,
+        playerId: playerId,
+        zoneId: zoneId || null,
+        playerNickname: verifiedNickname || null,
+        packageId: selectedPackage.id,
+        packageName: selectedPackage.amount,
+        amount: selectedPackage.price,
+        paymentMethod: selectedPayment,
+        createdAt: new Date().toISOString()
+      };
+
+      // Save to localStorage for order status page
+      localStorage.setItem('currentOrder', JSON.stringify(orderData));
+
+      // Asynchronously trigger server order registration
+      try {
+        fetch('/api/topup/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            package_id: selectedPackage.id,
+            player_id: playerId,
+            server_id: zoneId || null,
+            reference: orderRef,
+            game: currentGameData.title
+          })
+        }).catch(err => console.warn('Order background notice:', err));
+      } catch (e) {
+        console.warn('Order dispatch fetch error:', e);
+      }
+
+      // Smooth transition to Order Status
+      setTimeout(() => {
+        window.location.href = 'order-status.html?id=' + orderData.orderId;
+      }, 350);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | R1ckky Store</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    .checkout-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 40px;
+      margin: 40px 0;
+    }
+
+    .checkout-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+
+    .checkout-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+
+    .payment-methods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .payment-card {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(255,255,255,0.02);
+      transition: var(--transition);
+    }
+
+    .payment-card:hover {
+      border-color: var(--text-muted);
+    }
+
+    .payment-card.selected {
+      border-color: var(--primary-color);
+      background: rgba(0, 112, 243, 0.1);
+    }
+    
+    .payment-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+
+    .order-summary {
+      background: rgba(17, 26, 46, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 30px;
+      position: sticky;
+      top: 100px;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 20px 0;
+      color: var(--primary-color);
+    }
+
+    @media (max-width: 992px) {
+      .checkout-container { grid-template-columns: 1fr; }
+      .order-summary { position: static; }
+    }
+    @media (max-width: 576px) {
+      .payment-methods { grid-template-columns: 1fr; }
+    }
+  </style>
+    <link rel="icon" type="image/png" href="images/Newlogo.png">
+</head>
+<body>
+
+  <!-- Header (Simplified for Checkout) -->
+  <header class="site-header">
+    <div class="container header-inner" style="justify-content: center;">
+      <a href="index.html" class="brand">
+        <img src="images/Newlogo.png" alt="R1ckky Store Logo" style="height: 40px; width: auto;">
+        <span>R1ckky Store</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <div class="checkout-container">
+      
+      <div class="checkout-details">
+        <h1 class="mb-4">Checkout</h1>
+        
+
+
+        <!-- Game Info -->
+        <div class="checkout-section">
+          <h2>Game Information</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group mb-0">
+              <label class="form-label">Player ID</label>
+              <input type="text" id="playerId" class="form-control" placeholder="e.g. 123456789">
+            </div>
+            <div class="form-group mb-0">
+              <label class="form-label">Server ID</label>
+              <input type="text" id="serverId" class="form-control" placeholder="e.g. 1234">
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment -->
+        <div class="checkout-section">
+          <h2>Payment Method</h2>
+          <div class="payment-methods">
+            <div class="payment-card selected" onclick="selectPayment(this)">
+              <h3 class="mb-1">ABA Pay</h3>
+              <span class="badge badge-blue">Instant</span>
+            </div>
+            <div class="payment-card" onclick="selectPayment(this)">
+              <h3 class="mb-1">KHQR</h3>
+              <span class="badge badge-blue">Scan</span>
+            </div>
+            <div class="payment-card disabled">
+              <h3 class="mb-1">Credit Card</h3>
+              <span class="badge badge-blue" style="background: rgba(255,255,255,0.1); color: #fff; border-color: transparent;">Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Order Summary -->
+      <div>
+        <div class="order-summary">
+          <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">Order Summary</h2>
+          
+          <div class="summary-item">
+            <div>
+              <div style="font-weight: 600;">Mobile Legends</div>
+              <div class="text-muted" style="font-size: 0.9rem;">172 Diamonds</div>
+            </div>
+            <div>$1.99</div>
+          </div>
+          
+          <div class="summary-item">
+            <div class="text-muted">Subtotal</div>
+            <div>$1.99</div>
+          </div>
+          
+          <div class="summary-item">
+            <div class="text-muted">Processing Fee</div>
+            <div>$0.00</div>
+          </div>
+          
+          <div class="summary-total">
+            <div>Total</div>
+            <div>$1.99</div>
+          </div>
+          
+          <button id="placeOrderBtn" onclick="placeOrder()" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; cursor: pointer;">Place Order</button>
+        </div>
+      </div>
+      
+    </div>
+
+  </main>
+
+  <script>
+    function selectPayment(el) {
+      if (el.classList.contains('disabled')) return;
+      document.querySelectorAll('.payment-card').forEach(card => card.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    async function placeOrder() {
+      const playerId = document.getElementById('playerId').value.trim();
+      const serverId = document.getElementById('serverId').value.trim();
+
+      if (!playerId) {
+        alert('Please enter your Player ID');
+        return;
+      }
+
+      const btn = document.getElementById('placeOrderBtn');
+      btn.textContent = 'Processing Order...';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/api/topup/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            game: 'Mobile Legends',
+            playerId,
+            zoneId: serverId,
+            packageId: '172-diamonds',
+            contact: 'Direct'
+          })
+        });
+
+        const result = await response.json();
+        if (result.order) {
+          localStorage.setItem('currentOrder', JSON.stringify(result.order));
+          window.location.href = 'order-status.html?id=' + result.order.orderId;
+        } else {
+          window.location.href = 'order-status.html';
+        }
+      } catch (e) {
+        console.error('Order error:', e);
+        window.location.href = 'order-status.html';
+      }
+    }
+  </script>
+</body>
+</html>

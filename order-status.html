@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Status | R1ckky Store</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <style>
+    .status-container {
+      max-width: 800px;
+      margin: 60px auto;
+    }
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .order-id {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .order-date {
+      color: var(--text-muted);
+    }
+
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 50px;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border-color);
+      z-index: 1;
+    }
+
+    .timeline-step {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      width: 100px;
+    }
+
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-color);
+      border: 2px solid var(--border-color);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    .timeline-step.active .step-circle {
+      border-color: var(--primary-color);
+      background: var(--primary-color);
+      box-shadow: 0 0 10px var(--glow-color);
+    }
+
+    .timeline-step.completed .step-circle {
+      border-color: #10b981;
+      background: #10b981;
+    }
+
+    .step-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .timeline-step.active .step-label,
+    .timeline-step.completed .step-label {
+      color: var(--text-main);
+    }
+
+    .order-details-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 30px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+    }
+
+    .detail-value {
+      font-weight: 500;
+    }
+
+    @media (max-width: 576px) {
+      .status-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .timeline {
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      .timeline::before {
+        top: 0;
+        left: 15px;
+        bottom: 0;
+        height: auto;
+        width: 2px;
+      }
+
+      .timeline-step {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-align: left;
+        gap: 15px;
+      }
+
+      .step-circle {
+        margin: 0;
+      }
+    }
+  </style>
+  <link rel="icon" type="image/png" href="images/Newlogo.png">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/Newlogo.png" alt="R1ckky Store Logo" style="height: 40px; width: auto;">
+        <span>R1ckky Store</span>
+      </a>
+
+      <div class="header-actions">
+        <a href="index.html" class="btn btn-secondary">Back to Store</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <div class="status-container">
+      <div class="status-header">
+        <div>
+          <h1 style="font-size: 2rem; margin-bottom: 5px;">Order Status</h1>
+          <div class="order-id" id="orderIdText">R1CKKY-20260825-0001</div>
+        </div>
+        <div class="order-date" id="orderDateText">August 25, 2026</div>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-step completed">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Placed</div>
+        </div>
+        <div class="timeline-step active">
+          <div class="step-circle">2</div>
+          <div class="step-label">Processing</div>
+        </div>
+        <div class="timeline-step">
+          <div class="step-circle">3</div>
+          <div class="step-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="order-details-card">
+        <h2 style="font-size: 1.25rem; margin-bottom: 20px;">Order Details</h2>
+
+        <div class="detail-row">
+          <span class="detail-label">Product</span>
+          <span class="detail-value" id="productText">Mobile Legends - 172 Diamonds</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Player ID</span>
+          <span class="detail-value" id="playerIdText">123456789 (1234)</span>
+        </div>
+
+        <div class="detail-row" id="nickDetailRow" style="display: none;">
+          <span class="detail-label">Player Name</span>
+          <span class="detail-value" id="playerNickText" style="color: #38bdf8; font-weight: 700;">-</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Total Amount</span>
+          <span class="detail-value" id="totalAmountText"
+            style="color: var(--primary-color); font-weight: 700;">$0.00</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Payment Method</span>
+          <span class="detail-value" id="paymentMethodText">ABA Pay</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Payment Status</span>
+          <span class="badge badge-green">Paid</span>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <p class="text-muted">Need help with your order?</p>
+        <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Contact
+          Support on Telegram</a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Floating Telegram Support Button -->
+  <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="floating-telegram"
+    title="Contact Support on Telegram">
+    <svg viewBox="0 0 24 24">
+      <path
+        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
+    </svg>
+  </a>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const order = JSON.parse(localStorage.getItem('currentOrder') || '{}');
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlId = urlParams.get('id');
+
+        if (urlId || order.orderId) {
+          document.getElementById('orderIdText').textContent = urlId || order.orderId;
+          document.getElementById('orderDateText').textContent = new Date().toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+          });
+        }
+        if (order.playerId) {
+          document.getElementById('playerIdText').textContent = order.playerId + (order.zoneId ? ` (${order.zoneId})` : '');
+        }
+        if (order.playerNickname) {
+          const nickRow = document.getElementById('nickDetailRow');
+          if (nickRow) {
+            nickRow.style.display = 'flex';
+            document.getElementById('playerNickText').textContent = order.playerNickname;
+          }
+        }
+        if (order.game) {
+          const itemText = order.packageName || order.packageId || 'Top-Up';
+          document.getElementById('productText').textContent = `${order.game} - ${itemText}`;
+        }
+        if (order.amount !== undefined) {
+          document.getElementById('totalAmountText').textContent = '$' + Number(order.amount).toFixed(2);
+        }
+        if (order.paymentMethod) {
+          document.getElementById('paymentMethodText').textContent = order.paymentMethod;
+        }
+      } catch (e) {
+        console.error('Error loading order:', e);
+      }
+    });
+  </script>
+</body>
+
+</html>

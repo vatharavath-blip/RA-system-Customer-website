@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order | R1ckky Store</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    .track-container {
+      max-width: 600px;
+      margin: 80px auto;
+      text-align: center;
+    }
+    
+    .track-container h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .track-container p {
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+    }
+
+    .track-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      text-align: left;
+    }
+
+    .form-group:last-of-type {
+      margin-bottom: 30px;
+    }
+  </style>
+    <link rel="icon" type="image/png" href="images/Newlogo.png">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/Newlogo.png" alt="R1ckky Store Logo" style="height: 40px; width: auto;">
+        <span>R1ckky Store</span>
+      </a>
+      
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="games.html">Game Top Up</a></li>
+        <li><a href="coming-soon.html">Coming Soon</a></li>
+        <li><a href="track-order.html" style="color: var(--primary-color)">Track Order</a></li>
+      </ul>
+      
+      <div class="header-actions">
+        <button class="icon-btn" title="Search">🔍</button>
+        <button class="icon-btn" title="Cart">🛒</button>
+        <a href="signin.html" class="btn btn-primary" id="headerSignIn">Sign In</a>
+        <button class="icon-btn mobile-menu-toggle" id="menuToggle">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <div class="track-container">
+      <h1>Track Your Order</h1>
+      <p>Check your order status without signing in.</p>
+      
+      <div class="track-card">
+        <div class="form-group">
+          <label class="form-label">Order ID</label>
+          <input type="text" class="form-control" placeholder="e.g. R1CKKY-20260825-0001">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Contact / Email</label>
+          <input type="text" class="form-control" placeholder="The contact provided during checkout">
+        </div>
+        
+        <a href="order-status.html" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem;">Track Order</a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer" style="margin-top: 150px;">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <a href="index.html" class="footer-brand">
+            <img src="images/Newlogo.png" alt="R1ckky Store Logo" style="height: 40px; width: auto;">
+            <span>R1ckky Store</span>
+          </a>
+          <p class="footer-desc">Gaming • Digital Store</p>
+        </div>
+        <div class="footer-col">
+          <h4>Store</h4>
+          <ul class="footer-links">
+            <li><a href="games.html">Game Top Up</a></li>
+            <li><a href="coming-soon.html">Coming Soon</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Help</h4>
+          <ul class="footer-links">
+            <li><a href="track-order.html">Track Order</a></li>
+            <li><a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer">Telegram Support</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Account</h4>
+          <ul class="footer-links">
+            <li><a href="signin.html">Sign In</a></li>
+            <li><a href="account.html">My Orders</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 R1ckky Store. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Telegram Support Button -->
+  <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="floating-telegram" title="Contact Support on Telegram">
+    <svg viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+    </svg>
+  </a>
+
+</body>
+</html>
