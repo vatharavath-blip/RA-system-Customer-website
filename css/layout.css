@@ -195,8 +195,51 @@
   }
 }
 
-@media (max-width: 576px) {
-  .footer-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .container {
+    padding: 0 14px;
+  }
+  .brand {
+    font-size: 1.15rem;
+    gap: 8px;
+  }
+  .brand img {
+    height: 32px !important;
+  }
+  .header-actions {
+    gap: 6px;
+  }
+  .header-actions #headerSignIn {
+    display: none; /* Already prominent inside mobile overlay menu */
+  }
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.05rem;
+  }
+  .floating-telegram {
+    width: 48px;
+    height: 48px;
+    bottom: 20px;
+    right: 20px;
+  }
+  .floating-telegram svg {
+    width: 26px;
+    height: 26px;
   }
 }
+
+@media (max-width: 576px) {
+  .brand span {
+    font-size: 1.05rem;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .site-footer {
+    padding: 40px 0 20px;
+    margin-top: 40px;
+  }
+}
+

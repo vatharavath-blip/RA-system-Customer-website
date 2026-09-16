@@ -422,26 +422,133 @@
 
     @media (max-width: 992px) {
       .hero {
-        padding: 30px 0 45px;
-        gap: 20px;
+        padding: 26px 0 35px;
+        gap: 18px;
       }
       .hero-title {
-        font-size: 2.2rem;
+        font-size: 2rem;
       }
       .trust-features, .categories-grid {
         grid-template-columns: repeat(2, 1fr);
       }
       .product-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
       }
     }
 
-    @media (max-width: 576px) {
-      .hero-title {
-        font-size: 1.7rem;
+    @media (max-width: 640px) {
+      .hero {
+        padding: 16px 0 22px;
+        gap: 12px;
       }
-      .trust-features, .categories-grid, .product-grid {
-        grid-template-columns: 1fr;
+      .hero::before {
+        width: 320px;
+        height: 200px;
+      }
+      .hero-title {
+        font-size: 1.32rem;
+        line-height: 1.35;
+        padding: 0 4px;
+      }
+      .hero-banner img {
+        border-radius: 12px;
+        max-height: 210px;
+      }
+      .ticker-bar {
+        padding: 6px 0;
+      }
+      .ticker-badge {
+        padding: 3px 10px;
+        font-size: 0.72rem;
+        margin-left: 8px;
+        margin-right: 6px;
+      }
+      .ticker-item {
+        font-size: 0.8rem;
+      }
+      .section-header {
+        margin-bottom: 18px;
+        align-items: center;
+      }
+      .section-title h2 {
+        font-size: 1.35rem;
+        margin-bottom: 0;
+      }
+      .section-header .btn {
+        padding: 6px 12px;
+        font-size: 0.78rem;
+        border-radius: 14px;
+      }
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 40px;
+      }
+      .product-card {
+        padding: 8px;
+        border-radius: 14px;
+      }
+      .product-img {
+        border-radius: 10px;
+      }
+      .country-badge {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+        top: 6px;
+        right: 6px;
+      }
+      .product-info {
+        padding: 8px 2px 2px;
+      }
+      .product-info h3 {
+        font-size: 0.86rem;
+        margin-bottom: 8px;
+        line-height: 1.25;
+        min-height: 2.5em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .btn-topup {
+        padding: 6px 8px;
+        font-size: 0.72rem;
+        border-radius: 14px;
+        letter-spacing: 0.2px;
+      }
+      .trust-features {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin: 25px 0 35px;
+      }
+      .trust-card {
+        padding: 16px 8px;
+        border-radius: 12px;
+      }
+      .trust-icon {
+        font-size: 1.4rem;
+        margin-bottom: 6px;
+      }
+      .trust-card h3 {
+        font-size: 0.86rem;
+        margin-bottom: 3px;
+      }
+      .trust-card p {
+        font-size: 0.7rem;
+      }
+      .categories-grid {
+        gap: 12px;
+        margin-bottom: 35px;
+      }
+      .category-card {
+        padding: 20px 10px;
+        border-radius: 12px;
+      }
+      .category-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
       }
     }
   </style>

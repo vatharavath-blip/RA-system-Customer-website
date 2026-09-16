@@ -39,6 +39,23 @@
     .form-group:last-of-type {
       margin-bottom: 30px;
     }
+
+    @media (max-width: 640px) {
+      .track-container {
+        margin: 30px auto 50px;
+      }
+      .track-container h1 {
+        font-size: 1.75rem;
+      }
+      .track-container p {
+        font-size: 0.95rem;
+        margin-bottom: 25px;
+      }
+      .track-card {
+        padding: 22px 16px;
+        border-radius: 16px;
+      }
+    }
   </style>
     <link rel="icon" type="image/png" href="images/Newlogo.png">
 </head>
@@ -67,6 +84,16 @@
       </div>
     </div>
   </header>
+
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav-overlay" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="games.html">Game Top Up</a>
+    <a href="coming-soon.html">Coming Soon</a>
+    <a href="track-order.html" style="color: var(--primary-color)">Track Order</a>
+    <a href="signin.html" class="mt-4" style="color: var(--primary-color)">Sign In</a>
+  </div>
+
 
   <main class="container">
     
@@ -137,5 +164,14 @@
     </svg>
   </a>
 
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    if (menuToggle && mobileNav) {
+      menuToggle.addEventListener('click', () => {
+        mobileNav.classList.toggle('active');
+      });
+    }
+  </script>
 </body>
 </html>
