@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || process.env.SERVER_PORT || 3000;
+const PORT = process.env.SERVER_PORT || process.env.PORT || 3000;
 const API_KEY = process.env.TOPUP_API_KEY;
 const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 
