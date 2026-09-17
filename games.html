@@ -530,7 +530,7 @@
       let allGames = [];
       let activeCategory = 'all';
 
-      // Determine Country Flag Badge HTML with Real Flag Logos
+      // Determine Country Flag Badge HTML with Real Flag Logos (matches Khmer TopUp)
       function getFlagBadgeHtml(g) {
         if (g.flagUrl) {
           return `<span class="country-badge" title="${escapeHtml(g.countryName || g.name)}"><img src="${g.flagUrl}" alt="" class="flag-img" loading="lazy"></span>`;
@@ -538,7 +538,7 @@
 
         const s = ((g.slug || '') + ' ' + (g.name || '')).toLowerCase();
         let code = null;
-        let label = 'Global';
+        let label = '';
 
         if (s.includes('vietnam') || s.includes('-vn')) { code = 'vn'; label = 'Vietnam'; }
         else if (s.includes('cambodia') || s.includes('-kh')) { code = 'kh'; label = 'Cambodia'; }
@@ -554,15 +554,13 @@
         else if (s.includes('middle east') || s.includes('mena')) { code = 'ae'; label = 'Middle East'; }
         else if (s.includes('europe') || s.includes('-eu')) { code = 'eu'; label = 'Europe'; }
         else if (s.includes('america') || s.includes('latam')) { code = 'us'; label = 'Americas'; }
-        else if (s.includes('special')) {
-          return `<span class="country-badge" title="Special Promo"><span style="color:#fbbf24;font-size:14px;line-height:1;">⚡</span></span>`;
-        }
 
         if (code) {
           return `<span class="country-badge" title="${label}"><img src="https://flagcdn.com/w80/${code}.png" alt="${label}" class="flag-img" loading="lazy"></span>`;
         }
 
-        return `<span class="country-badge" title="Global"><svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg></span>`;
+        // Return empty if no country server (matches Khmer TopUp Image 2)
+        return '';
       }
 
       // Safe Image URL (uses khmer-topup static host if relative)

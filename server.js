@@ -58,10 +58,7 @@ function getCountryFlagInfo(name, slug) {
   if (s.includes('america') || s.includes('latam')) {
     return { code: 'us', name: 'Americas', flagUrl: 'https://flagcdn.com/w80/us.png', emoji: '🌎' };
   }
-  if (s.includes('special')) {
-    return { code: 'special', name: 'Special', flagUrl: null, emoji: '⚡' };
-  }
-  return { code: 'global', name: 'Global', flagUrl: null, emoji: '🌍' };
+  return { code: null, name: null, flagUrl: null, emoji: '' };
 }
 
 function getCountryFlag(name, slug) {

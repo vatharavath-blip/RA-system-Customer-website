@@ -342,111 +342,7 @@
     }
 
     /* Server/Variant Selector Tabs */
-    .variant-selector-container {
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, rgba(17, 26, 46, 0.9) 0%, rgba(13, 20, 36, 0.96) 100%);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1.5px solid rgba(56, 189, 248, 0.3);
-      border-radius: 18px;
-      padding: 18px 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    }
 
-    .variant-label {
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      letter-spacing: 0.2px;
-    }
-
-    .variant-tabs {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    @media (max-width: 640px) {
-      .variant-tabs {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-      .variant-selector-container {
-        padding: 14px 12px;
-      }
-    }
-
-    .variant-tab {
-      background: rgba(18, 28, 48, 0.85);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
-      padding: 12px 10px;
-      cursor: pointer;
-      text-align: center;
-      position: relative;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-      color: #cbd5e1;
-      font-family: inherit;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      user-select: none;
-    }
-
-    .variant-tab:hover {
-      border-color: rgba(56, 189, 248, 0.6);
-      background: rgba(22, 38, 68, 0.95);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 112, 243, 0.2);
-    }
-
-    .variant-tab.active {
-      border-color: #0070f3;
-      background: linear-gradient(135deg, rgba(0, 112, 243, 0.35), rgba(56, 189, 248, 0.2));
-      color: #fff;
-      box-shadow: 0 0 20px rgba(0, 112, 243, 0.45);
-      transform: translateY(-2px);
-    }
-
-    .variant-tab .tab-flag {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 2px;
-      min-height: 26px;
-    }
-
-    .variant-tab .tab-flag img {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      object-fit: cover;
-      display: block;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-      border: 1.5px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .variant-tab .tab-title {
-      font-weight: 700;
-      font-size: 0.84rem;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-
-    .variant-tab .tab-sub {
-      font-size: 0.72rem;
-      color: #38bdf8;
-      font-weight: 600;
-    }
 
     .country-flag-badge {
       display: inline-flex;
@@ -957,19 +853,7 @@
       
       <!-- Left: Form Steps -->
       <div class="topup-steps">
-        
-        <!-- Server / Region Selector with Country Flags -->
-        <div class="variant-selector-container" id="serverSelectorContainer" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <label class="variant-label">
-              🌐 ជ្រើសរើស Server / ប្រទេស (Select Server Region)
-            </label>
-            <span id="activeServerBadge" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.25);"></span>
-          </div>
-          <div class="variant-tabs" id="serverVariantTabs">
-            <!-- Dynamically populated server variant buttons with flags -->
-          </div>
-        </div>
+
 
         <!-- Step 1: Enter Account Info -->
         <section class="step-section">
@@ -1476,80 +1360,7 @@
       return `<svg class="globe-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg>`;
     }
 
-    // ── Render Regional Server Selector with Country Flags ────
-    function renderServerSelector(variants, activeSlug) {
-      const container = document.getElementById('serverSelectorContainer');
-      const tabs = document.getElementById('serverVariantTabs');
-      const badge = document.getElementById('activeServerBadge');
-      if (!container || !tabs) return;
 
-      if (!variants || variants.length <= 1) {
-        container.style.display = 'none';
-        return;
-      }
-
-      container.style.display = 'block';
-      tabs.innerHTML = '';
-
-      const activeVariant = variants.find(v => v.slug === activeSlug) || variants[0];
-      if (badge && activeVariant) {
-        const flagIcon = getFlagIconHtml(activeVariant.flagUrl, activeVariant.name, 18);
-        badge.innerHTML = `${flagIcon} <span>Server: <strong>${escapeHtml(activeVariant.name)}</strong></span>`;
-      }
-
-      variants.forEach(v => {
-        const tab = document.createElement('div');
-        tab.className = 'variant-tab' + (v.slug === activeSlug ? ' active' : '');
-        tab.setAttribute('data-slug', v.slug);
-
-        // Friendly label
-        let shortName = v.name
-          .replace(/Free\s*fire/gi, '')
-          .replace(/Mobile\s*Legends/gi, '')
-          .replace(/Valorant/gi, '')
-          .replace(/Wild\s*Rift/gi, '')
-          .replace(/League\s*of\s*Legends/gi, '')
-          .replace(/Teamfight\s*Tactics/gi, '')
-          .replace(/Delta\s*Force/gi, '')
-          .trim();
-        if (!shortName) shortName = v.name;
-
-        const countText = v.packageCount > 0 ? `${v.packageCount} Items` : 'Active';
-        const flagIconHtml = getFlagIconHtml(v.flagUrl, v.name, 26);
-
-        tab.innerHTML = `
-          <span class="tab-flag">${flagIconHtml}</span>
-          <span class="tab-title" title="${escapeHtml(v.name)}">${escapeHtml(shortName)}</span>
-          <span class="tab-sub">${countText}</span>
-        `;
-
-        tab.addEventListener('click', () => {
-          if (v.slug === currentSlug) return;
-          switchServer(v.slug);
-        });
-
-        tabs.appendChild(tab);
-      });
-    }
-
-    // ── Switch Active Server Region ─────────────────────────
-    function switchServer(newSlug) {
-      currentSlug = newSlug;
-
-      // Update URL without page reload
-      const url = new URL(window.location);
-      url.searchParams.set('slug', newSlug);
-      url.searchParams.delete('game');
-      window.history.replaceState({}, '', url);
-
-      // Reset package selection and summary
-      selectedPackage = null;
-      document.querySelectorAll('.package-item').forEach(p => p.classList.remove('selected'));
-      updateSummary();
-
-      // Load packages for newly chosen server
-      loadGamePackages(newSlug);
-    }
 
     // ── Load Live Game Packages ──────────────────────────────
     async function loadGamePackages(slug) {
@@ -1604,10 +1415,6 @@
           if (currentGameData) currentGameData.requiresZone = false;
         }
 
-        // Render Server / Region Selector if multiple server variants exist
-        if (data.server_variants && data.server_variants.length > 1) {
-          renderServerSelector(data.server_variants, slug);
-        }
 
         if (packages.length > 0) {
           renderPackages(packages, data.currency || (currentGameData && currentGameData.currency) || 'Diamonds');
