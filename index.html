@@ -289,14 +289,29 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: rgba(10, 15, 29, 0.8);
+      background: rgba(10, 15, 29, 0.85);
       border: 1.5px solid rgba(255, 255, 255, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
       z-index: 5;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .country-badge .flag-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .country-badge .globe-svg {
+      width: 16px;
+      height: 16px;
+      display: block;
     }
 
     /* Glass Shine Animation running automatically every 3s */
@@ -636,7 +651,7 @@
         <!-- 1. Mobile Legends Cambodia -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Cambodia">🇰🇭</span>
+            <span class="country-badge" title="Cambodia"><img src="https://flagcdn.com/w80/kh.png" alt="Cambodia" class="flag-img" loading="lazy"></span>
             <img src="images/mobilelegends-1696089976653.webp" alt="Mobile Legends Cambodia" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -648,7 +663,7 @@
         <!-- 2. Mobile Legends Exclusive Cambodia -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Cambodia">🇰🇭</span>
+            <span class="country-badge" title="Cambodia"><img src="https://flagcdn.com/w80/kh.png" alt="Cambodia" class="flag-img" loading="lazy"></span>
             <img src="images/mobilelegends-1696089976653.webp" alt="Mobile Legends Exclusive Cambodia" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -660,7 +675,7 @@
         <!-- 3. Mobile Legends Special -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Special Promo">⚡</span>
+            <span class="country-badge" title="Special Promo"><span style="color:#fbbf24;font-size:14px;line-height:1;">⚡</span></span>
             <img src="images/mobilelegends-1696089976653.webp" alt="Mobile Legends Special" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -672,7 +687,7 @@
         <!-- 4. Mobile Legends Global -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Global">🌍</span>
+            <span class="country-badge" title="Global"><svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg></span>
             <img src="images/mobilelegends-1696089976653.webp" alt="Mobile Legends Global" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -684,7 +699,7 @@
         <!-- 5. Free Fire (KH/SG) -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Cambodia">🇰🇭</span>
+            <span class="country-badge" title="Cambodia"><img src="https://flagcdn.com/w80/kh.png" alt="Cambodia" class="flag-img" loading="lazy"></span>
             <img src="images/Freefiver.jpg" alt="Free Fire KH/SG" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -696,7 +711,7 @@
         <!-- 6. Free Fire Vietnam -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Vietnam">🇻🇳</span>
+            <span class="country-badge" title="Vietnam"><img src="https://flagcdn.com/w80/vn.png" alt="Vietnam" class="flag-img" loading="lazy"></span>
             <img src="images/Freefiver.jpg" alt="Freefire Vietnam" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -708,7 +723,7 @@
         <!-- 7. Free Fire Global -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Global">🌍</span>
+            <span class="country-badge" title="Global"><svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg></span>
             <img src="images/Freefiver.jpg" alt="Freefire Global" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -720,7 +735,7 @@
         <!-- 8. Blood Strike -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Global">🌍</span>
+            <span class="country-badge" title="Global"><svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg></span>
             <img src="images/blood strick.jpg" alt="Blood Strike" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">
@@ -732,7 +747,7 @@
         <!-- 9. Delta Force -->
         <div class="card product-card">
           <div class="product-img">
-            <span class="country-badge" title="Global">🌍</span>
+            <span class="country-badge" title="Global"><svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg></span>
             <img src="images/Deltafors.png" alt="Delta Force" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div class="product-info">

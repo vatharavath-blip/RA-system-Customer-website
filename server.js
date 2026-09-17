@@ -13,26 +13,59 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Country & Region Flag Mapping
-function getCountryFlag(name, slug) {
+// Country & Region Flag Mapping with Official Logo Flag Image URLs
+function getCountryFlagInfo(name, slug) {
   const s = ((slug || '') + ' ' + (name || '')).toLowerCase();
-  if (s.includes('vietnam') || s.includes('-vn')) return '🇻🇳';
-  if (s.includes('cambodia') || s.includes('-kh')) return '🇰🇭';
-  if (s.includes('singapore') || s.includes('-sg')) return '🇸🇬';
-  if (s.includes('indonesia') || s.includes('-id')) return '🇮🇩';
-  if (s.includes('malaysia') || s.includes('-my')) return '🇲🇾';
-  if (s.includes('philippines') || s.includes('-ph')) return '🇵🇭';
-  if (s.includes('brazil')) return '🇧🇷';
-  if (s.includes('turkey')) return '🇹🇷';
-  if (s.includes('russia')) return '🇷🇺';
-  if (s.includes('taiwan')) return '🇹🇼';
-  if (s.includes('bangladesh')) return '🇧🇩';
-  if (s.includes('middle east') || s.includes('mena')) return '🇦🇪';
-  if (s.includes('europe')) return '🇪🇺';
-  if (s.includes('america') || s.includes('latam')) return '🌎';
-  if (s.includes('special')) return '⚡';
-  if (s.includes('exclusive')) return '⭐';
-  return '🌍';
+  if (s.includes('vietnam') || s.includes('-vn')) {
+    return { code: 'vn', name: 'Vietnam', flagUrl: 'https://flagcdn.com/w80/vn.png', emoji: '🇻🇳' };
+  }
+  if (s.includes('cambodia') || s.includes('-kh')) {
+    return { code: 'kh', name: 'Cambodia', flagUrl: 'https://flagcdn.com/w80/kh.png', emoji: '🇰🇭' };
+  }
+  if (s.includes('singapore') || s.includes('-sg')) {
+    return { code: 'sg', name: 'Singapore', flagUrl: 'https://flagcdn.com/w80/sg.png', emoji: '🇸🇬' };
+  }
+  if (s.includes('indonesia') || s.includes('-id')) {
+    return { code: 'id', name: 'Indonesia', flagUrl: 'https://flagcdn.com/w80/id.png', emoji: '🇮🇩' };
+  }
+  if (s.includes('malaysia') || s.includes('-my')) {
+    return { code: 'my', name: 'Malaysia', flagUrl: 'https://flagcdn.com/w80/my.png', emoji: '🇲🇾' };
+  }
+  if (s.includes('philippines') || s.includes('-ph')) {
+    return { code: 'ph', name: 'Philippines', flagUrl: 'https://flagcdn.com/w80/ph.png', emoji: '🇵🇭' };
+  }
+  if (s.includes('brazil') || s.includes('-br')) {
+    return { code: 'br', name: 'Brazil', flagUrl: 'https://flagcdn.com/w80/br.png', emoji: '🇧🇷' };
+  }
+  if (s.includes('turkey') || s.includes('-tr')) {
+    return { code: 'tr', name: 'Turkey', flagUrl: 'https://flagcdn.com/w80/tr.png', emoji: '🇹🇷' };
+  }
+  if (s.includes('russia') || s.includes('-ru')) {
+    return { code: 'ru', name: 'Russia', flagUrl: 'https://flagcdn.com/w80/ru.png', emoji: '🇷🇺' };
+  }
+  if (s.includes('taiwan') || s.includes('-tw')) {
+    return { code: 'tw', name: 'Taiwan', flagUrl: 'https://flagcdn.com/w80/tw.png', emoji: '🇹🇼' };
+  }
+  if (s.includes('bangladesh') || s.includes('-bd')) {
+    return { code: 'bd', name: 'Bangladesh', flagUrl: 'https://flagcdn.com/w80/bd.png', emoji: '🇧🇩' };
+  }
+  if (s.includes('middle east') || s.includes('mena')) {
+    return { code: 'ae', name: 'Middle East', flagUrl: 'https://flagcdn.com/w80/ae.png', emoji: '🇦🇪' };
+  }
+  if (s.includes('europe') || s.includes('-eu')) {
+    return { code: 'eu', name: 'Europe', flagUrl: 'https://flagcdn.com/w80/eu.png', emoji: '🇪🇺' };
+  }
+  if (s.includes('america') || s.includes('latam')) {
+    return { code: 'us', name: 'Americas', flagUrl: 'https://flagcdn.com/w80/us.png', emoji: '🌎' };
+  }
+  if (s.includes('special')) {
+    return { code: 'special', name: 'Special', flagUrl: null, emoji: '⚡' };
+  }
+  return { code: 'global', name: 'Global', flagUrl: null, emoji: '🌍' };
+}
+
+function getCountryFlag(name, slug) {
+  return getCountryFlagInfo(name, slug).emoji;
 }
 
 // Helper to map game names/aliases to khmer-topup.com slugs
@@ -84,13 +117,17 @@ function getServerVariants(targetGame, allGames) {
     return false;
   });
 
-  return matched.map(g => ({
-    slug: g.slug,
-    name: g.name,
-    flag: getCountryFlag(g.name, g.slug),
-    active: g.slug === targetGame.slug,
-    packageCount: g.packages ? g.packages.length : 0
-  }));
+  return matched.map(g => {
+    const flagInfo = getCountryFlagInfo(g.name, g.slug);
+    return {
+      slug: g.slug,
+      name: g.name,
+      flag: flagInfo.emoji,
+      flagUrl: flagInfo.flagUrl,
+      active: g.slug === targetGame.slug,
+      packageCount: g.packages ? g.packages.length : 0
+    };
+  });
 }
 
 // In-memory cache for provider games list
@@ -150,10 +187,16 @@ app.get('/api/topup/games', async (req, res) => {
 
   try {
     const games = await getGamesList();
-    const formatted = games.map(g => ({
-      ...g,
-      flag: getCountryFlag(g.name, g.slug)
-    }));
+    const formatted = games.map(g => {
+      const flagInfo = getCountryFlagInfo(g.name, g.slug);
+      return {
+        ...g,
+        flag: flagInfo.emoji,
+        flagUrl: flagInfo.flagUrl,
+        countryCode: flagInfo.code,
+        countryName: flagInfo.name
+      };
+    });
     res.json({ games: formatted, count: formatted.length });
   } catch (error) {
     console.error('Fetch Games Error:', error);
@@ -195,12 +238,15 @@ app.get('/api/topup/game/:slug', async (req, res) => {
       return res.status(404).json({ error: 'Game not found', slug });
     }
 
-    const flag = getCountryFlag(game.name, game.slug);
+    const flagInfo = getCountryFlagInfo(game.name, game.slug);
     const serverVariants = getServerVariants(game, games);
 
     res.json({
       ...game,
-      flag: flag,
+      flag: flagInfo.emoji,
+      flagUrl: flagInfo.flagUrl,
+      countryCode: flagInfo.code,
+      countryName: flagInfo.name,
       server_variants: serverVariants
     });
   } catch (error) {

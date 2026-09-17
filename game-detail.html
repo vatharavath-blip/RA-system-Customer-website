@@ -415,10 +415,21 @@
     }
 
     .variant-tab .tab-flag {
-      font-size: 1.65rem;
-      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 2px;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      min-height: 26px;
+    }
+
+    .variant-tab .tab-flag img {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
     }
 
     .variant-tab .tab-title {
@@ -441,10 +452,18 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
       margin-left: 8px;
       vertical-align: middle;
-      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    }
+
+    .country-flag-badge img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      vertical-align: middle;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
     /* Step 2: Package Grid */
@@ -1429,6 +1448,34 @@
       btnTopUpNow.addEventListener('click', handlePlaceOrder);
     });
 
+    // ── Helper: Country Flag Info & Official Flag CDN Logos ───
+    function getCountryFlagInfo(name, slug) {
+      const s = ((slug || '') + ' ' + (name || '')).toLowerCase();
+      if (s.includes('vietnam') || s.includes('-vn')) return { code: 'vn', name: 'Vietnam', flagUrl: 'https://flagcdn.com/w80/vn.png', emoji: '🇻🇳' };
+      if (s.includes('cambodia') || s.includes('-kh')) return { code: 'kh', name: 'Cambodia', flagUrl: 'https://flagcdn.com/w80/kh.png', emoji: '🇰🇭' };
+      if (s.includes('singapore') || s.includes('-sg')) return { code: 'sg', name: 'Singapore', flagUrl: 'https://flagcdn.com/w80/sg.png', emoji: '🇸🇬' };
+      if (s.includes('indonesia') || s.includes('-id')) return { code: 'id', name: 'Indonesia', flagUrl: 'https://flagcdn.com/w80/id.png', emoji: '🇮🇩' };
+      if (s.includes('malaysia') || s.includes('-my')) return { code: 'my', name: 'Malaysia', flagUrl: 'https://flagcdn.com/w80/my.png', emoji: '🇲🇾' };
+      if (s.includes('philippines') || s.includes('-ph')) return { code: 'ph', name: 'Philippines', flagUrl: 'https://flagcdn.com/w80/ph.png', emoji: '🇵🇭' };
+      if (s.includes('brazil') || s.includes('-br')) return { code: 'br', name: 'Brazil', flagUrl: 'https://flagcdn.com/w80/br.png', emoji: '🇧🇷' };
+      if (s.includes('turkey') || s.includes('-tr')) return { code: 'tr', name: 'Turkey', flagUrl: 'https://flagcdn.com/w80/tr.png', emoji: '🇹🇷' };
+      if (s.includes('russia') || s.includes('-ru')) return { code: 'ru', name: 'Russia', flagUrl: 'https://flagcdn.com/w80/ru.png', emoji: '🇷🇺' };
+      if (s.includes('taiwan') || s.includes('-tw')) return { code: 'tw', name: 'Taiwan', flagUrl: 'https://flagcdn.com/w80/tw.png', emoji: '🇹🇼' };
+      if (s.includes('bangladesh') || s.includes('-bd')) return { code: 'bd', name: 'Bangladesh', flagUrl: 'https://flagcdn.com/w80/bd.png', emoji: '🇧🇩' };
+      if (s.includes('middle east') || s.includes('mena')) return { code: 'ae', name: 'Middle East', flagUrl: 'https://flagcdn.com/w80/ae.png', emoji: '🇦🇪' };
+      if (s.includes('europe') || s.includes('-eu')) return { code: 'eu', name: 'Europe', flagUrl: 'https://flagcdn.com/w80/eu.png', emoji: '🇪🇺' };
+      if (s.includes('america') || s.includes('latam')) return { code: 'us', name: 'Americas', flagUrl: 'https://flagcdn.com/w80/us.png', emoji: '🌎' };
+      if (s.includes('special')) return { code: 'special', name: 'Special', flagUrl: null, emoji: '⚡' };
+      return { code: 'global', name: 'Global', flagUrl: null, emoji: '🌍' };
+    }
+
+    function getFlagIconHtml(flagUrl, name, size = 24) {
+      if (flagUrl) {
+        return `<img src="${flagUrl}" alt="${escapeHtml(name || '')}" class="flag-logo-img" style="width: ${size}px; height: ${size}px; border-radius: 50%; object-fit: cover; vertical-align: middle; display: inline-block; box-shadow: 0 2px 6px rgba(0,0,0,0.35); border: 1.5px solid rgba(255,255,255,0.25);">`;
+      }
+      return `<svg class="globe-svg" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; display: inline-block;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg>`;
+    }
+
     // ── Render Regional Server Selector with Country Flags ────
     function renderServerSelector(variants, activeSlug) {
       const container = document.getElementById('serverSelectorContainer');
@@ -1446,7 +1493,8 @@
 
       const activeVariant = variants.find(v => v.slug === activeSlug) || variants[0];
       if (badge && activeVariant) {
-        badge.innerHTML = `${activeVariant.flag} <span>Server: <strong>${escapeHtml(activeVariant.name)}</strong></span>`;
+        const flagIcon = getFlagIconHtml(activeVariant.flagUrl, activeVariant.name, 18);
+        badge.innerHTML = `${flagIcon} <span>Server: <strong>${escapeHtml(activeVariant.name)}</strong></span>`;
       }
 
       variants.forEach(v => {
@@ -1467,9 +1515,10 @@
         if (!shortName) shortName = v.name;
 
         const countText = v.packageCount > 0 ? `${v.packageCount} Items` : 'Active';
+        const flagIconHtml = getFlagIconHtml(v.flagUrl, v.name, 26);
 
         tab.innerHTML = `
-          <span class="tab-flag">${v.flag || '🌍'}</span>
+          <span class="tab-flag">${flagIconHtml}</span>
           <span class="tab-title" title="${escapeHtml(v.name)}">${escapeHtml(shortName)}</span>
           <span class="tab-sub">${countText}</span>
         `;
@@ -1517,15 +1566,16 @@
         }
         const data = await res.json();
         const packages = data.packages || [];
-        const countryFlag = data.flag || getCountryFlag(data.name, data.slug);
+        const flagInfo = data.flagUrl ? { flagUrl: data.flagUrl, emoji: data.flag, name: data.countryName } : getCountryFlagInfo(data.name, data.slug);
+        const heroFlagHtml = getFlagIconHtml(flagInfo.flagUrl, flagInfo.name, 30);
 
         if (data.name) {
           if (titleElem) titleElem.textContent = data.name;
-          document.getElementById('summaryGameName').textContent = `${countryFlag} ${data.name}`;
-          document.title = `${countryFlag} ${data.name} Top Up | R1ckky Store`;
+          document.getElementById('summaryGameName').innerHTML = `${heroFlagHtml} ${escapeHtml(data.name)}`;
+          document.title = `${data.name} Top Up | R1ckky Store`;
         }
         if (flagElem) {
-          flagElem.textContent = countryFlag;
+          flagElem.innerHTML = heroFlagHtml;
         }
         if (data.image) {
           const fullImg = data.image.startsWith('http') ? data.image : ('https://khmer-topup.com' + data.image);
@@ -1566,7 +1616,7 @@
             countBadge.style.display = 'inline-block';
           }
           if (categoryTitle) {
-            categoryTitle.innerHTML = `${countryFlag} ${data.name} Packages <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">${packages.length} items</span>`;
+            categoryTitle.innerHTML = `${heroFlagHtml} ${escapeHtml(data.name)} Packages <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">${packages.length} items</span>`;
           }
           return;
         }
@@ -1576,8 +1626,9 @@
 
       // Fallback
       const fallbackList = (currentGameData && currentGameData.fallbackPackages) || [];
-      const fallbackFlag = (currentGameData && currentGameData.flag) || getCountryFlag(slug, slug);
-      if (flagElem) flagElem.textContent = fallbackFlag;
+      const fallbackFlagInfo = getCountryFlagInfo(currentGameData ? currentGameData.name : slug, slug);
+      const fallbackFlagHtml = getFlagIconHtml(fallbackFlagInfo.flagUrl, fallbackFlagInfo.name, 30);
+      if (flagElem) flagElem.innerHTML = fallbackFlagHtml;
       renderPackages(fallbackList, (currentGameData && currentGameData.currency) || 'Diamonds');
       if (countBadge) {
         countBadge.textContent = `${fallbackList.length} items`;

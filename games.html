@@ -162,14 +162,29 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: rgba(10, 15, 29, 0.8);
+      background: rgba(10, 15, 29, 0.85);
       border: 1.5px solid rgba(255, 255, 255, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
       z-index: 5;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .country-badge .flag-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .country-badge .globe-svg {
+      width: 16px;
+      height: 16px;
+      display: block;
     }
 
     /* Glass Shine Animation running automatically every 3s */
@@ -515,26 +530,39 @@
       let allGames = [];
       let activeCategory = 'all';
 
-      // Determine Country Flag Badge
-      function getFlagBadge(name, slug) {
-        const s = ((slug || '') + ' ' + (name || '')).toLowerCase();
-        if (s.includes('vietnam') || s.includes('-vn')) return '🇻🇳';
-        if (s.includes('cambodia') || s.includes('-kh')) return '🇰🇭';
-        if (s.includes('singapore') || s.includes('-sg')) return '🇸🇬';
-        if (s.includes('indonesia') || s.includes('-id')) return '🇮🇩';
-        if (s.includes('malaysia') || s.includes('-my')) return '🇲🇾';
-        if (s.includes('philippines') || s.includes('-ph')) return '🇵🇭';
-        if (s.includes('brazil')) return '🇧🇷';
-        if (s.includes('turkey')) return '🇹🇷';
-        if (s.includes('russia')) return '🇷🇺';
-        if (s.includes('taiwan')) return '🇹🇼';
-        if (s.includes('bangladesh')) return '🇧🇩';
-        if (s.includes('middle east') || s.includes('mena')) return '🇦🇪';
-        if (s.includes('europe')) return '🇪🇺';
-        if (s.includes('america') || s.includes('latam')) return '🌎';
-        if (s.includes('special')) return '⚡';
-        if (s.includes('exclusive')) return '⭐';
-        return '🌍';
+      // Determine Country Flag Badge HTML with Real Flag Logos
+      function getFlagBadgeHtml(g) {
+        if (g.flagUrl) {
+          return `<span class="country-badge" title="${escapeHtml(g.countryName || g.name)}"><img src="${g.flagUrl}" alt="" class="flag-img" loading="lazy"></span>`;
+        }
+
+        const s = ((g.slug || '') + ' ' + (g.name || '')).toLowerCase();
+        let code = null;
+        let label = 'Global';
+
+        if (s.includes('vietnam') || s.includes('-vn')) { code = 'vn'; label = 'Vietnam'; }
+        else if (s.includes('cambodia') || s.includes('-kh')) { code = 'kh'; label = 'Cambodia'; }
+        else if (s.includes('singapore') || s.includes('-sg')) { code = 'sg'; label = 'Singapore'; }
+        else if (s.includes('indonesia') || s.includes('-id')) { code = 'id'; label = 'Indonesia'; }
+        else if (s.includes('malaysia') || s.includes('-my')) { code = 'my'; label = 'Malaysia'; }
+        else if (s.includes('philippines') || s.includes('-ph')) { code = 'ph'; label = 'Philippines'; }
+        else if (s.includes('brazil') || s.includes('-br')) { code = 'br'; label = 'Brazil'; }
+        else if (s.includes('turkey') || s.includes('-tr')) { code = 'tr'; label = 'Turkey'; }
+        else if (s.includes('russia') || s.includes('-ru')) { code = 'ru'; label = 'Russia'; }
+        else if (s.includes('taiwan') || s.includes('-tw')) { code = 'tw'; label = 'Taiwan'; }
+        else if (s.includes('bangladesh') || s.includes('-bd')) { code = 'bd'; label = 'Bangladesh'; }
+        else if (s.includes('middle east') || s.includes('mena')) { code = 'ae'; label = 'Middle East'; }
+        else if (s.includes('europe') || s.includes('-eu')) { code = 'eu'; label = 'Europe'; }
+        else if (s.includes('america') || s.includes('latam')) { code = 'us'; label = 'Americas'; }
+        else if (s.includes('special')) {
+          return `<span class="country-badge" title="Special Promo"><span style="color:#fbbf24;font-size:14px;line-height:1;">⚡</span></span>`;
+        }
+
+        if (code) {
+          return `<span class="country-badge" title="${label}"><img src="https://flagcdn.com/w80/${code}.png" alt="${label}" class="flag-img" loading="lazy"></span>`;
+        }
+
+        return `<span class="country-badge" title="Global"><svg class="globe-svg" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"></path></svg></span>`;
       }
 
       // Safe Image URL (uses khmer-topup static host if relative)
@@ -571,7 +599,7 @@
         }
 
         gamesGrid.innerHTML = list.map(g => {
-          const flag = getFlagBadge(g.name, g.slug);
+          const flagBadgeHtml = getFlagBadgeHtml(g);
           const imgUrl = getGameImageUrl(g);
           const safeName = escapeHtml(g.name);
           const safeSlug = encodeURIComponent(g.slug);
@@ -580,7 +608,7 @@
           return `
             <div class="card product-card" data-category="${categoryName}" data-name="${safeName.toLowerCase()}">
               <div class="product-img">
-                <span class="country-badge" title="${flag}">${flag}</span>
+                ${flagBadgeHtml}
                 <img src="${imgUrl}" alt="${safeName}" loading="lazy" onerror="this.onerror=null;this.src='images/Freefiver.jpg';">
               </div>
               <div class="product-info">
