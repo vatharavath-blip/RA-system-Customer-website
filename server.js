@@ -13,17 +13,84 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// Helper to map game names to khmer-topup.com slugs
+// Country & Region Flag Mapping
+function getCountryFlag(name, slug) {
+  const s = ((slug || '') + ' ' + (name || '')).toLowerCase();
+  if (s.includes('vietnam') || s.includes('-vn')) return '🇻🇳';
+  if (s.includes('cambodia') || s.includes('-kh')) return '🇰🇭';
+  if (s.includes('singapore') || s.includes('-sg')) return '🇸🇬';
+  if (s.includes('indonesia') || s.includes('-id')) return '🇮🇩';
+  if (s.includes('malaysia') || s.includes('-my')) return '🇲🇾';
+  if (s.includes('philippines') || s.includes('-ph')) return '🇵🇭';
+  if (s.includes('brazil')) return '🇧🇷';
+  if (s.includes('turkey')) return '🇹🇷';
+  if (s.includes('russia')) return '🇷🇺';
+  if (s.includes('taiwan')) return '🇹🇼';
+  if (s.includes('bangladesh')) return '🇧🇩';
+  if (s.includes('middle east') || s.includes('mena')) return '🇦🇪';
+  if (s.includes('europe')) return '🇪🇺';
+  if (s.includes('america') || s.includes('latam')) return '🌎';
+  if (s.includes('special')) return '⚡';
+  if (s.includes('exclusive')) return '⭐';
+  return '🌍';
+}
+
+// Helper to map game names/aliases to khmer-topup.com slugs
 function getGameSlug(game) {
   const g = (game || '').toLowerCase().trim();
+  if (!g) return '';
+  // If it's already an exact slug with hyphen, preserve it
+  if (g.includes('-')) return g;
+  if (g === 'freefire' || g === 'free-fire' || g === 'free fire') return 'free-fire-kh-sg';
+  if (g === 'mlbb' || g === 'mobile legends' || g === 'mobile-legends') return 'mobile-legends';
   if (g.includes('exclusive')) return 'mobile-legends-exclusive';
   if (g.includes('special')) return 'mobile-legends-special';
   if (g.includes('global') && (g.includes('legend') || g.includes('mlbb'))) return 'mobile-legends-global';
-  if (g.includes('free fire') || g.includes('freefire') || g.includes('free-fire')) return 'free-fire-kh-sg';
-  if (g.includes('mobile legends') || g.includes('mlbb')) return 'mobile-legends';
   if (g.includes('delta')) return 'delta-force';
   if (g.includes('blood')) return 'blood-strike';
   return g.replace(/\s+/g, '-');
+}
+
+// Identify franchise/group and collect all sister server variants with flags
+function getServerVariants(targetGame, allGames) {
+  const slug = targetGame.slug;
+  let familyKey = null;
+
+  if (slug.includes('freefire') || slug.includes('free-fire')) familyKey = 'freefire';
+  else if (slug.includes('mobile-legends') && !slug.includes('adventure')) familyKey = 'mobile-legends';
+  else if (slug.includes('valorant')) familyKey = 'valorant';
+  else if (slug.includes('wild-rift')) familyKey = 'wild-rift';
+  else if (slug.includes('league-of-legends')) familyKey = 'league-of-legends';
+  else if (slug.includes('teamfight-tactics')) familyKey = 'teamfight-tactics';
+  else if (slug.includes('magic-chess-gogo')) familyKey = 'magic-chess-gogo';
+  else if (slug.includes('blood-strike')) familyKey = 'blood-strike';
+  else if (slug.includes('delta-force') || slug.includes('deltaforce')) familyKey = 'delta-force';
+  else if (slug.includes('eafc-mobile')) familyKey = 'eafc-mobile';
+
+  if (!familyKey) return [];
+
+  const matched = allGames.filter(g => {
+    const s = g.slug;
+    if (familyKey === 'freefire') return s.includes('freefire') || s.includes('free-fire');
+    if (familyKey === 'mobile-legends') return s.includes('mobile-legends') && !s.includes('adventure');
+    if (familyKey === 'valorant') return s.includes('valorant');
+    if (familyKey === 'wild-rift') return s.includes('wild-rift');
+    if (familyKey === 'league-of-legends') return s.includes('league-of-legends');
+    if (familyKey === 'teamfight-tactics') return s.includes('teamfight-tactics');
+    if (familyKey === 'magic-chess-gogo') return s.includes('magic-chess-gogo');
+    if (familyKey === 'blood-strike') return s.includes('blood-strike');
+    if (familyKey === 'delta-force') return s.includes('delta-force') || s.includes('deltaforce');
+    if (familyKey === 'eafc-mobile') return s.includes('eafc-mobile');
+    return false;
+  });
+
+  return matched.map(g => ({
+    slug: g.slug,
+    name: g.name,
+    flag: getCountryFlag(g.name, g.slug),
+    active: g.slug === targetGame.slug,
+    packageCount: g.packages ? g.packages.length : 0
+  }));
 }
 
 // In-memory cache for provider games list
@@ -83,7 +150,11 @@ app.get('/api/topup/games', async (req, res) => {
 
   try {
     const games = await getGamesList();
-    res.json({ games, count: games.length });
+    const formatted = games.map(g => ({
+      ...g,
+      flag: getCountryFlag(g.name, g.slug)
+    }));
+    res.json({ games: formatted, count: formatted.length });
   } catch (error) {
     console.error('Fetch Games Error:', error);
     res.status(500).json({ error: 'Failed to fetch games from provider', details: error.message });
@@ -101,18 +172,37 @@ app.get('/api/topup/game/:slug', async (req, res) => {
 
   try {
     const games = await getGamesList();
-    const game = games.find(g => 
-      g.slug === slug || 
-      g.slug === targetSlug || 
-      getGameSlug(g.name) === targetSlug ||
-      g.slug.includes(slug)
-    );
+
+    // 1. Exact match first (CRITICAL for regional slugs: freefire-vietnam, free-fire-kh-sg, etc.)
+    let game = games.find(g => g.slug === slug);
+
+    // 2. Case-insensitive match
+    if (!game) {
+      game = games.find(g => g.slug.toLowerCase() === slug.toLowerCase());
+    }
+
+    // 3. Fallback to mapped targetSlug if alias was used (e.g. 'freefire', 'mlbb')
+    if (!game && targetSlug) {
+      game = games.find(g => g.slug === targetSlug);
+    }
+
+    // 4. Fuzzy fallback if still not found
+    if (!game) {
+      game = games.find(g => g.slug.includes(slug) || slug.includes(g.slug));
+    }
 
     if (!game) {
       return res.status(404).json({ error: 'Game not found', slug });
     }
 
-    res.json(game);
+    const flag = getCountryFlag(game.name, game.slug);
+    const serverVariants = getServerVariants(game, games);
+
+    res.json({
+      ...game,
+      flag: flag,
+      server_variants: serverVariants
+    });
   } catch (error) {
     console.error('Fetch Single Game Error:', error);
     res.status(500).json({ error: 'Failed to fetch game details', details: error.message });
@@ -124,7 +214,7 @@ app.post('/api/topup/check-id', async (req, res) => {
   const { game, slug, playerId, player_id, zoneId, serverId, server_id } = req.body;
   let targetPlayerId = String(playerId || player_id || '').trim();
   let targetServerId = String(zoneId || serverId || server_id || '').trim();
-  const targetSlug = slug || getGameSlug(game);
+  const targetSlug = (slug && String(slug).trim()) || getGameSlug(game);
 
   // If player pasted e.g. "1264663279 (14037)" into player ID
   const combinedMatch = targetPlayerId.match(/^([^(]+)\s*\(([^)]+)\)$/);

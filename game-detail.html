@@ -343,39 +343,47 @@
 
     /* Server/Variant Selector Tabs */
     .variant-selector-container {
-      margin-bottom: 20px;
-      background: rgba(13, 20, 36, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 16px 18px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(17, 26, 46, 0.9) 0%, rgba(13, 20, 36, 0.96) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(56, 189, 248, 0.3);
+      border-radius: 18px;
+      padding: 18px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     }
 
     .variant-label {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #94a3b8;
-      display: block;
-      margin-bottom: 12px;
-      letter-spacing: 0.3px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.2px;
     }
 
     .variant-tabs {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 640px) {
       .variant-tabs {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .variant-selector-container {
+        padding: 14px 12px;
       }
     }
 
     .variant-tab {
       background: rgba(18, 28, 48, 0.85);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
       padding: 12px 10px;
       cursor: pointer;
       text-align: center;
@@ -387,53 +395,56 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 3px;
+      gap: 4px;
+      user-select: none;
     }
 
     .variant-tab:hover {
-      border-color: rgba(56, 189, 248, 0.5);
-      background: rgba(22, 36, 62, 0.95);
+      border-color: rgba(56, 189, 248, 0.6);
+      background: rgba(22, 38, 68, 0.95);
       transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 112, 243, 0.2);
     }
 
     .variant-tab.active {
       border-color: #0070f3;
-      background: linear-gradient(135deg, rgba(0, 112, 243, 0.25), rgba(56, 189, 248, 0.15));
+      background: linear-gradient(135deg, rgba(0, 112, 243, 0.35), rgba(56, 189, 248, 0.2));
       color: #fff;
-      box-shadow: 0 0 16px rgba(0, 112, 243, 0.35);
+      box-shadow: 0 0 20px rgba(0, 112, 243, 0.45);
+      transform: translateY(-2px);
     }
 
-    .variant-tab .tab-badge {
-      position: absolute;
-      top: -7px;
-      right: 8px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 8px;
-      background: #10b981;
-      color: #050b14;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .variant-tab .tab-badge.special {
-      background: #f59e0b;
-      color: #000;
+    .variant-tab .tab-flag {
+      font-size: 1.65rem;
+      line-height: 1;
+      margin-bottom: 2px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     }
 
     .variant-tab .tab-title {
       font-weight: 700;
-      font-size: 0.88rem;
-      display: block;
+      font-size: 0.84rem;
       color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     .variant-tab .tab-sub {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #38bdf8;
-      display: block;
       font-weight: 600;
+    }
+
+    .country-flag-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-left: 8px;
+      vertical-align: middle;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
     }
 
     /* Step 2: Package Grid */
@@ -909,7 +920,7 @@
       </div>
       <div class="game-meta">
         <div class="game-publisher" id="gamePublisher">GARENA</div>
-        <h1 class="game-title" id="gameTitle">Free Fire (KH/MY/SG)</h1>
+        <h1 class="game-title" id="gameTitle"><span id="gameTitleText">Free Fire (KH/MY/SG)</span> <span id="gameCountryFlag" class="country-flag-badge">🇰🇭</span></h1>
         <div class="game-region-warning">
           <span>⚠️ Use an account registered in this region. Wrong region will fail.</span>
         </div>
@@ -928,6 +939,19 @@
       <!-- Left: Form Steps -->
       <div class="topup-steps">
         
+        <!-- Server / Region Selector with Country Flags -->
+        <div class="variant-selector-container" id="serverSelectorContainer" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <label class="variant-label">
+              🌐 ជ្រើសរើស Server / ប្រទេស (Select Server Region)
+            </label>
+            <span id="activeServerBadge" style="font-size: 0.78rem; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.25);"></span>
+          </div>
+          <div class="variant-tabs" id="serverVariantTabs">
+            <!-- Dynamically populated server variant buttons with flags -->
+          </div>
+        </div>
+
         <!-- Step 1: Enter Account Info -->
         <section class="step-section">
           <div class="step-title-box">
@@ -1110,11 +1134,34 @@
   </a>
 
   <script>
-    // Game Catalog Configuration & API Slugs
+    // Helper to determine Country & Region Flag
+    function getCountryFlag(name, slug) {
+      const s = ((slug || '') + ' ' + (name || '')).toLowerCase();
+      if (s.includes('vietnam') || s.includes('-vn')) return '🇻🇳';
+      if (s.includes('cambodia') || s.includes('-kh')) return '🇰🇭';
+      if (s.includes('singapore') || s.includes('-sg')) return '🇸🇬';
+      if (s.includes('indonesia') || s.includes('-id')) return '🇮🇩';
+      if (s.includes('malaysia') || s.includes('-my')) return '🇲🇾';
+      if (s.includes('philippines') || s.includes('-ph')) return '🇵🇭';
+      if (s.includes('brazil')) return '🇧🇷';
+      if (s.includes('turkey')) return '🇹🇷';
+      if (s.includes('russia')) return '🇷🇺';
+      if (s.includes('taiwan')) return '🇹🇼';
+      if (s.includes('bangladesh')) return '🇧🇩';
+      if (s.includes('middle east') || s.includes('mena')) return '🇦🇪';
+      if (s.includes('europe')) return '🇪🇺';
+      if (s.includes('america') || s.includes('latam')) return '🌎';
+      if (s.includes('special')) return '⚡';
+      if (s.includes('exclusive')) return '⭐';
+      return '🌍';
+    }
+
+    // Curated Fallback Packages (Synchronized with live Khmer Topup API)
     const GAMES_DATA = {
       freefire: {
         slug: "free-fire-kh-sg",
-        title: "Free Fire (KH/MY/SG)",
+        title: "Free Fire (KH/SG)",
+        flag: "🇰🇭",
         publisher: "GARENA",
         image: "images/Freefiver.jpg",
         currency: "Diamonds",
@@ -1122,19 +1169,45 @@
         idLabel: "Player ID",
         idPlaceholder: "Enter your Free Fire Player ID (e.g. 1029384756)",
         fallbackPackages: [
-          { package_id: 5123, name: "20 Diamonds", price: 0.19, tag: null },
-          { package_id: 5124, name: "40 Diamonds", price: 0.37, tag: null },
+          { package_id: 5123, name: "20 Diamonds", price: 0.20, tag: null },
+          { package_id: 5124, name: "40 Diamonds", price: 0.38, tag: null },
           { package_id: 5131, name: "60 Diamonds", price: 0.53, tag: null },
           { package_id: 5125, name: "100 Diamonds", price: 0.78, tag: "HOT" },
-          { package_id: 5126, name: "310 Diamonds", price: 2.87, tag: null },
-          { package_id: 5127, name: "520 Diamonds", price: 3.97, tag: "BEST" },
-          { package_id: 5128, name: "1060 Diamonds", price: 7.80, tag: "HOT" },
-          { package_id: 5129, name: "2180 Diamonds", price: 15.76, tag: "BEST" }
+          { package_id: 5132, name: "160 Diamonds", price: 1.39, tag: null },
+          { package_id: 5126, name: "205 Diamonds", price: 1.77, tag: null },
+          { package_id: 5127, name: "420 Diamonds", price: 3.53, tag: "BEST" },
+          { package_id: 5128, name: "650 Diamonds", price: 5.41, tag: "HOT" },
+          { package_id: 5133, name: "840 Diamonds", price: 7.00, tag: null },
+          { package_id: 5129, name: "1100 Diamonds", price: 8.81, tag: "BEST" }
+        ]
+      },
+      freefire_vietnam: {
+        slug: "freefire-vietnam",
+        title: "Freefire Vietnam",
+        flag: "🇻🇳",
+        publisher: "GARENA",
+        image: "images/Freefiver.jpg",
+        currency: "Diamonds",
+        requiresZone: false,
+        idLabel: "Player ID",
+        idPlaceholder: "Enter Free Fire Vietnam Player ID",
+        fallbackPackages: [
+          { package_id: 519, name: "25 Diamonds", price: 0.21, tag: null },
+          { package_id: 520, name: "51 Diamonds", price: 0.40, tag: null },
+          { package_id: 521, name: "113 Diamonds", price: 0.77, tag: "HOT" },
+          { package_id: 522, name: "283 Diamonds", price: 1.91, tag: null },
+          { package_id: 523, name: "566 Diamonds", price: 3.81, tag: "BEST" },
+          { package_id: 524, name: "1132 Diamonds", price: 7.60, tag: null },
+          { package_id: 525, name: "2830 Diamonds", price: 18.96, tag: null },
+          { package_id: 527, name: "Weekly Lite", price: 0.47, tag: null },
+          { package_id: 528, name: "Weekly Membership", price: 1.91, tag: null },
+          { package_id: 526, name: "Monthly Membership", price: 8.36, tag: null }
         ]
       },
       mlbb: {
         slug: "mobile-legends",
         title: "Mobile Legends Cambodia",
+        flag: "🇰🇭",
         publisher: "MOONTON",
         image: "images/mobilelegends-1696089976653.webp",
         currency: "Diamonds",
@@ -1145,14 +1218,20 @@
         zonePlaceholder: "e.g. 1234",
         fallbackPackages: [
           { package_id: 268, name: "55 Diamonds", price: 0.77, tag: null },
-          { package_id: 269, name: "86 Diamonds", price: 1.23, tag: null },
-          { package_id: 270, name: "165 Diamonds", price: 2.30, tag: "HOT" },
-          { package_id: 271, name: "172 Diamonds", price: 2.38, tag: null }
+          { package_id: 269, name: "86 Diamonds", price: 1.21, tag: null },
+          { package_id: 270, name: "165 Diamonds", price: 2.27, tag: "HOT" },
+          { package_id: 271, name: "172 Diamonds", price: 2.39, tag: null },
+          { package_id: 272, name: "257 Diamonds", price: 3.41, tag: null },
+          { package_id: 273, name: "275 Diamonds", price: 3.67, tag: null },
+          { package_id: 274, name: "343 Diamonds", price: 4.60, tag: null },
+          { package_id: 275, name: "344 Diamonds", price: 4.75, tag: null },
+          { package_id: 276, name: "429 Diamonds", price: 5.77, tag: "BEST" }
         ]
       },
       mlbb_exclusive: {
         slug: "mobile-legends-exclusive",
         title: "Mobile Legends Exclusive Cambodia",
+        flag: "🇰🇭",
         publisher: "MOONTON",
         image: "images/mobilelegends-1696089976653.webp",
         currency: "Diamonds",
@@ -1164,12 +1243,17 @@
         fallbackPackages: [
           { package_id: 691, name: "5 Diamonds", price: 0.11, tag: "CHEAPEST" },
           { package_id: 692, name: "11 Diamonds", price: 0.19, tag: null },
-          { package_id: 693, name: "22 Diamonds", price: 0.37, tag: null }
+          { package_id: 693, name: "22 Diamonds", price: 0.37, tag: null },
+          { package_id: 694, name: "33 Diamonds", price: 0.55, tag: null },
+          { package_id: 696, name: "56 Diamonds", price: 0.77, tag: "HOT" },
+          { package_id: 697, name: "112 Diamonds", price: 1.77, tag: null },
+          { package_id: 698, name: "165 Diamonds", price: 2.27, tag: "BEST" }
         ]
       },
       mlbb_special: {
         slug: "mobile-legends-special",
         title: "Mobile Legends Special",
+        flag: "⚡",
         publisher: "MOONTON",
         image: "images/mobilelegends-1696089976653.webp",
         currency: "Diamonds",
@@ -1180,12 +1264,17 @@
         zonePlaceholder: "e.g. 1234",
         fallbackPackages: [
           { package_id: 569, name: "14 Diamonds", price: 0.25, tag: "PROMO" },
-          { package_id: 570, name: "28 Diamonds", price: 0.50, tag: null }
+          { package_id: 570, name: "28 Diamonds", price: 0.49, tag: null },
+          { package_id: 571, name: "42 Diamonds", price: 0.72, tag: null },
+          { package_id: 572, name: "55 Diamonds", price: 0.93, tag: null },
+          { package_id: 574, name: "70 Diamonds", price: 1.18, tag: "HOT" },
+          { package_id: 576, name: "140 Diamonds", price: 2.34, tag: "BEST" }
         ]
       },
       mlbb_global: {
         slug: "mobile-legends-global",
         title: "Mobile Legends Global",
+        flag: "🌍",
         publisher: "MOONTON",
         image: "images/mobilelegends-1696089976653.webp",
         currency: "Diamonds",
@@ -1196,12 +1285,17 @@
         zonePlaceholder: "e.g. 1234",
         fallbackPackages: [
           { package_id: 4321, name: "5 Diamonds", price: 0.11, tag: null },
-          { package_id: 4322, name: "12 Diamonds", price: 0.24, tag: null }
+          { package_id: 4322, name: "12 Diamonds", price: 0.24, tag: null },
+          { package_id: 4323, name: "19 Diamonds", price: 0.37, tag: null },
+          { package_id: 4324, name: "28 Diamonds", price: 0.53, tag: null },
+          { package_id: 4325, name: "44 Diamonds", price: 0.77, tag: "HOT" },
+          { package_id: 4328, name: "170 Diamonds", price: 2.90, tag: "BEST" }
         ]
       },
       bloodstrike: {
         slug: "blood-strike",
         title: "Blood Strike",
+        flag: "🌍",
         publisher: "NETEASE",
         image: "images/blood strick.jpg",
         currency: "Gold",
@@ -1209,16 +1303,16 @@
         idLabel: "Player ID",
         idPlaceholder: "Enter Blood Strike Player ID",
         fallbackPackages: [
-          { package_id: 452, name: "51 Gold", price: 0.42, tag: null },
-          { package_id: 453, name: "105 Gold", price: 0.76, tag: null },
-          { package_id: 454, name: "260 Gold", price: 1.90, tag: "HOT" },
-          { package_id: 455, name: "530 Gold", price: 3.75, tag: "BEST" },
-          { package_id: 456, name: "1100 Gold", price: 7.45, tag: null }
+          { package_id: 452, name: "51 Gold", price: 0.41, tag: null },
+          { package_id: 453, name: "105 Gold", price: 0.73, tag: null },
+          { package_id: 454, name: "320 Gold", price: 2.38, tag: "HOT" },
+          { package_id: 455, name: "540 Gold", price: 3.97, tag: "BEST" }
         ]
       },
       deltaforce: {
         slug: "delta-force",
         title: "Delta Force",
+        flag: "🌍",
         publisher: "TIAMI STUDIOS",
         image: "images/Deltafors.png",
         currency: "Delta Coins",
@@ -1226,11 +1320,11 @@
         idLabel: "Player ID",
         idPlaceholder: "Enter Delta Force Player ID",
         fallbackPackages: [
-          { package_id: 2068, name: "18 Delta Coins", price: 0.23, tag: null },
-          { package_id: 2069, name: "30 Delta Coins", price: 0.39, tag: null },
+          { package_id: 2068, name: "18 Delta Coins", price: 0.25, tag: null },
+          { package_id: 2069, name: "30 Delta Coins", price: 0.40, tag: null },
           { package_id: 2070, name: "60 Delta Coins", price: 0.79, tag: "HOT" },
-          { package_id: 2071, name: "300 Delta Coins", price: 3.85, tag: null },
-          { package_id: 2072, name: "600 Delta Coins", price: 7.60, tag: "BEST" }
+          { package_id: 2071, name: "320 Delta Coins", price: 3.86, tag: null },
+          { package_id: 2072, name: "460 Delta Coins", price: 5.59, tag: "BEST" }
         ]
       }
     };
@@ -1261,6 +1355,7 @@
           currentGameData = {
             slug: slugParam,
             title: slugParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            flag: getCountryFlag(slugParam, slugParam),
             publisher: isML ? "MOONTON" : "GARENA",
             image: isML ? "images/mobilelegends-1696089976653.webp" : "images/Freefiver.jpg",
             currency: "Diamonds",
@@ -1281,10 +1376,11 @@
       }
 
       // Update static header information
-      document.getElementById('gameTitle').textContent = currentGameData.title;
+      document.getElementById('gameTitleText').textContent = currentGameData.title;
+      document.getElementById('gameCountryFlag').textContent = currentGameData.flag || getCountryFlag(currentGameData.title, currentGameData.slug);
       document.getElementById('gamePublisher').textContent = currentGameData.publisher;
       document.getElementById('gameImage').src = currentGameData.image;
-      document.getElementById('summaryGameName').textContent = currentGameData.title;
+      document.getElementById('summaryGameName').textContent = `${currentGameData.flag || ''} ${currentGameData.title}`;
 
       // Update input labels & zone requirement
       const playerIdLabel = document.getElementById('playerIdLabel');
@@ -1333,11 +1429,86 @@
       btnTopUpNow.addEventListener('click', handlePlaceOrder);
     });
 
+    // ── Render Regional Server Selector with Country Flags ────
+    function renderServerSelector(variants, activeSlug) {
+      const container = document.getElementById('serverSelectorContainer');
+      const tabs = document.getElementById('serverVariantTabs');
+      const badge = document.getElementById('activeServerBadge');
+      if (!container || !tabs) return;
+
+      if (!variants || variants.length <= 1) {
+        container.style.display = 'none';
+        return;
+      }
+
+      container.style.display = 'block';
+      tabs.innerHTML = '';
+
+      const activeVariant = variants.find(v => v.slug === activeSlug) || variants[0];
+      if (badge && activeVariant) {
+        badge.innerHTML = `${activeVariant.flag} <span>Server: <strong>${escapeHtml(activeVariant.name)}</strong></span>`;
+      }
+
+      variants.forEach(v => {
+        const tab = document.createElement('div');
+        tab.className = 'variant-tab' + (v.slug === activeSlug ? ' active' : '');
+        tab.setAttribute('data-slug', v.slug);
+
+        // Friendly label
+        let shortName = v.name
+          .replace(/Free\s*fire/gi, '')
+          .replace(/Mobile\s*Legends/gi, '')
+          .replace(/Valorant/gi, '')
+          .replace(/Wild\s*Rift/gi, '')
+          .replace(/League\s*of\s*Legends/gi, '')
+          .replace(/Teamfight\s*Tactics/gi, '')
+          .replace(/Delta\s*Force/gi, '')
+          .trim();
+        if (!shortName) shortName = v.name;
+
+        const countText = v.packageCount > 0 ? `${v.packageCount} Items` : 'Active';
+
+        tab.innerHTML = `
+          <span class="tab-flag">${v.flag || '🌍'}</span>
+          <span class="tab-title" title="${escapeHtml(v.name)}">${escapeHtml(shortName)}</span>
+          <span class="tab-sub">${countText}</span>
+        `;
+
+        tab.addEventListener('click', () => {
+          if (v.slug === currentSlug) return;
+          switchServer(v.slug);
+        });
+
+        tabs.appendChild(tab);
+      });
+    }
+
+    // ── Switch Active Server Region ─────────────────────────
+    function switchServer(newSlug) {
+      currentSlug = newSlug;
+
+      // Update URL without page reload
+      const url = new URL(window.location);
+      url.searchParams.set('slug', newSlug);
+      url.searchParams.delete('game');
+      window.history.replaceState({}, '', url);
+
+      // Reset package selection and summary
+      selectedPackage = null;
+      document.querySelectorAll('.package-item').forEach(p => p.classList.remove('selected'));
+      updateSummary();
+
+      // Load packages for newly chosen server
+      loadGamePackages(newSlug);
+    }
+
     // ── Load Live Game Packages ──────────────────────────────
     async function loadGamePackages(slug) {
       const packagesGrid = document.getElementById('packagesGrid');
       const countBadge = document.getElementById('packagesCountBadge');
       const categoryTitle = document.getElementById('packageCategoryTitle');
+      const flagElem = document.getElementById('gameCountryFlag');
+      const titleElem = document.getElementById('gameTitleText');
 
       try {
         const res = await fetch(`/api/topup/game/${encodeURIComponent(slug)}`);
@@ -1346,11 +1517,15 @@
         }
         const data = await res.json();
         const packages = data.packages || [];
+        const countryFlag = data.flag || getCountryFlag(data.name, data.slug);
 
         if (data.name) {
-          document.getElementById('gameTitle').textContent = data.name;
-          document.getElementById('summaryGameName').textContent = data.name;
-          document.title = `${data.name} Top Up | R1ckky Store`;
+          if (titleElem) titleElem.textContent = data.name;
+          document.getElementById('summaryGameName').textContent = `${countryFlag} ${data.name}`;
+          document.title = `${countryFlag} ${data.name} Top Up | R1ckky Store`;
+        }
+        if (flagElem) {
+          flagElem.textContent = countryFlag;
         }
         if (data.image) {
           const fullImg = data.image.startsWith('http') ? data.image : ('https://khmer-topup.com' + data.image);
@@ -1373,16 +1548,25 @@
           if (zLabel) zLabel.textContent = data.server_label;
           if (zInput) zInput.placeholder = `Enter ${data.server_label}`;
           if (currentGameData) currentGameData.requiresZone = true;
+        } else {
+          const zField = document.getElementById('zoneIdField');
+          if (zField) zField.style.display = 'none';
+          if (currentGameData) currentGameData.requiresZone = false;
+        }
+
+        // Render Server / Region Selector if multiple server variants exist
+        if (data.server_variants && data.server_variants.length > 1) {
+          renderServerSelector(data.server_variants, slug);
         }
 
         if (packages.length > 0) {
-          renderPackages(packages, data.currency || currentGameData.currency);
+          renderPackages(packages, data.currency || (currentGameData && currentGameData.currency) || 'Diamonds');
           if (countBadge) {
             countBadge.textContent = `${packages.length} items`;
             countBadge.style.display = 'inline-block';
           }
           if (categoryTitle) {
-            categoryTitle.innerHTML = `${data.name || currentGameData.title} Packages <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">${packages.length} items</span>`;
+            categoryTitle.innerHTML = `${countryFlag} ${data.name} Packages <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">${packages.length} items</span>`;
           }
           return;
         }
@@ -1391,8 +1575,10 @@
       }
 
       // Fallback
-      const fallbackList = currentGameData.fallbackPackages || [];
-      renderPackages(fallbackList, currentGameData.currency);
+      const fallbackList = (currentGameData && currentGameData.fallbackPackages) || [];
+      const fallbackFlag = (currentGameData && currentGameData.flag) || getCountryFlag(slug, slug);
+      if (flagElem) flagElem.textContent = fallbackFlag;
+      renderPackages(fallbackList, (currentGameData && currentGameData.currency) || 'Diamonds');
       if (countBadge) {
         countBadge.textContent = `${fallbackList.length} items`;
         countBadge.style.display = 'inline-block';
@@ -1713,7 +1899,8 @@
             player_id: playerId,
             server_id: zoneId || null,
             reference: orderRef,
-            game: currentGameData.title
+            game: currentGameData.title,
+            slug: currentSlug
           })
         }).catch(err => console.warn('Order background notice:', err));
       } catch (e) {

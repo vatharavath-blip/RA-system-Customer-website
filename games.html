@@ -517,17 +517,23 @@
 
       // Determine Country Flag Badge
       function getFlagBadge(name, slug) {
-        const s = (slug + ' ' + name).toLowerCase();
+        const s = ((slug || '') + ' ' + (name || '')).toLowerCase();
+        if (s.includes('vietnam') || s.includes('-vn')) return '🇻🇳';
         if (s.includes('cambodia') || s.includes('-kh')) return '🇰🇭';
         if (s.includes('singapore') || s.includes('-sg')) return '🇸🇬';
-        if (s.includes('vietnam') || s.includes('-vn')) return '🇻🇳';
         if (s.includes('indonesia') || s.includes('-id')) return '🇮🇩';
         if (s.includes('malaysia') || s.includes('-my')) return '🇲🇾';
         if (s.includes('philippines') || s.includes('-ph')) return '🇵🇭';
         if (s.includes('brazil')) return '🇧🇷';
         if (s.includes('turkey')) return '🇹🇷';
         if (s.includes('russia')) return '🇷🇺';
+        if (s.includes('taiwan')) return '🇹🇼';
+        if (s.includes('bangladesh')) return '🇧🇩';
+        if (s.includes('middle east') || s.includes('mena')) return '🇦🇪';
+        if (s.includes('europe')) return '🇪🇺';
+        if (s.includes('america') || s.includes('latam')) return '🌎';
         if (s.includes('special')) return '⚡';
+        if (s.includes('exclusive')) return '⭐';
         return '🌍';
       }
 
