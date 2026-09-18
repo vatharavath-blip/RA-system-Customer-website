@@ -537,7 +537,7 @@ app.post('/api/payment/create', async (req, res) => {
     if (PAYWAY_API_TOKEN) {
       try {
         const externalUrl = `${PAYWAY_API_URL}/generate_qr/?payway_link=${encodeURIComponent(PAYWAY_LINK)}&amount=${amtStr}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
-        const extResp = await fetch(externalUrl, { timeout: 10000 });
+        const extResp = await fetch(externalUrl, { signal: AbortSignal.timeout(15000) });
         const extData = await extResp.json();
 
         if (extData && (extData.success === true || extData.qr_string)) {

@@ -2731,7 +2731,19 @@
       const currStr = paymentData.currency || 'USD';
       document.getElementById('modalAmount').textContent = `$${amtStr} ${currStr}`;
       document.getElementById('modalInvoiceNum').textContent = paymentData.bill_number;
-      document.getElementById('modalMerchantName').textContent = 'POV KIMHOV';
+
+      // Extract merchant name dynamically from KHQR string tag 59 or fallback
+      let merchantName = 'YOUT CHENG by Pay System';
+      if (paymentData.qr_string) {
+        const m59 = paymentData.qr_string.match(/59(\d{2})(.+?)60/);
+        if (m59 && m59[2]) {
+          const l = parseInt(m59[1], 10);
+          merchantName = m59[2].substring(0, l);
+        }
+      }
+      document.getElementById('modalMerchantName').textContent = merchantName;
+      const footerEl = document.getElementById('modalMerchantFooter');
+      if (footerEl) footerEl.textContent = merchantName;
       document.getElementById('modalPackageName').textContent = `${orderMeta.game} - ${orderMeta.packageName || orderMeta.packageId}`;
       document.getElementById('modalPlayerId').textContent = orderMeta.playerId + (orderMeta.zoneId ? ` (${orderMeta.zoneId})` : '');
 
@@ -3043,7 +3055,7 @@
             <div class="khqr-stand-info">
               <div>
                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Merchant</div>
-                <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
+                <div class="khqr-merchant-name" id="modalMerchantName">YOUT CHENG by Pay System</div>
               </div>
               <div style="text-align: right;">
                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount to Pay</div>
@@ -3068,7 +3080,7 @@
 
             <div class="khqr-stand-footer">
               <span>ABA Bank • USD</span>
-              <span style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
+              <span id="modalMerchantFooter" style="color: #0284c7; font-weight: 700;">YOUT CHENG by Pay System</span>
             </div>
           </div>
 
