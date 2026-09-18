@@ -1849,6 +1849,8 @@
       });
     }
 
+    let isAccountValid = false;
+
     // ── Execute Player ID Check with Backend ────────────────
     async function performPlayerCheck(rawPlayerId, rawZoneId) {
       const verifyBox = document.getElementById('verifyResult');
@@ -1861,10 +1863,12 @@
       const zoneId = String(rawZoneId || '').replace(/[\s()\[\]]/g, '');
 
       // Set Loading UI
+      isAccountValid = false;
       verifyBox.className = 'verify-result loading';
       verifySpinner.style.display = 'inline-block';
       verifyText.innerHTML = 'កំពុងត្រួតពិនិត្យឈ្មោះគណនី... (Verifying...)';
       playerIdInput.classList.remove('is-verified', 'is-invalid');
+      updateSummary();
 
       try {
         const response = await fetch('/api/topup/check-id', {
@@ -1882,14 +1886,16 @@
         verifySpinner.style.display = 'none';
 
         if (data.valid && data.nickname) {
-          // Success state
+          // Success state: verified
+          isAccountValid = true;
           verifiedNickname = data.nickname;
           verifyBox.className = 'verify-result success';
           verifyText.innerHTML = `✓ ឈ្មោះគណនី: <strong style="color: #38bdf8;">${escapeHtml(data.nickname)}</strong> (Verified)`;
           playerIdInput.classList.add('is-verified');
           playerIdInput.classList.remove('is-invalid');
         } else if (data.result === 'invalid' || !data.valid) {
-          // Invalid account
+          // Invalid account: strictly block
+          isAccountValid = false;
           verifiedNickname = null;
           verifyBox.className = 'verify-result error';
           const zoneMsg = currentGameData.requiresZone ? ' និង Zone ID ' : ' ';
@@ -1898,6 +1904,7 @@
           playerIdInput.classList.remove('is-verified');
         } else {
           // Fallback or simulated result
+          isAccountValid = true;
           const nick = data.nickname || ('Player_' + playerId.slice(-4));
           verifiedNickname = nick;
           verifyBox.className = 'verify-result success';
@@ -1909,6 +1916,7 @@
         verifySpinner.style.display = 'none';
         verifyBox.className = 'verify-result error';
         verifyText.innerHTML = '⚠️ មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ។ សូមសាកល្បងម្ដងទៀត។';
+        isAccountValid = false;
       }
 
       updateSummary();
@@ -1921,6 +1929,7 @@
       verifyBox.style.display = 'none';
       playerIdInput.classList.remove('is-verified', 'is-invalid');
       verifiedNickname = null;
+      isAccountValid = false;
       updateSummary();
     }
 
@@ -1955,19 +1964,38 @@
           nickRow.style.display = 'none';
         }
 
-        // Enable button if package is chosen and player ID is filled
-        if (playerId) {
+        // Check Zone ID requirement
+        const needsZone = currentGameData && currentGameData.requiresZone;
+        const hasZone = !needsZone || Boolean(zoneId);
+
+        // STRICT GATING: Only enable Top Up Now if:
+        // 1. Package is selected
+        // 2. Player ID is filled
+        // 3. Zone ID is filled (if required)
+        // 4. Account is successfully verified (isAccountValid === true)
+        if (playerId && hasZone && isAccountValid) {
           topUpBtn.classList.add('active');
           topUpBtn.disabled = false;
+          topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
         } else {
           topUpBtn.classList.remove('active');
           topUpBtn.disabled = true;
+          if (playerIdInput.classList.contains('is-invalid')) {
+            topUpBtn.innerHTML = '❌ គណនីមិនត្រឹមត្រូវ (Invalid Account)';
+          } else if (playerIdInput.classList.contains('loading')) {
+            topUpBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់គណនី...';
+          } else if (!isAccountValid && playerId) {
+            topUpBtn.innerHTML = '⚠️ សូមរង់ចាំផ្ទៀងផ្ទាត់គណនី...';
+          } else {
+            topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
+          }
         }
       } else {
         emptyBox.style.display = 'block';
         selectedBox.style.display = 'none';
         topUpBtn.classList.remove('active');
         topUpBtn.disabled = true;
+        topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
       }
     }
 
@@ -1986,6 +2014,11 @@
       if (currentGameData.requiresZone && !zoneId) {
         alert('សូមបញ្ចូល Zone / Server ID!');
         zoneIdInput.focus();
+        return;
+      }
+
+      if (!isAccountValid) {
+        alert('❌ គណនីមិនត្រឹមត្រូវ ឬរកមិនឃើញឡើយ! សូមពិនិត្យ Player ID និង Zone ID ឡើងវិញ។');
         return;
       }
 
@@ -2020,47 +2053,13 @@
       openKhqrModal(orderData);
     }
 
-    // ── Dynamic KHQR Generator (NBC Bakong EMVCo Standard) ──
-    function crc16_ccitt(data) {
-      let crc = 0xFFFF;
-      for (let i = 0; i < data.length; i++) {
-        crc ^= (data.charCodeAt(i) << 8);
-        for (let j = 0; j < 8; j++) {
-          if ((crc & 0x8000) !== 0) {
-            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
-          } else {
-            crc = (crc << 1) & 0xFFFF;
-          }
-        }
-      }
-      return crc.toString(16).toUpperCase().padStart(4, '0');
-    }
-
-    function generateDynamicKhqr(amount) {
-      const amtStr = Number(amount).toFixed(2);
-      const tag54 = '54' + String(amtStr.length).padStart(2, '0') + amtStr;
-      const parts = [
-        '000201',
-        '010212', // 12 = Dynamic QR
-        '30510016abaakhppxxx@abaa01151260917172414410208ABA Bank',
-        '52044814',
-        '5303840', // USD 840
-        tag54,
-        '5802KH',
-        '5910POV KIMHOV',
-        '6010BATTAMBANG',
-        '624268380010PAYWAY@ABA010719916270209032528705',
-        '6304'
-      ];
-      const raw = parts.join('');
-      const crc = crc16_ccitt(raw);
-      return raw + crc;
-    }
+    // ── Official ABA Merchant KHQR for POV KIMHOV ──
+    const ABA_OFFICIAL_QR = '00020101021130510016abaakhppxxx@abaa01151260917172414410208ABA Bank5204481453038405802KH5910POV KIMHOV6010BATTAMBANG624268380010PAYWAY@ABA010719916270209032528705630410A3';
 
     // ── Modal State & Controls ──────────────────────────────
     let khqrTimerInterval = null;
     let currentModalOrder = null;
-    let currentKhqrString = '';
+    let currentKhqrString = ABA_OFFICIAL_QR;
 
     function openKhqrModal(orderData) {
       currentModalOrder = orderData;
@@ -2072,26 +2071,12 @@
       document.getElementById('modalPackageName').textContent = `${orderData.game} - ${orderData.packageName || orderData.packageId}`;
       document.getElementById('modalPlayerId').textContent = orderData.playerId + (orderData.zoneId ? ` (${orderData.zoneId})` : '');
 
-      currentKhqrString = generateDynamicKhqr(amount);
+      currentKhqrString = ABA_OFFICIAL_QR;
 
       const qrImg = document.getElementById('modalQrImg');
       
-      // Immediate reliable visual QR generator
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(currentKhqrString)}`;
-
-      // Fetch official high-res server QR if backend is reachable
-      fetch('/api/payment/generate-khqr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: amount, orderId: orderData.orderId })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.qrDataUrl) {
-          qrImg.src = data.qrDataUrl;
-        }
-      })
-      .catch(err => console.log('Client-side QR fallback active:', err));
+      // Render official valid ABA QR code
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(ABA_OFFICIAL_QR)}`;
 
       // Setup ABA Mobile button link
       const deepLink = document.getElementById('modalAbaDeepLink');
@@ -2112,6 +2097,16 @@
       }, 1000);
 
       modal.classList.add('active');
+    }
+
+    function copyAmountText() {
+      if (currentModalOrder && currentModalOrder.amount) {
+        navigator.clipboard.writeText(currentModalOrder.amount).then(() => {
+          alert(`បានចម្លងចំនួនទឹកប្រាក់ $${currentModalOrder.amount} ជោគជ័យ!`);
+        }).catch(() => {
+          prompt('សូមចម្លងចំនួនទឹកប្រាក់:', currentModalOrder.amount);
+        });
+      }
     }
 
     function updateTimerDisplay(seconds) {
@@ -2222,8 +2217,11 @@
               <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
             </div>
             <div style="text-align: right;">
-              <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount</div>
-              <div class="khqr-stand-amount" id="modalAmount">$0.00</div>
+              <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount to Pay</div>
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                <div class="khqr-stand-amount" id="modalAmount">$0.00</div>
+                <button type="button" onclick="copyAmountText()" style="background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.35); border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; color: #0284c7; cursor: pointer; font-weight: 700;" title="Copy Amount">📋 Copy</button>
+              </div>
             </div>
           </div>
 
@@ -2241,7 +2239,7 @@
 
           <div class="khqr-stand-footer">
             <span>ABA Bank • USD</span>
-            <span style="color: #0284c7;">Auto-Amount</span>
+            <span style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
           </div>
         </div>
 
