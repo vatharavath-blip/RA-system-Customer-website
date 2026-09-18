@@ -1167,38 +1167,82 @@
     .khqr-modal-actions {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
     }
-    .btn-khqr-tap {
-      background: linear-gradient(135deg, #0070f3, #0284c7);
+    .btn-aba-pay {
+      background: linear-gradient(135deg, #005696, #0084d1);
       color: #fff;
       border: none;
-      border-radius: 14px;
-      padding: 13px 18px;
+      border-radius: 12px;
+      padding: 12px 16px;
       font-weight: 700;
-      font-size: 0.98rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 106, 179, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-aba-pay:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 106, 179, 0.55);
+      color: #fff;
+    }
+    .btn-bakong-pay {
+      background: linear-gradient(135deg, #b91c1c, #e11d48);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-bakong-pay:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.55);
+      color: #fff;
+    }
+    .btn-checkout-pay {
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 700;
+      font-size: 0.92rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       text-decoration: none;
-      box-shadow: 0 4px 15px rgba(0, 112, 243, 0.35);
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
       transition: all 0.2s ease;
     }
-    .btn-khqr-tap:hover {
+    .btn-checkout-pay:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 22px rgba(0, 112, 243, 0.55);
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.5);
       color: #fff;
     }
-    .btn-khqr-confirm {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 13px 18px;
+    .btn-check-manual {
+      background: rgba(255, 255, 255, 0.08);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      padding: 11px 16px;
       font-weight: 700;
-      font-size: 0.98rem;
+      font-size: 0.92rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -1206,9 +1250,10 @@
       gap: 8px;
       transition: all 0.2s ease;
     }
-    .btn-khqr-confirm:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    .btn-check-manual:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: #38bdf8;
+      color: #fff;
     }
     .btn-khqr-row {
       display: flex;
@@ -1216,21 +1261,121 @@
     }
     .btn-khqr-save {
       flex: 1;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       color: #94a3b8;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 12px;
       font-weight: 600;
-      font-size: 0.86rem;
+      font-size: 0.82rem;
       cursor: pointer;
       transition: all 0.2s;
     }
     .btn-khqr-save:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
       color: #fff;
     }
+    /* Payment Live Status Pill */
+    .pay-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-top: 6px;
+      transition: all 0.3s ease;
+    }
+    .pay-status-pill.pending {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+    .pay-status-pill.checking {
+      background: rgba(14, 165, 233, 0.12);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+      color: #38bdf8;
+    }
+    .pay-status-pill.success {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+    .pay-status-pill.expired {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
+    }
+    .status-dot-pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fbbf24;
+      box-shadow: 0 0 10px #fbbf24;
+      animation: pulseGlow 1.5s infinite;
+      display: inline-block;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+    .status-dot-spin {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Success View */
+    .khqr-success-view {
+      display: none;
+      text-align: center;
+      padding: 30px 15px;
+    }
+    .khqr-success-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.4));
+      border: 2px solid #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #10b981;
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.45);
+      animation: scalePop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes scalePop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    /* Expired View */
+    .khqr-expired-view {
+      display: none;
+      text-align: center;
+      padding: 30px 15px;
+    }
+    .khqr-expired-icon {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.15);
+      border: 2px solid #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ef4444;
+    }
   </style>
+
 </head>
 <body>
 
@@ -2465,21 +2610,29 @@
       }
     }
 
-    // ── Handle Order Submission ─────────────────────────────
+    // ── PayWay Payment System State & Configuration ─────────
+    let khqrTimerInterval = null;
+    let paymentPollInterval = null;
+    let currentPaymentData = null;
+    let currentOrderMeta = null;
+    let isCheckingPayment = false;
+
+    // ── Handle Order Submission (Calls /api/payment/create) ──
     async function handlePlaceOrder() {
-      const playerId = document.getElementById('playerIdInput').value.replace(/[\s()\[\]]/g, '').trim();
+      const playerIdInput = document.getElementById('playerIdInput');
+      const playerId = playerIdInput ? playerIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
       const zoneIdInput = document.getElementById('zoneIdInput');
       const zoneId = zoneIdInput ? zoneIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
 
       if (!playerId) {
         alert('សូមបញ្ចូល Player ID របស់អ្នក!');
-        document.getElementById('playerIdInput').focus();
+        if (playerIdInput) playerIdInput.focus();
         return;
       }
 
-      if (currentGameData.requiresZone && !zoneId) {
+      if (currentGameData && currentGameData.requiresZone && !zoneId) {
         alert('សូមបញ្ចូល Zone / Server ID!');
-        zoneIdInput.focus();
+        if (zoneIdInput) zoneIdInput.focus();
         return;
       }
 
@@ -2494,102 +2647,319 @@
       }
 
       const btn = document.getElementById('btnTopUpNow');
-      btn.innerHTML = '⚡ កំពុងរៀបចំ QR...';
-      btn.disabled = true;
+      const originalBtnText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '⚡ កំពុងរៀបចំ QR...';
+        btn.disabled = true;
+      }
 
-      const orderRef = 'R1CKKY-' + Date.now().toString().slice(-8);
-      const orderData = {
+      const mBtn = document.getElementById('mobileBtnPay');
+      if (mBtn) mBtn.disabled = true;
+
+      const orderRef = 'INV-' + Date.now();
+      const amountVal = Number(selectedPackage.price).toFixed(2);
+
+      const orderMeta = {
         orderId: orderRef,
-        game: currentGameData.title,
+        game: currentGameData ? currentGameData.title : 'Game Top-Up',
         slug: currentSlug,
         playerId: playerId,
         zoneId: zoneId || null,
         playerNickname: verifiedNickname || null,
         packageId: selectedPackage.id,
         packageName: selectedPackage.amount,
-        amount: Number(selectedPackage.price).toFixed(2),
+        amount: amountVal,
+        currency: 'USD',
         paymentMethod: selectedPayment || 'ABA Pay',
         createdAt: new Date().toISOString()
       };
 
-      // Save to localStorage for order status page
-      localStorage.setItem('currentOrder', JSON.stringify(orderData));
+      try {
+        // Call backend /api/payment/create (Proxies PayWay Payment System API securely)
+        const resp = await fetch('/api/payment/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: amountVal,
+            orderId: orderRef,
+            game: orderMeta.game,
+            slug: orderMeta.slug,
+            playerId: orderMeta.playerId,
+            zoneId: orderMeta.zoneId,
+            packageId: orderMeta.packageId,
+            packageName: orderMeta.packageName
+          })
+        });
 
-      // Open Dynamic KHQR Modal directly
-      openKhqrModal(orderData);
+        const data = await resp.json();
+
+        if (!data || !data.success || !data.qr_string) {
+          throw new Error(data && data.error ? data.error : 'Failed to generate KHQR');
+        }
+
+        currentPaymentData = data;
+        currentOrderMeta = orderMeta;
+
+        // Persist order with md5 and bill_number to localStorage
+        orderMeta.md5 = data.md5;
+        orderMeta.billNumber = data.bill_number;
+        localStorage.setItem('currentOrder', JSON.stringify(orderMeta));
+
+        // Open PayWay Payment System Modal
+        openKhqrModal(data, orderMeta);
+      } catch (err) {
+        console.error('Payment Create Error:', err);
+        alert('⚠️ មានបញ្ហាក្នុងការបង្កើត QR Code: ' + err.message + '\nសូមព្យាយាមម្ដងទៀត។');
+        if (btn) {
+          btn.innerHTML = originalBtnText || '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
+          btn.disabled = false;
+        }
+        if (mBtn) mBtn.disabled = false;
+      }
     }
 
-    // ── Official ABA Merchant KHQR for POV KIMHOV ──
-    const ABA_OFFICIAL_QR = '00020101021130510016abaakhppxxx@abaa01151260917172414410208ABA Bank5204481453038405802KH5910POV KIMHOV6010BATTAMBANG624268380010PAYWAY@ABA010719916270209032528705630410A3';
-
-    // ── Modal State & Controls ──────────────────────────────
-    let khqrTimerInterval = null;
-    let currentModalOrder = null;
-    let currentKhqrString = ABA_OFFICIAL_QR;
-
-    function openKhqrModal(orderData) {
-      currentModalOrder = orderData;
+    // ── Open Modern PayWay Payment Modal ─────────────────────
+    function openKhqrModal(paymentData, orderMeta) {
       const modal = document.getElementById('khqrModal');
-      const amount = Number(orderData.amount).toFixed(2);
+      if (!modal) return;
 
-      document.getElementById('modalAmount').textContent = '$' + amount;
+      // Reset modal sub-views
+      document.getElementById('khqrPaymentView').style.display = 'block';
+      document.getElementById('khqrSuccessView').style.display = 'none';
+      document.getElementById('khqrExpiredView').style.display = 'none';
+
+      // Set Display Details
+      const amtStr = Number(paymentData.amount).toFixed(2);
+      const currStr = paymentData.currency || 'USD';
+      document.getElementById('modalAmount').textContent = `$${amtStr} ${currStr}`;
+      document.getElementById('modalInvoiceNum').textContent = paymentData.bill_number;
       document.getElementById('modalMerchantName').textContent = 'POV KIMHOV';
-      document.getElementById('modalPackageName').textContent = `${orderData.game} - ${orderData.packageName || orderData.packageId}`;
-      document.getElementById('modalPlayerId').textContent = orderData.playerId + (orderData.zoneId ? ` (${orderData.zoneId})` : '');
+      document.getElementById('modalPackageName').textContent = `${orderMeta.game} - ${orderMeta.packageName || orderMeta.packageId}`;
+      document.getElementById('modalPlayerId').textContent = orderMeta.playerId + (orderMeta.zoneId ? ` (${orderMeta.zoneId})` : '');
 
-      currentKhqrString = ABA_OFFICIAL_QR;
-
+      // Render Dynamic QR Code with exact auto-filled price
       const qrImg = document.getElementById('modalQrImg');
-      
-      // Render official valid ABA QR code
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(ABA_OFFICIAL_QR)}`;
+      const qrDataToRender = paymentData.qr_string;
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=4&data=${encodeURIComponent(qrDataToRender)}`;
 
-      // Setup ABA Mobile button link
-      const deepLink = document.getElementById('modalAbaDeepLink');
-      deepLink.href = 'https://link.payway.com.kh/ABAPAYTh526248G';
+      // Wire Action Buttons
+      // 1. Pay with ABA
+      const abaBtn = document.getElementById('modalAbaDeepLink');
+      if (abaBtn) {
+        abaBtn.href = paymentData.deeplink_aba || 'https://link.payway.com.kh/ABAPAYTh526248G';
+      }
 
-      // 5-minute Countdown Timer
-      let timeLeft = 300;
+      // 2. Pay with Bakong
+      const bakongBtn = document.getElementById('modalBakongDeepLink');
+      if (bakongBtn) {
+        if (paymentData.deeplink_bakong) {
+          bakongBtn.href = paymentData.deeplink_bakong;
+          bakongBtn.style.display = 'flex';
+        } else {
+          bakongBtn.href = 'https://bakong-deeplink.nbc.gov.kh/';
+          bakongBtn.style.display = 'flex';
+        }
+      }
+
+      // 3. Open Checkout
+      const checkoutBtn = document.getElementById('modalCheckoutLink');
+      if (checkoutBtn) {
+        if (paymentData.checkout) {
+          checkoutBtn.href = paymentData.checkout;
+          checkoutBtn.style.display = 'flex';
+        } else {
+          checkoutBtn.href = `https://payway.payment-system.dev/api/v1/checkout/${encodeURIComponent(paymentData.md5)}`;
+          checkoutBtn.style.display = 'flex';
+        }
+      }
+
+      // Reset Live Status Pill
+      updateModalStatusPill('pending', 'Waiting for payment (កំពុងរង់ចាំការទូទាត់)');
+
+      // 3-Minute Countdown Timer (Using expire_in_sec)
+      let timeLeft = Number(paymentData.expire_in_sec) || 180;
       clearInterval(khqrTimerInterval);
       updateTimerDisplay(timeLeft);
-      khqrTimerInterval = setInterval(() => {
+
+      khqrTimerInterval = setInterval(async () => {
         timeLeft--;
         if (timeLeft <= 0) {
           clearInterval(khqrTimerInterval);
-          document.getElementById('modalTimer').textContent = 'EXPIRED';
+          document.getElementById('modalTimer').textContent = '00:00';
+          
+          // CRITICAL: Perform one final transaction check before marking expired!
+          updateModalStatusPill('checking', 'Final verification check...');
+          const finalSuccess = await checkPaymentTransaction(true);
+          if (!finalSuccess) {
+            clearInterval(paymentPollInterval);
+            showExpiredScreen();
+          }
         } else {
           updateTimerDisplay(timeLeft);
         }
       }, 1000);
 
+      // Automatic Transaction Checking Loop (Polls every 3 seconds)
+      clearInterval(paymentPollInterval);
+      paymentPollInterval = setInterval(() => {
+        checkPaymentTransaction(false);
+      }, 3000);
+
       modal.classList.add('active');
     }
 
-    function copyAmountText() {
-      if (currentModalOrder && currentModalOrder.amount) {
-        navigator.clipboard.writeText(currentModalOrder.amount).then(() => {
-          alert(`បានចម្លងចំនួនទឹកប្រាក់ $${currentModalOrder.amount} ជោគជ័យ!`);
-        }).catch(() => {
-          prompt('សូមចម្លងចំនួនទឹកប្រាក់:', currentModalOrder.amount);
+    // ── Check Transaction by MD5 ─────────────────────────────
+    async function checkPaymentTransaction(isFinalCheck = false) {
+      if (!currentPaymentData || !currentPaymentData.md5 || isCheckingPayment) return false;
+      isCheckingPayment = true;
+
+      try {
+        const resp = await fetch('/api/payment/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ md5: currentPaymentData.md5 })
         });
+
+        const resData = await resp.json();
+
+        // 3. SUCCESS when API returns responseCode = 0 / status = success
+        if (resData && (resData.status === 'success' || resData.responseCode === 0)) {
+          clearInterval(khqrTimerInterval);
+          clearInterval(paymentPollInterval);
+
+          // Update saved order with transaction hash
+          if (currentOrderMeta) {
+            currentOrderMeta.status = 'success';
+            currentOrderMeta.transactionHash = resData.transaction_hash;
+            localStorage.setItem('currentOrder', JSON.stringify(currentOrderMeta));
+          }
+
+          showSuccessScreen(resData);
+          return true;
+        }
+
+        // When Expired
+        if (resData && resData.status === 'expired') {
+          clearInterval(khqrTimerInterval);
+          clearInterval(paymentPollInterval);
+          showExpiredScreen();
+          return false;
+        }
+
+        // Still Pending (responseCode = 1) -> Stay in PENDING, do NOT mark failed
+        if (!isFinalCheck) {
+          updateModalStatusPill('pending', 'Waiting for payment (កំពុងរង់ចាំការទូទាត់)');
+        }
+        return false;
+      } catch (err) {
+        console.warn('Payment check error:', err.message);
+        return false;
+      } finally {
+        isCheckingPayment = false;
       }
     }
 
+    // Manual check trigger from [ 🔄 Check Payment ] button
+    async function checkPaymentStatusNow() {
+      const checkBtn = document.getElementById('btnManualCheck');
+      if (checkBtn) {
+        checkBtn.disabled = true;
+        checkBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់...';
+      }
+      updateModalStatusPill('checking', 'Checking transaction status...');
+
+      const success = await checkPaymentTransaction(false);
+      if (!success) {
+        setTimeout(() => {
+          if (checkBtn) {
+            checkBtn.disabled = false;
+            checkBtn.innerHTML = '🔄 Check Payment (ពិនិត្យការទូទាត់)';
+          }
+          updateModalStatusPill('pending', 'Waiting for payment (មិនទាន់បានបង់ប្រាក់នៅឡើយ)');
+        }, 800);
+      }
+    }
+
+    // ── Update Status Badge ──────────────────────────────────
+    function updateModalStatusPill(status, text) {
+      const pill = document.getElementById('modalStatusPill');
+      const txt = document.getElementById('modalStatusText');
+      if (!pill || !txt) return;
+
+      pill.className = `pay-status-pill ${status}`;
+      txt.textContent = text;
+    }
+
+    // ── Show Success Screen ──────────────────────────────────
+    function showSuccessScreen(txData) {
+      document.getElementById('khqrPaymentView').style.display = 'none';
+      document.getElementById('khqrExpiredView').style.display = 'none';
+      const successView = document.getElementById('khqrSuccessView');
+      successView.style.display = 'block';
+
+      const successAmount = document.getElementById('successAmount');
+      if (successAmount) {
+        successAmount.textContent = `$${Number(txData.amount || currentPaymentData.amount).toFixed(2)} ${txData.currency || 'USD'}`;
+      }
+
+      const successInvoice = document.getElementById('successInvoice');
+      if (successInvoice) {
+        successInvoice.textContent = txData.bill_number || currentPaymentData.bill_number;
+      }
+
+      const successHash = document.getElementById('successHash');
+      if (successHash && txData.transaction_hash) {
+        successHash.textContent = txData.transaction_hash;
+        successHash.parentElement.style.display = 'block';
+      }
+
+      // Auto redirect to order status page after 2.5s
+      setTimeout(() => {
+        const billNum = txData.bill_number || (currentPaymentData && currentPaymentData.bill_number) || '';
+        window.location.href = `order-status.html?id=${encodeURIComponent(billNum)}`;
+      }, 2500);
+    }
+
+    // ── Show Expired Screen ──────────────────────────────────
+    function showExpiredScreen() {
+      document.getElementById('khqrPaymentView').style.display = 'none';
+      document.getElementById('khqrSuccessView').style.display = 'none';
+      const expiredView = document.getElementById('khqrExpiredView');
+      expiredView.style.display = 'block';
+    }
+
+    // ── Helper Utilities ─────────────────────────────────────
     function updateTimerDisplay(seconds) {
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
-      document.getElementById('modalTimer').textContent = 
-        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      const el = document.getElementById('modalTimer');
+      if (el) {
+        el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
     }
 
     function closeKhqrModal() {
       const modal = document.getElementById('khqrModal');
-      modal.classList.remove('active');
+      if (modal) modal.classList.remove('active');
       clearInterval(khqrTimerInterval);
+      clearInterval(paymentPollInterval);
+
       const btn = document.getElementById('btnTopUpNow');
       if (btn) {
         btn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
         btn.disabled = false;
+      }
+      const mBtn = document.getElementById('mobileBtnPay');
+      if (mBtn) mBtn.disabled = false;
+    }
+
+    function copyAmountText() {
+      if (currentPaymentData && currentPaymentData.amount) {
+        navigator.clipboard.writeText(currentPaymentData.amount).then(() => {
+          alert(`បានចម្លងចំនួនទឹកប្រាក់ $${currentPaymentData.amount} ជោគជ័យ!`);
+        }).catch(() => {
+          prompt('សូមចម្លងចំនួនទឹកប្រាក់:', currentPaymentData.amount);
+        });
       }
     }
 
@@ -2598,7 +2968,7 @@
       if (qrImg && qrImg.src) {
         const a = document.createElement('a');
         a.href = qrImg.src;
-        a.download = `KHQR-POV_KIMHOV-${(currentModalOrder && currentModalOrder.orderId) || 'ORDER'}.png`;
+        a.download = `KHQR-${(currentPaymentData && currentPaymentData.bill_number) || 'ORDER'}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -2606,38 +2976,18 @@
     }
 
     function copyKhqrText() {
-      if (currentKhqrString) {
-        navigator.clipboard.writeText(currentKhqrString).then(() => {
+      if (currentPaymentData && currentPaymentData.qr_string) {
+        navigator.clipboard.writeText(currentPaymentData.qr_string).then(() => {
           alert('បានចម្លងកូដ KHQR ជោគជ័យ!');
         }).catch(() => {
-          alert(currentKhqrString);
+          alert(currentPaymentData.qr_string);
         });
       }
     }
 
-    function confirmPaymentAndProceed() {
-      if (!currentModalOrder) return;
+    function retryGenerateQr() {
       closeKhqrModal();
-
-      // Trigger order registration in background
-      try {
-        fetch('/api/topup/order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            package_id: currentModalOrder.packageId,
-            player_id: currentModalOrder.playerId,
-            server_id: currentModalOrder.zoneId || null,
-            reference: currentModalOrder.orderId,
-            game: currentModalOrder.game,
-            slug: currentModalOrder.slug
-          })
-        }).catch(err => console.warn('Order background notice:', err));
-      } catch (e) {
-        console.warn('Order dispatch fetch error:', e);
-      }
-
-      window.location.href = 'order-status.html?id=' + currentModalOrder.orderId;
+      handlePlaceOrder();
     }
 
     function escapeHtml(str) {
@@ -2673,78 +3023,156 @@
     }, { passive: false });
   </script>
 
-  <!-- Dynamic KHQR Payment Modal -->
+  <!-- Complete PayWay KHQR Payment Modal -->
   <div class="khqr-modal-overlay" id="khqrModal">
     <div class="khqr-modal-card">
       <div class="khqr-modal-header">
         <div class="khqr-modal-title">
           <img src="images/Newlogo.png" alt="Logo" style="height: 26px; width: auto;">
-          <span>ស្កេនទូទាត់ប្រាក់ (KHQR)</span>
+          <span>KHQR PAYMENT</span>
         </div>
         <button class="khqr-modal-close" onclick="closeKhqrModal()" title="Close">✕</button>
       </div>
 
       <div class="khqr-modal-body">
-        <!-- Authentic KHQR Stand Card -->
-        <div class="khqr-stand-card">
-          <div class="khqr-stand-header">
-            <div class="khqr-tag-logo">KHQR</div>
-          </div>
-          <div class="khqr-stand-info">
-            <div>
-              <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Merchant</div>
-              <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
+        <!-- 1. Active Payment View -->
+        <div id="khqrPaymentView">
+          <!-- Authentic KHQR Stand Card -->
+          <div class="khqr-stand-card">
+            <div class="khqr-stand-header">
+              <div class="khqr-tag-logo">KHQR</div>
             </div>
-            <div style="text-align: right;">
-              <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount to Pay</div>
-              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
-                <div class="khqr-stand-amount" id="modalAmount">$0.00</div>
-                <button type="button" onclick="copyAmountText()" style="background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.35); border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; color: #0284c7; cursor: pointer; font-weight: 700;" title="Copy Amount">📋 Copy</button>
+            <div class="khqr-stand-info">
+              <div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Merchant</div>
+                <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount to Pay</div>
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                  <div class="khqr-stand-amount" id="modalAmount">$0.00 USD</div>
+                  <button type="button" onclick="copyAmountText()" style="background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.35); border-radius: 6px; padding: 2px 8px; font-size: 0.75rem; color: #0284c7; cursor: pointer; font-weight: 700;" title="Copy Amount">📋 Copy</button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="khqr-qr-container">
-            <img id="modalQrImg" class="khqr-qr-img" src="" alt="KHQR Code">
-            <div class="khqr-center-badge">
-              <!-- Bakong Red Emblem SVG -->
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="48" fill="#E11D48"/>
-                <circle cx="50" cy="50" r="38" stroke="#FFFFFF" stroke-width="4"/>
-                <path d="M50 20 L58 36 L76 38 L62 50 L66 68 L50 58 L34 68 L38 50 L24 38 L42 36 Z" fill="#FFFFFF"/>
-              </svg>
+            <div class="khqr-qr-container">
+              <img id="modalQrImg" class="khqr-qr-img" src="" alt="KHQR Code">
+              <div class="khqr-center-badge">
+                <!-- Bakong Red Emblem SVG -->
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="48" fill="#E11D48"/>
+                  <circle cx="50" cy="50" r="38" stroke="#FFFFFF" stroke-width="4"/>
+                  <path d="M50 20 L58 36 L76 38 L62 50 L66 68 L50 58 L34 68 L38 50 L24 38 L42 36 Z" fill="#FFFFFF"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="khqr-stand-footer">
+              <span>ABA Bank • USD</span>
+              <span style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
             </div>
           </div>
 
-          <div class="khqr-stand-footer">
-            <span>ABA Bank • USD</span>
-            <span style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
+          <!-- Invoice & Countdown Display -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; font-size: 0.86rem;">
+            <div style="color: #94a3b8; font-weight: 600;">
+              Invoice: <span id="modalInvoiceNum" style="color: #38bdf8; font-weight: 800;">-</span>
+            </div>
+            <div class="khqr-timer-box" style="margin-bottom: 0;">
+              <span>⏳ Time remaining:</span>
+              <span id="modalTimer" style="font-weight: 800; font-size: 0.95rem; color: #fbbf24;">03:00</span>
+            </div>
+          </div>
+
+          <div class="khqr-order-meta" style="margin-bottom: 12px; font-size: 0.82rem; text-align: left; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px;">
+            <div>Package: <span id="modalPackageName">-</span></div>
+            <div>Account: <span id="modalPlayerId">-</span></div>
+          </div>
+
+          <!-- PayWay Action Buttons -->
+          <div class="khqr-modal-actions">
+            <!-- 1. Pay with ABA -->
+            <a id="modalAbaDeepLink" href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" class="btn-aba-pay">
+              <span>📱 Pay with ABA (បង់ប្រាក់តាម ABA)</span>
+            </a>
+
+            <!-- 2. Pay with Bakong -->
+            <a id="modalBakongDeepLink" href="https://bakong-deeplink.nbc.gov.kh/" target="_blank" rel="noopener noreferrer" class="btn-bakong-pay">
+              <span>🏛️ Pay with Bakong (បង់ប្រាក់តាម Bakong)</span>
+            </a>
+
+            <!-- 3. Open Checkout -->
+            <a id="modalCheckoutLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-checkout-pay">
+              <span>🌐 Open Checkout (បើកទំព័រទូទាត់ប្រាក់)</span>
+            </a>
+
+            <!-- 4. Manual Check Payment -->
+            <button id="btnManualCheck" class="btn-check-manual" onclick="checkPaymentStatusNow()">
+              <span>🔄 Check Payment (ពិនិត្យការទូទាត់)</span>
+            </button>
+
+            <!-- Save / Copy Row -->
+            <div class="btn-khqr-row">
+              <button class="btn-khqr-save" onclick="downloadKhqrImage()">📥 រក្សាទុក QR</button>
+              <button class="btn-khqr-save" onclick="copyKhqrText()">📋 ចម្លងកូដ KHQR</button>
+            </div>
+          </div>
+
+          <!-- Live Dynamic Payment Status Indicator -->
+          <div style="margin-top: 14px;">
+            <div class="pay-status-pill pending" id="modalStatusPill">
+              <span class="status-dot-pulse"></span>
+              <span id="modalStatusText">Waiting for payment (កំពុងរង់ចាំការទូទាត់)</span>
+            </div>
           </div>
         </div>
 
-        <div class="khqr-timer-box">
-          <span>⏳ ផុតកំណត់ក្នុងរយៈពេល:</span>
-          <span id="modalTimer" style="font-weight: 800; font-size: 0.95rem;">05:00</span>
-        </div>
+        <!-- 2. Success View -->
+        <div id="khqrSuccessView" class="khqr-success-view">
+          <div class="khqr-success-icon">
+            <svg viewBox="0 0 24 24" width="44" height="44" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3 style="color: #10b981; font-size: 1.35rem; font-weight: 800; margin: 0 0 8px;">Payment Successful!</h3>
+          <p style="color: #94a3b8; font-size: 0.95rem; margin: 0 0 16px;">ការទូទាត់ប្រាក់ទទួលបានជោគជ័យ</p>
 
-        <div class="khqr-order-meta">
-          <div>កញ្ចប់: <span id="modalPackageName">-</span></div>
-          <div>គណនី: <span id="modalPlayerId">-</span></div>
-        </div>
-
-        <div class="khqr-modal-actions">
-          <!-- Direct Mobile Link -->
-          <a id="modalAbaDeepLink" href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" class="btn-khqr-tap">
-            <span>📱 បង់ប្រាក់តាម ABA Mobile (Tap to Pay)</span>
-          </a>
-
-          <div class="btn-khqr-row">
-            <button class="btn-khqr-save" onclick="downloadKhqrImage()">📥 រក្សាទុក QR</button>
-            <button class="btn-khqr-save" onclick="copyKhqrText()">📋 ចម្លងកូដ</button>
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 14px; margin-bottom: 20px; text-align: left; font-size: 0.88rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: #94a3b8;">Amount Paid:</span>
+              <span id="successAmount" style="color: #10b981; font-weight: 800;">$0.00 USD</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="color: #94a3b8;">Invoice:</span>
+              <span id="successInvoice" style="color: #fff; font-weight: 700;">-</span>
+            </div>
+            <div style="display: none; justify-content: space-between;">
+              <span style="color: #94a3b8;">Hash:</span>
+              <span id="successHash" style="color: #cbd5e1; font-family: monospace; font-size: 0.78rem;">-</span>
+            </div>
           </div>
 
-          <button class="btn-khqr-confirm" onclick="confirmPaymentAndProceed()">
-            <span>✅ ខ្ញុំបានបង់ប្រាក់រួចរាល់ (Proceed)</span>
+          <div style="color: #38bdf8; font-size: 0.86rem; font-weight: 600;">
+            ⏳ កំពុងបញ្ជូនទៅកាន់ទំព័រតាមដានការបញ្ជាទិញ...
+          </div>
+        </div>
+
+        <!-- 3. Expired View -->
+        <div id="khqrExpiredView" class="khqr-expired-view">
+          <div class="khqr-expired-icon">
+            <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 style="color: #ef4444; font-size: 1.25rem; font-weight: 800; margin: 0 0 8px;">QR Code Expired</h3>
+          <p style="color: #94a3b8; font-size: 0.92rem; margin: 0 0 20px;">
+            ពេលវេលាទូទាត់ប្រាក់ 3 នាទីបានផុតកំណត់ហើយ។ សូមចុចប៊ូតុងខាងក្រោមដើម្បីបង្កើត QR ថ្មី។
+          </p>
+          <button class="btn-aba-pay" onclick="retryGenerateQr()" style="width: 100%; justify-content: center;">
+            <span>🔄 បង្កើត QR ថ្មី (Generate New QR)</span>
           </button>
         </div>
       </div>

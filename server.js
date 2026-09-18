@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 const QRCode = require('qrcode');
@@ -9,10 +11,45 @@ const PORT = process.env.SERVER_PORT || process.env.PORT || 3000;
 const API_KEY = process.env.TOPUP_API_KEY;
 const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 
+// PayWay Payment Gateway System API Configuration
+const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-system.dev/api/v1').replace(/\/$/, '');
+const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '';
+const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
+
+// Persistent Transaction Store (Maps md5 -> payment record for duplicate protection and order processing)
+const PAYMENTS_FILE = path.join(__dirname, 'payments.json');
+const paymentStore = new Map();
+
+function savePayments() {
+  try {
+    const obj = Object.fromEntries(paymentStore);
+    fs.writeFileSync(PAYMENTS_FILE, JSON.stringify(obj, null, 2));
+  } catch (e) {
+    console.error('Error saving payments.json:', e.message);
+  }
+}
+
+function loadPayments() {
+  try {
+    if (fs.existsSync(PAYMENTS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(PAYMENTS_FILE, 'utf8'));
+      for (const [k, v] of Object.entries(data)) {
+        paymentStore.set(k, v);
+      }
+      console.log(`Loaded ${paymentStore.size} payment records from payments.json`);
+    }
+  } catch (e) {
+    console.error('Error loading payments.json:', e.message);
+  }
+}
+
+loadPayments();
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
 
 // Tiered Profit Margin:
 // Under $5.00: +$0.15 profit
@@ -49,13 +86,18 @@ function crc16_ccitt(data) {
   return crc.toString(16).toUpperCase().padStart(4, '0');
 }
 
-// Generate Dynamic NBC Bakong KHQR for POV KIMHOV (ABA Bank USD)
+// Generate Dynamic NBC Bakong KHQR for POV KIMHOV (ABA Bank USD with Auto Amount)
 function generateDynamicKhqr(amount) {
   const amtStr = Number(amount).toFixed(2);
   const tag54 = '54' + String(amtStr.length).padStart(2, '0') + amtStr;
+  const now = Date.now();
+  const expire = now + 15 * 60 * 1000; // 15 mins validity
+  const tag99Val = '0013' + now + '0113' + expire;
+  const tag99 = '99' + String(tag99Val.length).padStart(2, '0') + tag99Val;
+
   const parts = [
     '000201',
-    '010212', // 12 = Dynamic QR
+    '010212', // 12 = Dynamic QR (Auto Price)
     '30510016abaakhppxxx@abaa01151260917172414410208ABA Bank',
     '52044814',
     '5303840', // USD 840
@@ -64,6 +106,7 @@ function generateDynamicKhqr(amount) {
     '5910POV KIMHOV',
     '6010BATTAMBANG',
     '624268380010PAYWAY@ABA010719916270209032528705',
+    tag99,
     '6304'
   ];
   const raw = parts.join('');
@@ -476,41 +519,271 @@ app.get('/api/topup/order-status/:orderCode', async (req, res) => {
   }
 });
 
-// 6. Generate Dynamic KHQR (EMVCo Standard for POV KIMHOV)
-app.post('/api/payment/generate-khqr', async (req, res) => {
+// 6. PayWay Payment System API Endpoints
+
+// 6.1 Create Payment & Generate Dynamic KHQR (Auto-filled Price)
+app.post('/api/payment/create', async (req, res) => {
   try {
-    const { amount, orderId, reference } = req.body;
+    const { amount, orderId, reference, game, slug, playerId, zoneId, packageId, packageName } = req.body;
     const numAmount = Number(amount) || 0;
     if (numAmount <= 0) {
       return res.status(400).json({ error: 'Valid amount is required' });
     }
 
-    const qrString = generateDynamicKhqr(numAmount);
-    const qrDataUrl = await QRCode.toDataURL(qrString, {
-      width: 320,
-      margin: 1,
-      color: {
-        dark: '#000000',
-        light: '#ffffff'
+    const amtStr = numAmount.toFixed(2);
+    const billNumber = orderId || reference || ('INV-' + Date.now());
+
+    // 1. If PAYWAY_API_TOKEN is configured, call external PayWay Payment System API
+    if (PAYWAY_API_TOKEN) {
+      try {
+        const externalUrl = `${PAYWAY_API_URL}/generate_qr/?payway_link=${encodeURIComponent(PAYWAY_LINK)}&amount=${amtStr}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
+        const extResp = await fetch(externalUrl, { timeout: 10000 });
+        const extData = await extResp.json();
+
+        if (extData && (extData.success === true || extData.qr_string)) {
+          const md5Val = extData.md5 || crypto.createHash('md5').update(billNumber + amtStr + Date.now()).digest('hex');
+
+          // Store transaction record with duplicate protection
+          paymentStore.set(md5Val, {
+            id: billNumber,
+            billNumber: extData.bill_number || billNumber,
+            md5: md5Val,
+            paywayLink: PAYWAY_LINK,
+            amount: numAmount,
+            currency: extData.currency || 'USD',
+            status: 'pending',
+            qrString: extData.qr_string,
+            downloadQr: extData.download_qr || null,
+            checkout: extData.checkout || null,
+            deeplinkAba: extData.deeplink_aba || PAYWAY_LINK,
+            deeplinkBakong: extData.deeplink_bakong || null,
+            expireInSec: Number(extData.expire_in_sec) || 180,
+            expireDate: extData.expire_date || new Date(Date.now() + 180000).toISOString(),
+            checkCount: 0,
+            lastCheckAt: null,
+            paidAt: null,
+            createdAt: new Date().toISOString(),
+            orderFulfilled: false,
+            orderDetails: { game, slug, playerId, zoneId, packageId, packageName, orderId: billNumber }
+          });
+          savePayments();
+
+          return res.json({
+            success: true,
+            status: 'pending',
+            md5: md5Val,
+            bill_number: extData.bill_number || billNumber,
+            amount: amtStr,
+            currency: extData.currency || 'USD',
+            qr_string: extData.qr_string,
+            download_qr: extData.download_qr || null,
+            checkout: extData.checkout || null,
+            deeplink_aba: extData.deeplink_aba || PAYWAY_LINK,
+            deeplink_bakong: extData.deeplink_bakong || null,
+            expire_in_sec: Number(extData.expire_in_sec) || 180,
+            expire_date: extData.expire_date || null
+          });
+        }
+      } catch (extErr) {
+        console.warn('PayWay external API call error, using local NBC Bakong dynamic engine:', extErr.message);
       }
+    }
+
+    // 2. High-reliability NBC Bakong Dynamic KHQR Engine (Auto-Price Embedded)
+    const dynamicKhqr = generateDynamicKhqr(numAmount);
+    const md5Val = crypto.createHash('md5').update(billNumber + amtStr + Date.now()).digest('hex');
+    const expireSec = 180;
+    const expireDate = new Date(Date.now() + expireSec * 1000).toISOString();
+
+    paymentStore.set(md5Val, {
+      id: billNumber,
+      billNumber: billNumber,
+      md5: md5Val,
+      paywayLink: PAYWAY_LINK,
+      amount: numAmount,
+      currency: 'USD',
+      status: 'pending',
+      qrString: dynamicKhqr,
+      downloadQr: null,
+      checkout: null,
+      deeplinkAba: PAYWAY_LINK,
+      deeplinkBakong: null,
+      expireInSec: expireSec,
+      expireDate: expireDate,
+      checkCount: 0,
+      lastCheckAt: null,
+      paidAt: null,
+      createdAt: new Date().toISOString(),
+      orderFulfilled: false,
+      orderDetails: { game, slug, playerId, zoneId, packageId, packageName, orderId: billNumber }
     });
+    savePayments();
 
     res.json({
       success: true,
-      orderId: orderId || reference || ('R1CKKY-' + Date.now().toString().slice(-8)),
-      amount: numAmount.toFixed(2),
+      status: 'pending',
+      md5: md5Val,
+      bill_number: billNumber,
+      amount: amtStr,
       currency: 'USD',
-      merchantName: 'POV KIMHOV',
-      bankName: 'ABA Bank',
-      qrString: qrString,
-      qrDataUrl: qrDataUrl,
-      paywayLink: 'https://link.payway.com.kh/ABAPAYTh526248G'
+      qr_string: dynamicKhqr,
+      download_qr: null,
+      checkout: null,
+      deeplink_aba: PAYWAY_LINK,
+      deeplink_bakong: null,
+      expire_in_sec: expireSec,
+      expire_date: expireDate
     });
   } catch (err) {
-    console.error('KHQR Generation Error:', err);
-    res.status(500).json({ error: 'Failed to generate KHQR', details: err.message });
+    console.error('Payment Create Error:', err);
+    res.status(500).json({ success: false, error: 'Failed to create payment', details: err.message });
   }
 });
+
+// Legacy Alias
+app.post('/api/payment/generate-khqr', (req, res, next) => {
+  req.url = '/api/payment/create';
+  app.handle(req, res, next);
+});
+
+// 6.2 Check Transaction Status (Idempotent with Duplicate Protection)
+app.post('/api/payment/check', async (req, res) => {
+  try {
+    const { md5 } = req.body;
+    if (!md5) {
+      return res.status(400).json({ success: false, error: 'md5 parameter is required' });
+    }
+
+    const payment = paymentStore.get(md5);
+    if (payment) {
+      payment.checkCount = (payment.checkCount || 0) + 1;
+      payment.lastCheckAt = new Date().toISOString();
+    }
+
+    // 10. If already confirmed SUCCESS, return idempotent response
+    if (payment && payment.status === 'success') {
+      return res.json({
+        success: true,
+        status: 'success',
+        amount: payment.amount,
+        currency: payment.currency,
+        bill_number: payment.billNumber,
+        transaction_hash: payment.transactionHash || null
+      });
+    }
+
+    // Call PayWay check_transaction_by_md5 if API token is configured
+    if (PAYWAY_API_TOKEN) {
+      try {
+        const checkUrl = `${PAYWAY_API_URL}/check_transaction_by_md5/?md5=${encodeURIComponent(md5)}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
+        const extResp = await fetch(checkUrl, { timeout: 8000 });
+        const extData = await extResp.json();
+
+        // 3. When Paid: responseCode === 0
+        if (extData && extData.responseCode === 0 && extData.data) {
+          const tx = extData.data;
+
+          // 9. Validation:
+          // data.amount matches requested amount
+          // data.currency matches requested currency
+          // data.description matches generated bill number
+          const amtValid = !payment || Math.abs(Number(tx.amount) - Number(payment.amount)) < 0.01;
+          const currValid = !payment || !tx.currency || tx.currency.toUpperCase() === (payment.currency || 'USD').toUpperCase();
+          const descValid = !payment || !tx.description || tx.description === payment.billNumber;
+
+          if (!amtValid || !currValid || !descValid) {
+            console.warn('Payment validation mismatch:', { amtValid, currValid, descValid, tx, expected: payment });
+            return res.status(400).json({
+              success: false,
+              error: 'Transaction verification mismatch',
+              status: 'verification_failed'
+            });
+          }
+
+          if (payment) {
+            payment.status = 'success';
+            payment.transactionHash = tx.hash;
+            payment.receiptUrl = tx.download_receipt;
+            payment.paidAt = new Date().toISOString();
+            savePayments();
+
+            // Auto-fulfill Game Top-Up Order (Only once with idempotent protection)
+            if (!payment.orderFulfilled && payment.orderDetails && payment.orderDetails.playerId) {
+              payment.orderFulfilled = true;
+              savePayments();
+              fetch(`http://localhost:${PORT}/api/topup/order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  package_id: payment.orderDetails.packageId,
+                  player_id: payment.orderDetails.playerId,
+                  server_id: payment.orderDetails.zoneId || null,
+                  reference: payment.billNumber,
+                  game: payment.orderDetails.game,
+                  slug: payment.orderDetails.slug
+                })
+              }).catch(e => console.warn('Auto topup background dispatch notice:', e.message));
+            }
+          }
+
+          return res.json({
+            success: true,
+            status: 'success',
+            amount: tx.amount,
+            currency: tx.currency || 'USD',
+            bill_number: tx.description || (payment ? payment.billNumber : null),
+            transaction_hash: tx.hash
+          });
+        }
+
+        // 2 & 4. When Not Paid Yet: responseCode === 1 (PENDING)
+        // Do NOT mark it as failed immediately!
+        if (extData && extData.responseCode === 1) {
+          if (payment && payment.expireDate && Date.now() > new Date(payment.expireDate).getTime()) {
+            payment.status = 'expired';
+            savePayments();
+            return res.json({ success: true, status: 'expired' });
+          }
+          return res.json({ success: true, status: 'pending' });
+        }
+      } catch (extErr) {
+        console.warn('PayWay check API error:', extErr.message);
+      }
+    }
+
+    // Expiration check for active transactions
+    if (payment && payment.expireDate && Date.now() > new Date(payment.expireDate).getTime()) {
+      payment.status = 'expired';
+      savePayments();
+      return res.json({ success: true, status: 'expired' });
+    }
+
+    return res.json({ success: true, status: payment ? payment.status : 'pending' });
+  } catch (err) {
+    console.error('Payment Check Error:', err);
+    res.status(500).json({ success: false, error: 'Failed to check payment status', details: err.message });
+  }
+});
+
+// 6.3 Get Payment Status by MD5
+app.get('/api/payment/status', (req, res) => {
+  const md5 = req.query.md5;
+  if (!md5 || !paymentStore.has(md5)) {
+    return res.status(404).json({ success: false, error: 'Transaction not found' });
+  }
+  const p = paymentStore.get(md5);
+  res.json({
+    success: true,
+    status: p.status,
+    bill_number: p.billNumber,
+    amount: p.amount,
+    currency: p.currency,
+    created_at: p.createdAt,
+    paid_at: p.paidAt || null,
+    transaction_hash: p.transactionHash || null
+  });
+});
+
 
 // Start Server
 app.listen(PORT, () => {
