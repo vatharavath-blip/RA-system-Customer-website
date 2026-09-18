@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>R1ckky Store | Gaming & Digital Store</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kantumruy+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -20,6 +20,7 @@
       align-items: center;
       text-align: center;
       gap: 30px;
+      overflow: hidden;
     }
     
     .hero::before {
@@ -873,6 +874,19 @@
     menuToggle.addEventListener('click', () => {
       mobileNav.classList.toggle('active');
     });
+
+    // Mobile anti-zoom & screen lock
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        if (!e.target.closest('input, textarea, select, a, button')) {
+          e.preventDefault();
+        }
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
   </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Free Fire Top Up | R1ckky Store</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kantumruy+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,7 +13,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden !important;
+      position: relative;
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
       background-color: #060b13;
       background-image: radial-gradient(rgba(0, 112, 243, 0.08) 1px, transparent 1px);
       background-size: 24px 24px;
@@ -371,23 +379,43 @@
     .pkg-section-title {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 1.05rem;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.95rem;
       font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
       margin-bottom: 12px;
-      color: #fff;
     }
 
-    .pkg-section-title.recommended {
+    .pkg-title-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pkg-section-title.recommended .pkg-title-left {
       color: #f59e0b;
     }
 
-    .pkg-section-title.hot {
+    .pkg-section-title.hot .pkg-title-left {
       color: #fb7185;
     }
 
-    .pkg-section-title.regular {
+    .pkg-section-title.regular .pkg-title-left {
       color: #e2e8f0;
+    }
+
+    .pkg-count-badge {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #f59e0b;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
     }
 
     .pkg-grid-3col {
@@ -399,29 +427,23 @@
     @media (max-width: 900px) {
       .pkg-grid-3col {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
       }
     }
 
-    @media (max-width: 520px) {
-      .pkg-grid-3col {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Modern Horizontal Package Card */
+    /* Modern 2-Column Mobile Package Card (Matching User Reference) */
     .pkg-card {
       position: relative;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 14px;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
       cursor: pointer;
       transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
       user-select: none;
-      min-height: 72px;
+      min-height: 64px;
     }
 
     .pkg-card:hover {
@@ -512,48 +534,48 @@
       color: #fff;
     }
 
-    /* Card Content Info */
+    /* Card Content Info (Price on Top, Name on Bottom) */
     .pkg-info {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      justify-content: center;
+      gap: 2px;
       flex: 1;
       min-width: 0;
     }
 
-    .pkg-name {
-      font-size: 0.95rem;
+    .pkg-price {
+      font-size: 1.05rem;
       font-weight: 800;
-      color: #fff;
+      color: #f59e0b;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+    }
+
+    .pkg-card.regular .pkg-price,
+    .pkg-card.hot .pkg-price,
+    .pkg-card.recommended .pkg-price {
+      color: #f59e0b;
+    }
+
+    .pkg-card.selected .pkg-price {
+      color: #fbbf24;
+    }
+
+    .pkg-name {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #f1f5f9;
       line-height: 1.25;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .pkg-price {
-      font-size: 0.92rem;
-      font-weight: 800;
-      color: #f59e0b;
-      letter-spacing: 0.2px;
-    }
-
-    .pkg-card.regular .pkg-price {
-      color: #38bdf8;
-    }
-
-    .pkg-card.hot .pkg-price {
-      color: #fb7185;
-    }
-
-    .pkg-card.selected .pkg-price {
-      color: #60a5fa;
-    }
-
-    /* Card Art / Icon */
+    /* Card Art / Icon on Left */
     .pkg-icon-wrap {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -561,8 +583,8 @@
     }
 
     .pkg-icon-svg {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
     }
 
@@ -797,16 +819,108 @@
       fill: #fff;
     }
 
+    /* ── Mobile Fixed Bottom Checkout Bar ────────────────── */
+    .mobile-bottom-bar {
+      display: none;
+    }
+
     /* Responsive */
     @media (max-width: 992px) {
       .topup-grid {
         grid-template-columns: 1fr;
       }
-      .packages-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
       .summary-card {
-        position: static;
+        display: none; /* Mobile uses fixed bottom bar for checkout */
+      }
+      .topup-wrapper {
+        padding-bottom: 110px !important;
+      }
+      .floating-telegram {
+        bottom: 82px !important;
+        right: 16px !important;
+        width: 52px !important;
+        height: 52px !important;
+      }
+      .floating-telegram svg {
+        width: 28px !important;
+        height: 28px !important;
+      }
+      .mobile-bottom-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background: #090e1a;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 10px 16px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+      .mobile-bar-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .mobile-total-line {
+        font-size: 0.98rem;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+      }
+      .mobile-total-line #mobileTotalPrice {
+        color: #f59e0b;
+        font-weight: 900;
+        font-size: 1.2rem;
+        margin-left: 4px;
+      }
+      .mobile-product-line {
+        font-size: 0.78rem;
+        color: #94a3b8;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        line-height: 1.2;
+      }
+      .mobile-product-line #mobileProductName {
+        color: #cbd5e1;
+        font-weight: 700;
+      }
+      .mobile-pay-btn {
+        background: #84a929;
+        background: linear-gradient(135deg, #8cb52b, #709420);
+        color: #111e03;
+        font-weight: 800;
+        font-size: 0.96rem;
+        padding: 11px 22px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        box-shadow: 0 4px 14px rgba(132, 204, 22, 0.3);
+        transition: all 0.2s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-pay-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        box-shadow: none;
+        filter: grayscale(0.5);
+      }
+      .mobile-pay-btn:not(:disabled):active {
+        transform: scale(0.96);
       }
     }
 
@@ -860,35 +974,12 @@
         border-radius: 14px;
       }
       .account-input {
-        padding: 10px 14px;
-        font-size: 0.95rem;
-      }
-      .packages-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-      }
-      .package-item {
-        padding: 14px 8px 12px;
-        border-radius: 12px;
-      }
-      .diamond-icon-box {
-        width: 40px;
-        height: 40px;
-        margin: 4px auto 8px;
-      }
-      .package-amount {
-        font-size: 0.88rem;
-      }
-      .package-price {
-        font-size: 0.95rem;
+        padding: 12px 16px;
+        font-size: 16px !important; /* Prevents auto-zoom on mobile */
       }
       .payments-grid {
         grid-template-columns: 1fr;
         gap: 10px;
-      }
-      .summary-card {
-        padding: 18px 14px;
-        border-radius: 16px;
       }
     }
 
@@ -1377,6 +1468,20 @@
 
   </div>
 
+  <!-- Fixed Mobile Bottom Checkout Bar (Matches User Screenshot) -->
+  <div class="mobile-bottom-bar" id="mobileBottomBar">
+    <div class="mobile-bar-info">
+      <div class="mobile-total-line">Total: <span id="mobileTotalPrice">$0.00</span></div>
+      <div class="mobile-product-line">Product: <span id="mobileProductName">-</span></div>
+    </div>
+    <button type="button" class="mobile-pay-btn" id="mobileBtnPay" disabled>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+        <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+      </svg>
+      Pay Now
+    </button>
+  </div>
+
   <!-- Floating Telegram Support Button -->
   <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="floating-telegram" title="Contact Support on Telegram">
     <svg viewBox="0 0 24 24">
@@ -1684,6 +1789,28 @@
       // 5. Place Order Button
       const btnTopUpNow = document.getElementById('btnTopUpNow');
       btnTopUpNow.addEventListener('click', handlePlaceOrder);
+
+      // Mobile Bottom Bar Pay Button (Matches User Reference)
+      const mobileBtnPay = document.getElementById('mobileBtnPay');
+      if (mobileBtnPay) {
+        mobileBtnPay.addEventListener('click', () => {
+          if (!btnTopUpNow.disabled) {
+            handlePlaceOrder();
+          } else {
+            if (!selectedPackage) {
+              const pkgSec = document.getElementById('packagesContainer');
+              if (pkgSec) pkgSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+              const accCard = document.querySelector('.account-card');
+              if (accCard) {
+                accCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const pid = document.getElementById('playerIdInput');
+                if (pid && !pid.value) pid.focus();
+              }
+            }
+          }
+        });
+      }
     });
 
     // ── Helper: Country Flag Info & Official Flag CDN Logos ───
@@ -1897,12 +2024,12 @@
 
       card.innerHTML = `
         ${badgeHtml}
-        <div class="pkg-info">
-          <div class="pkg-name" title="${escapeHtml(pkg.name)}">${escapeHtml(pkg.name)}</div>
-          <div class="pkg-price">$${Number(finalPrice).toFixed(2)}</div>
-        </div>
         <div class="pkg-icon-wrap">
           ${iconHtml}
+        </div>
+        <div class="pkg-info">
+          <div class="pkg-price">$${Number(finalPrice).toFixed(2)}</div>
+          <div class="pkg-name" title="${escapeHtml(pkg.name)}">${escapeHtml(pkg.name)}</div>
         </div>
       `;
 
@@ -1923,7 +2050,7 @@
     // ── Render Packages Separated by Category ─────────────────
     // 1. Recommended for You (Full Ticket, 3x Weekly, Top Combos)
     // 2. Hot Items / Passes & Events (Weekly, Monthly, Twilight, Elite, Passes, Memberships, 50+50)
-    // 3. Regular Diamonds / Standard Packages
+    // 3. Regular Diamonds / Saving Packages
     function renderPackages(packages, currencyName) {
       const container = document.getElementById('packagesContainer');
       if (!container) return;
@@ -1993,7 +2120,10 @@
         recWrap.className = 'pkg-section-wrap';
         recWrap.innerHTML = `
           <div class="pkg-section-title recommended">
-            <span>✨</span> Recommended for You <span style="font-size: 0.8rem; background: rgba(245, 158, 11, 0.18); color: #f59e0b; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">ពិសេសណែនាំ</span>
+            <div class="pkg-title-left">
+              <span>✨</span> RECOMMENDED PACKAGES
+            </div>
+            <span class="pkg-count-badge">${recList.length} ITEMS</span>
           </div>
           <div class="pkg-grid-3col" id="recGrid"></div>
         `;
@@ -2008,7 +2138,10 @@
         hotWrap.className = 'pkg-section-wrap';
         hotWrap.innerHTML = `
           <div class="pkg-section-title hot">
-            <span>🔥</span> Hot Items <span style="font-size: 0.8rem; background: rgba(244, 63, 94, 0.18); color: #fb7185; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">Passes & Events</span>
+            <div class="pkg-title-left">
+              <span>🔥</span> HOT PASSES & EVENTS
+            </div>
+            <span class="pkg-count-badge">${hotList.length} ITEMS</span>
           </div>
           <div class="pkg-grid-3col" id="hotGrid"></div>
         `;
@@ -2024,18 +2157,17 @@
         container.appendChild(divider);
       }
 
-      // 3. Regular Diamonds Section
+      // 3. Regular Diamonds / Saving Packages Section (Matches User Reference Screenshot)
       if (regList.length > 0) {
         const regWrap = document.createElement('div');
         regWrap.className = 'pkg-section-wrap';
-        const hasSpecialAbove = recList.length > 0 || hotList.length > 0;
-        const regTitleHtml = hasSpecialAbove ? `
-          <div class="pkg-section-title regular">
-            <span>💎</span> កញ្ចប់ពេជ្រទូទៅ (${escapeHtml(currencyName)})
-          </div>
-        ` : '';
         regWrap.innerHTML = `
-          ${regTitleHtml}
+          <div class="pkg-section-title regular">
+            <div class="pkg-title-left">
+              <span>💎</span> SAVING PACKAGES
+            </div>
+            <span class="pkg-count-badge">${regList.length} ITEMS</span>
+          </div>
           <div class="pkg-grid-3col" id="regGrid"></div>
         `;
         const regGrid = regWrap.querySelector('#regGrid');
@@ -2306,6 +2438,31 @@
         topUpBtn.disabled = true;
         topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
       }
+
+      // Sync Fixed Mobile Bottom Checkout Bar (Matches User Reference Screenshot)
+      const mTotalPrice = document.getElementById('mobileTotalPrice');
+      const mProductName = document.getElementById('mobileProductName');
+      const mBtnPay = document.getElementById('mobileBtnPay');
+
+      if (mTotalPrice && mProductName && mBtnPay) {
+        if (selectedPackage) {
+          mTotalPrice.textContent = '$' + selectedPackage.price.toFixed(2);
+          mProductName.textContent = selectedPackage.amount;
+        } else {
+          mTotalPrice.textContent = '$0.00';
+          mProductName.textContent = '-';
+        }
+
+        const isReadyToPay = Boolean(selectedPackage && playerId && hasZone && isAccountValid);
+        mBtnPay.disabled = !isReadyToPay;
+        if (isReadyToPay) {
+          mBtnPay.style.opacity = '1';
+          mBtnPay.style.cursor = 'pointer';
+        } else {
+          mBtnPay.style.opacity = '0.45';
+          mBtnPay.style.cursor = 'not-allowed';
+        }
+      }
     }
 
     // ── Handle Order Submission ─────────────────────────────
@@ -2501,6 +2658,19 @@
         mobileNav.classList.toggle('active');
       });
     }
+
+    // Mobile Anti-Zoom & Screen Lock (Fixes "អត់និងមួយកន្លែង" problem)
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        if (!e.target.closest('input, textarea, select, a, button, .pkg-card, .payment-option')) {
+          e.preventDefault();
+        }
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
   </script>
 
   <!-- Dynamic KHQR Payment Modal -->
