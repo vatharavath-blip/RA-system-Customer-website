@@ -363,116 +363,214 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
-    /* Step 2: Package Grid */
-    .package-category-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: #fff;
-      margin: 24px 0 14px;
+    /* Step 2: Categorized Package Sections (Recommended, Hot Items, Regular) */
+    .pkg-section-wrap {
+      margin-bottom: 24px;
+    }
+
+    .pkg-section-title {
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .package-category-title span {
-      color: #94a3b8;
-      font-size: 0.95rem;
-      font-weight: 500;
-    }
-
-    .packages-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .package-item {
-      background: rgba(13, 22, 41, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 20px 12px 16px;
-      text-align: center;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    }
-
-    .package-item:hover {
-      border-color: rgba(0, 150, 255, 0.5);
-      background: rgba(18, 30, 56, 0.85);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(0, 112, 243, 0.25);
-    }
-
-    .package-item.selected {
-      border-color: #0070f3;
-      background: linear-gradient(180deg, rgba(0, 112, 243, 0.15) 0%, rgba(13, 22, 41, 0.9) 100%);
-      box-shadow: 0 0 25px rgba(0, 112, 243, 0.4), inset 0 0 15px rgba(0, 112, 243, 0.15);
-      transform: translateY(-3px);
-    }
-
-    .package-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      padding: 2px 7px;
-      border-radius: 6px;
-      font-size: 0.65rem;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .package-badge.hot {
-      background: linear-gradient(135deg, #ff4757, #ff6b81);
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 12px;
       color: #fff;
     }
 
-    .package-badge.best {
+    .pkg-section-title.recommended {
+      color: #f59e0b;
+    }
+
+    .pkg-section-title.hot {
+      color: #fb7185;
+    }
+
+    .pkg-section-title.regular {
+      color: #e2e8f0;
+    }
+
+    .pkg-grid-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .pkg-grid-3col {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .pkg-grid-3col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Modern Horizontal Package Card */
+    .pkg-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      user-select: none;
+      min-height: 72px;
+    }
+
+    .pkg-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Card Variant: Recommended for You (Amber/Gold glow) */
+    .pkg-card.recommended {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.03));
+      border: 1.5px solid #f59e0b;
+    }
+
+    .pkg-card.recommended:hover {
+      border-color: #fbbf24;
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+    }
+
+    /* Card Variant: Hot Items / Passes & Events (Soft Rose/Pink glow) */
+    .pkg-card.hot {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.09), rgba(244, 63, 94, 0.02));
+      border: 1.5px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .pkg-card.hot:hover {
+      border-color: rgba(244, 63, 94, 0.65);
+      box-shadow: 0 8px 24px rgba(244, 63, 94, 0.22);
+    }
+
+    /* Card Variant: Regular Diamonds / Units */
+    .pkg-card.regular {
+      background: rgba(13, 22, 41, 0.75);
+      border: 1.5px solid rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(10px);
+    }
+
+    .pkg-card.regular:hover {
+      border-color: rgba(56, 189, 248, 0.45);
+      background: rgba(18, 30, 56, 0.85);
+      box-shadow: 0 8px 24px rgba(0, 112, 243, 0.2);
+    }
+
+    /* Selected State (Universal Vibrant Cyan / Royal Blue) */
+    .pkg-card.selected {
+      border-color: #0070f3 !important;
+      background: linear-gradient(135deg, rgba(0, 112, 243, 0.25), rgba(13, 22, 41, 0.95)) !important;
+      box-shadow: 0 0 24px rgba(0, 112, 243, 0.45), inset 0 0 12px rgba(0, 112, 243, 0.2) !important;
+      transform: translateY(-2px);
+    }
+
+    /* Badge on Top Right */
+    .pkg-badge-top {
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      background: #eab308;
+      color: #0f172a;
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-top-right-radius: 13px;
+      border-bottom-left-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .pkg-badge-pill {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .pkg-badge-pill.hot {
+      background: linear-gradient(135deg, #ef4444, #f43f5e);
+      color: #fff;
+    }
+
+    .pkg-badge-pill.best {
       background: linear-gradient(135deg, #10b981, #059669);
       color: #fff;
     }
 
-    .diamond-icon-box {
-      width: 54px;
-      height: 54px;
-      margin: 8px auto 12px;
+    /* Card Content Info */
+    .pkg-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .pkg-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pkg-price {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: #f59e0b;
+      letter-spacing: 0.2px;
+    }
+
+    .pkg-card.regular .pkg-price {
+      color: #38bdf8;
+    }
+
+    .pkg-card.hot .pkg-price {
+      color: #fb7185;
+    }
+
+    .pkg-card.selected .pkg-price {
+      color: #60a5fa;
+    }
+
+    /* Card Art / Icon */
+    .pkg-icon-wrap {
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
+      flex-shrink: 0;
     }
 
-    .diamond-icon-box svg {
-      width: 100%;
-      height: 100%;
-      filter: drop-shadow(0 0 10px rgba(0, 195, 255, 0.6));
-      transition: transform 0.3s ease;
+    .pkg-icon-svg {
+      width: 38px;
+      height: 38px;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
     }
 
-    .package-item:hover .diamond-icon-box svg {
-      transform: scale(1.1);
-    }
-
-    .package-amount {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #f1f5f9;
-      margin-bottom: 6px;
-    }
-
-    .package-price {
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: 0.3px;
+    /* Section divider line */
+    .pkg-sections-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 24px 0 20px;
     }
 
     /* Step 3: Payment Cards */
@@ -647,6 +745,15 @@
     .btn-topup-now.active:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 30px rgba(0, 112, 243, 0.6);
+    }
+
+    .btn-topup-now.btn-error-state {
+      background: rgba(239, 68, 68, 0.18) !important;
+      border: 1.5px solid rgba(239, 68, 68, 0.45) !important;
+      color: #fca5a5 !important;
+      cursor: not-allowed !important;
+      box-shadow: none !important;
+      transform: none !important;
     }
 
     .secure-badge {
@@ -1147,38 +1254,30 @@
           <div class="step-title-box">
             <div class="step-number">2</div>
             <div class="step-text">
-              <h2>Choose Package</h2>
-              <span id="stepPackagesSubtitle">ជ្រើសរើសកញ្ចប់</span>
+              <h2>ជ្រើសរើសកញ្ចប់</h2>
+              <span id="stepPackagesSubtitle">Choose Package <span id="packagesCountBadge" style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px; display: none;"></span></span>
             </div>
           </div>
 
-          <!-- Packages Title -->
-          <div class="package-category-title" id="packageCategoryTitle">
-            Available Packages
-            <span id="packagesCountBadge" style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px; display: none;"></span>
-          </div>
-
-          <div class="packages-grid" id="packagesGrid">
-            <!-- Dynamic packages loaded from provider API -->
-            <div class="package-skeleton">
-              <div class="package-skeleton-icon"></div>
-              <div class="package-skeleton-line"></div>
-              <div class="package-skeleton-price"></div>
-            </div>
-            <div class="package-skeleton">
-              <div class="package-skeleton-icon"></div>
-              <div class="package-skeleton-line"></div>
-              <div class="package-skeleton-price"></div>
-            </div>
-            <div class="package-skeleton">
-              <div class="package-skeleton-icon"></div>
-              <div class="package-skeleton-line"></div>
-              <div class="package-skeleton-price"></div>
-            </div>
-            <div class="package-skeleton">
-              <div class="package-skeleton-icon"></div>
-              <div class="package-skeleton-line"></div>
-              <div class="package-skeleton-price"></div>
+          <!-- Dynamic Container for Categorized Packages (Recommended, Hot Items, Regular) -->
+          <div id="packagesContainer">
+            <!-- Skeleton placeholder while fetching API -->
+            <div class="pkg-grid-3col">
+              <div class="package-skeleton">
+                <div class="package-skeleton-icon"></div>
+                <div class="package-skeleton-line"></div>
+                <div class="package-skeleton-price"></div>
+              </div>
+              <div class="package-skeleton">
+                <div class="package-skeleton-icon"></div>
+                <div class="package-skeleton-line"></div>
+                <div class="package-skeleton-price"></div>
+              </div>
+              <div class="package-skeleton">
+                <div class="package-skeleton-icon"></div>
+                <div class="package-skeleton-line"></div>
+                <div class="package-skeleton-price"></div>
+              </div>
             </div>
           </div>
         </section>
@@ -1369,6 +1468,12 @@
         zoneLabel: "Zone ID",
         zonePlaceholder: "e.g. 1234",
         fallbackPackages: [
+          { package_id: 4968, name: "3x Weekly", price: 4.43, tag: "TOP" },
+          { package_id: 4967, name: "2x Weekly", price: 2.96, tag: "TOP" },
+          { package_id: 372, name: "Weekly Elite Pack", price: 0.80, tag: null },
+          { package_id: 371, name: "Weekly", price: 1.50, tag: "HOT" },
+          { package_id: 369, name: "Monthly Elite Pack", price: 3.85, tag: null },
+          { package_id: 370, name: "Twilight", price: 7.83, tag: null },
           { package_id: 268, name: "55 Diamonds", price: 0.77, tag: null },
           { package_id: 269, name: "86 Diamonds", price: 1.21, tag: null },
           { package_id: 270, name: "165 Diamonds", price: 2.27, tag: "HOT" },
@@ -1613,9 +1718,7 @@
 
     // ── Load Live Game Packages ──────────────────────────────
     async function loadGamePackages(slug) {
-      const packagesGrid = document.getElementById('packagesGrid');
       const countBadge = document.getElementById('packagesCountBadge');
-      const categoryTitle = document.getElementById('packageCategoryTitle');
       const flagElem = document.getElementById('gameCountryFlag');
       const titleElem = document.getElementById('gameTitleText');
 
@@ -1664,15 +1767,11 @@
           if (currentGameData) currentGameData.requiresZone = false;
         }
 
-
         if (packages.length > 0) {
           renderPackages(packages, data.currency || (currentGameData && currentGameData.currency) || 'Diamonds');
           if (countBadge) {
-            countBadge.textContent = `${packages.length} items`;
+            countBadge.textContent = `• ${packages.length} items`;
             countBadge.style.display = 'inline-block';
-          }
-          if (categoryTitle) {
-            categoryTitle.innerHTML = `${heroFlagHtml} ${escapeHtml(data.name)} Packages <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 8px; border-radius: 12px; margin-left: 8px;">${packages.length} items</span>`;
           }
           return;
         }
@@ -1687,7 +1786,7 @@
       if (flagElem) flagElem.innerHTML = fallbackFlagHtml;
       renderPackages(fallbackList, (currentGameData && currentGameData.currency) || 'Diamonds');
       if (countBadge) {
-        countBadge.textContent = `${fallbackList.length} items`;
+        countBadge.textContent = `• ${fallbackList.length} items`;
         countBadge.style.display = 'inline-block';
       }
     }
@@ -1708,60 +1807,238 @@
       return Number((price + markup).toFixed(2));
     }
 
-    // ── Render Packages to HTML ─────────────────────────────
-    function renderPackages(packages, currencyName) {
-      const grid = document.getElementById('packagesGrid');
-      grid.innerHTML = '';
+    // Package Icons (Chest, Pass, Diamond)
+    const PKG_ICONS = {
+      chest: `
+        <svg viewBox="0 0 48 48" class="pkg-icon-svg">
+          <defs>
+            <radialGradient id="chestGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="24" cy="24" r="22" fill="url(#chestGlow)"/>
+          <rect x="8" y="20" width="32" height="18" rx="4" fill="#6366f1" stroke="#fbbf24" stroke-width="2"/>
+          <path d="M6 18 C6 12, 14 10, 24 10 C34 10, 42 12, 42 18 L42 22 L6 22 Z" fill="#4f46e5" stroke="#fbbf24" stroke-width="2"/>
+          <rect x="20" y="20" width="8" height="8" rx="2" fill="#fbbf24"/>
+          <circle cx="24" cy="24" r="2" fill="#78350f"/>
+          <polygon points="24,3 26,9 33,9 27,13 29,19 24,15 19,19 21,13 15,9 22,9" fill="#fef08a"/>
+        </svg>
+      `,
+      pass: `
+        <svg viewBox="0 0 48 48" class="pkg-icon-svg">
+          <defs>
+            <linearGradient id="passGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ec4899"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+            <radialGradient id="passGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#f43f5e" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="24" cy="24" r="22" fill="url(#passGlow)"/>
+          <rect x="8" y="12" width="32" height="24" rx="6" fill="url(#passGrad)" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+          <path d="M12 24 L36 24" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-dasharray="3 2"/>
+          <polygon points="24,15 26,19 30,19 27,22 28,26 24,23 20,26 21,22 18,19 22,19" fill="#fef08a"/>
+          <circle cx="12" cy="24" r="2.5" fill="#0f172a"/>
+          <circle cx="36" cy="24" r="2.5" fill="#0f172a"/>
+        </svg>
+      `,
+      diamond: `
+        <svg viewBox="0 0 48 48" class="pkg-icon-svg">
+          <defs>
+            <linearGradient id="diaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#0284c7"/>
+            </linearGradient>
+            <radialGradient id="diaGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="24" cy="24" r="20" fill="url(#diaGlow)"/>
+          <polygon points="24,9 38,19 24,39 10,19" fill="url(#diaGrad)"/>
+          <polygon points="24,9 32,19 24,28 16,19" fill="#bae6fd"/>
+          <polygon points="24,28 32,19 24,39" fill="#0369a1"/>
+          <polygon points="24,28 16,19 24,39" fill="#0284c7"/>
+        </svg>
+      `
+    };
 
-      packages.forEach(pkg => {
-        const card = document.createElement('div');
-        card.className = 'package-item';
-        card.setAttribute('data-id', pkg.package_id || pkg.id);
-        card.setAttribute('data-name', pkg.name);
+    function createPackageCard(pkg, categoryType) {
+      const card = document.createElement('div');
+      card.className = `pkg-card ${categoryType}`;
+      card.setAttribute('data-id', pkg.package_id || pkg.id);
+      card.setAttribute('data-name', pkg.name);
 
-        // Calculate final customer price with profit margin
-        const rawPrice = Number(pkg.price);
-        const finalPrice = pkg.base_price !== undefined ? rawPrice : applyMarkup(rawPrice);
-        card.setAttribute('data-price', finalPrice);
+      const rawPrice = Number(pkg.price);
+      const finalPrice = pkg.base_price !== undefined ? rawPrice : applyMarkup(rawPrice);
+      card.setAttribute('data-price', finalPrice);
 
-        // Tag badge (HOT, BEST, etc.)
-        let badgeHtml = '';
+      let badgeHtml = '';
+      let iconHtml = PKG_ICONS.diamond;
+
+      if (categoryType === 'recommended') {
+        badgeHtml = '<span class="pkg-badge-top">⭐ TOP</span>';
+        iconHtml = PKG_ICONS.chest;
+      } else if (categoryType === 'hot') {
+        iconHtml = PKG_ICONS.pass;
         const tag = (pkg.tag || '').toUpperCase();
         if (tag.includes('HOT')) {
-          badgeHtml = '<span class="package-badge hot">HOT</span>';
+          badgeHtml = '<span class="pkg-badge-pill hot">HOT</span>';
         } else if (tag.includes('BEST')) {
-          badgeHtml = '<span class="package-badge best">BEST</span>';
-        } else if (tag) {
-          badgeHtml = `<span class="package-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">${tag}</span>`;
+          badgeHtml = '<span class="pkg-badge-pill best">BEST</span>';
         }
+      }
 
-        card.innerHTML = `
-          ${badgeHtml}
-          <div class="diamond-icon-box">
-            <svg viewBox="0 0 64 64">
-              <polygon points="32,4 56,22 32,60 8,22" fill="#00d4ff"/>
-              <polygon points="32,4 46,22 32,38 18,22" fill="#80eaff"/>
-              <polygon points="32,38 46,22 32,60" fill="#0099e6"/>
-              <polygon points="32,38 18,22 32,60" fill="#0077b6"/>
-            </svg>
-          </div>
-          <div class="package-amount">${escapeHtml(pkg.name)}</div>
-          <div class="package-price">$${Number(finalPrice).toFixed(2)}</div>
-        `;
+      card.innerHTML = `
+        ${badgeHtml}
+        <div class="pkg-info">
+          <div class="pkg-name" title="${escapeHtml(pkg.name)}">${escapeHtml(pkg.name)}</div>
+          <div class="pkg-price">$${Number(finalPrice).toFixed(2)}</div>
+        </div>
+        <div class="pkg-icon-wrap">
+          ${iconHtml}
+        </div>
+      `;
 
-        card.addEventListener('click', () => {
-          document.querySelectorAll('.package-item').forEach(p => p.classList.remove('selected'));
-          card.classList.add('selected');
-          selectedPackage = {
-            id: pkg.package_id || pkg.id,
-            amount: pkg.name,
-            price: Number(finalPrice)
-          };
-          updateSummary();
-        });
-
-        grid.appendChild(card);
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.pkg-card').forEach(p => p.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedPackage = {
+          id: pkg.package_id || pkg.id,
+          amount: pkg.name,
+          price: Number(finalPrice)
+        };
+        updateSummary();
       });
+
+      return card;
+    }
+
+    // ── Render Packages Separated by Category ─────────────────
+    // 1. Recommended for You (Full Ticket, 3x Weekly, Top Combos)
+    // 2. Hot Items / Passes & Events (Weekly, Monthly, Twilight, Elite, Passes, Memberships, 50+50)
+    // 3. Regular Diamonds / Standard Packages
+    function renderPackages(packages, currencyName) {
+      const container = document.getElementById('packagesContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const recList = [];
+      const hotList = [];
+      const regList = [];
+
+      packages.forEach(pkg => {
+        const name = (pkg.name || '').toLowerCase();
+        const tag = (pkg.tag || '').toUpperCase();
+
+        // 1. Recommended Category:
+        if (
+          name.includes('ticket') ||
+          name.includes('[ full ticket ]') ||
+          name.includes('weeklyx3') ||
+          name.includes('3x weekly') ||
+          name.includes('combo') ||
+          tag === 'TOP'
+        ) {
+          recList.push(pkg);
+        }
+        // 2. Hot Items / Passes / Events / Memberships:
+        else if (
+          name.includes('weekly') ||
+          name.includes('monthly') ||
+          name.includes('twilight') ||
+          name.includes('elite') ||
+          name.includes('pass') ||
+          name.includes('membership') ||
+          name.includes('level up') ||
+          name.includes('3 in 1') ||
+          name.includes('+') ||
+          tag === 'HOT' ||
+          tag === 'EVENT' ||
+          tag === 'PROMO'
+        ) {
+          hotList.push(pkg);
+        }
+        // 3. Regular Diamonds / Units:
+        else {
+          regList.push(pkg);
+        }
+      });
+
+      // If recommended list has 0 items but hot items has multiple, promote top multi-passes to Recommended
+      if (recList.length === 0 && hotList.length >= 3) {
+        const topCombos = hotList.filter(p => {
+          const n = p.name.toLowerCase();
+          return n.includes('3x') || n.includes('2x') || n.includes('ticket') || n.includes('elite');
+        });
+        if (topCombos.length > 0) {
+          const promoted = topCombos.slice(0, 3);
+          promoted.forEach(p => {
+            recList.push(p);
+            const idx = hotList.indexOf(p);
+            if (idx !== -1) hotList.splice(idx, 1);
+          });
+        }
+      }
+
+      // 1. Recommended Section
+      if (recList.length > 0) {
+        const recWrap = document.createElement('div');
+        recWrap.className = 'pkg-section-wrap';
+        recWrap.innerHTML = `
+          <div class="pkg-section-title recommended">
+            <span>✨</span> Recommended for You <span style="font-size: 0.8rem; background: rgba(245, 158, 11, 0.18); color: #f59e0b; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">ពិសេសណែនាំ</span>
+          </div>
+          <div class="pkg-grid-3col" id="recGrid"></div>
+        `;
+        const recGrid = recWrap.querySelector('#recGrid');
+        recList.forEach(p => recGrid.appendChild(createPackageCard(p, 'recommended')));
+        container.appendChild(recWrap);
+      }
+
+      // 2. Hot Items / Passes & Events Section
+      if (hotList.length > 0) {
+        const hotWrap = document.createElement('div');
+        hotWrap.className = 'pkg-section-wrap';
+        hotWrap.innerHTML = `
+          <div class="pkg-section-title hot">
+            <span>🔥</span> Hot Items <span style="font-size: 0.8rem; background: rgba(244, 63, 94, 0.18); color: #fb7185; padding: 2px 8px; border-radius: 12px; margin-left: 6px;">Passes & Events</span>
+          </div>
+          <div class="pkg-grid-3col" id="hotGrid"></div>
+        `;
+        const hotGrid = hotWrap.querySelector('#hotGrid');
+        hotList.forEach(p => hotGrid.appendChild(createPackageCard(p, 'hot')));
+        container.appendChild(hotWrap);
+      }
+
+      // Divider line between Special Events and Regular Diamonds
+      if ((recList.length > 0 || hotList.length > 0) && regList.length > 0) {
+        const divider = document.createElement('hr');
+        divider.className = 'pkg-sections-divider';
+        container.appendChild(divider);
+      }
+
+      // 3. Regular Diamonds Section
+      if (regList.length > 0) {
+        const regWrap = document.createElement('div');
+        regWrap.className = 'pkg-section-wrap';
+        const hasSpecialAbove = recList.length > 0 || hotList.length > 0;
+        const regTitleHtml = hasSpecialAbove ? `
+          <div class="pkg-section-title regular">
+            <span>💎</span> កញ្ចប់ពេជ្រទូទៅ (${escapeHtml(currencyName)})
+          </div>
+        ` : '';
+        regWrap.innerHTML = `
+          ${regTitleHtml}
+          <div class="pkg-grid-3col" id="regGrid"></div>
+        `;
+        const regGrid = regWrap.querySelector('#regGrid');
+        regList.forEach(p => regGrid.appendChild(createPackageCard(p, 'regular')));
+        container.appendChild(regWrap);
+      }
     }
 
     // ── Setup Automatic Player ID Verification ──────────────
@@ -1792,28 +2069,33 @@
       }
 
       const triggerCheckDebounced = () => {
-        updateSummary();
         clearTimeout(verifyDebounceTimer);
+
+        // STRICT RESET: As soon as user changes input, invalidate verified status immediately
+        isAccountValid = false;
+        verifiedNickname = null;
+        playerIdInput.classList.remove('is-verified', 'is-invalid');
+        if (zoneIdInput) {
+          zoneIdInput.classList.remove('is-verified', 'is-invalid');
+        }
 
         const rawPlayerId = playerIdInput.value.trim();
         const rawZoneId = zoneIdInput ? zoneIdInput.value.trim() : '';
-
-        // Strip parentheses, brackets, and spaces
         const playerId = rawPlayerId.replace(/[\s()\[\]]/g, '');
         const zoneId = rawZoneId.replace(/[\s()\[\]]/g, '');
 
-        // If field is cleared, reset state
+        updateSummary();
+
         if (!playerId) {
           resetVerifyState();
           return;
         }
 
-        // Only auto-check when length is sufficient
         if (playerId.length < 3) {
           return;
         }
 
-        if (currentGameData.requiresZone && !zoneId) {
+        if (currentGameData && currentGameData.requiresZone && !zoneId) {
           return; // Wait until zone ID is also provided
         }
 
@@ -1838,7 +2120,7 @@
           return;
         }
 
-        if (currentGameData.requiresZone && !zoneId) {
+        if (currentGameData && currentGameData.requiresZone && !zoneId) {
           alert('សូមបញ្ចូល Zone / Server ID ផងដែរ!');
           zoneIdInput.focus();
           return;
@@ -1857,17 +2139,23 @@
       const verifyText = document.getElementById('verifyText');
       const verifySpinner = document.getElementById('verifySpinner');
       const playerIdInput = document.getElementById('playerIdInput');
+      const zoneIdInput = document.getElementById('zoneIdInput');
 
-      // Sanitize inputs (remove any parentheses like "(14037)")
       const playerId = String(rawPlayerId || '').replace(/[\s()\[\]]/g, '');
       const zoneId = String(rawZoneId || '').replace(/[\s()\[\]]/g, '');
 
       // Set Loading UI
       isAccountValid = false;
+      verifiedNickname = null;
+      verifyBox.style.display = 'flex';
       verifyBox.className = 'verify-result loading';
       verifySpinner.style.display = 'inline-block';
       verifyText.innerHTML = 'កំពុងត្រួតពិនិត្យឈ្មោះគណនី... (Verifying...)';
       playerIdInput.classList.remove('is-verified', 'is-invalid');
+      if (zoneIdInput) {
+        zoneIdInput.classList.remove('is-verified', 'is-invalid');
+      }
+
       updateSummary();
 
       try {
@@ -1885,31 +2173,31 @@
         const data = await response.json();
         verifySpinner.style.display = 'none';
 
-        if (data.valid && data.nickname) {
-          // Success state: verified
+        // STRICT VALIDATION: Must have valid === true AND have a valid non-empty nickname
+        if (data.valid && data.nickname && data.result !== 'invalid') {
           isAccountValid = true;
           verifiedNickname = data.nickname;
           verifyBox.className = 'verify-result success';
           verifyText.innerHTML = `✓ ឈ្មោះគណនី: <strong style="color: #38bdf8;">${escapeHtml(data.nickname)}</strong> (Verified)`;
           playerIdInput.classList.add('is-verified');
           playerIdInput.classList.remove('is-invalid');
-        } else if (data.result === 'invalid' || !data.valid) {
-          // Invalid account: strictly block
+          if (zoneIdInput) {
+            zoneIdInput.classList.add('is-verified');
+            zoneIdInput.classList.remove('is-invalid');
+          }
+        } else {
+          // STRICT INVALID: Do NOT allow Top Up Now
           isAccountValid = false;
           verifiedNickname = null;
           verifyBox.className = 'verify-result error';
-          const zoneMsg = currentGameData.requiresZone ? ' និង Zone ID ' : ' ';
+          const zoneMsg = (currentGameData && currentGameData.requiresZone) ? ' និង Zone ID ' : ' ';
           verifyText.innerHTML = `❌ រកមិនឃើញគណនី (Player ID${zoneMsg}មិនត្រឹមត្រូវ)`;
           playerIdInput.classList.add('is-invalid');
           playerIdInput.classList.remove('is-verified');
-        } else {
-          // Fallback or simulated result
-          isAccountValid = true;
-          const nick = data.nickname || ('Player_' + playerId.slice(-4));
-          verifiedNickname = nick;
-          verifyBox.className = 'verify-result success';
-          verifyText.innerHTML = `✓ ឈ្មោះគណនី: <strong style="color: #38bdf8;">${escapeHtml(nick)}</strong>`;
-          playerIdInput.classList.add('is-verified');
+          if (zoneIdInput) {
+            zoneIdInput.classList.add('is-invalid');
+            zoneIdInput.classList.remove('is-verified');
+          }
         }
       } catch (err) {
         console.error('Check ID network error:', err);
@@ -1917,6 +2205,11 @@
         verifyBox.className = 'verify-result error';
         verifyText.innerHTML = '⚠️ មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ។ សូមសាកល្បងម្ដងទៀត។';
         isAccountValid = false;
+        verifiedNickname = null;
+        playerIdInput.classList.add('is-invalid');
+        if (zoneIdInput) {
+          zoneIdInput.classList.add('is-invalid');
+        }
       }
 
       updateSummary();
@@ -1925,9 +2218,13 @@
     function resetVerifyState() {
       const verifyBox = document.getElementById('verifyResult');
       const playerIdInput = document.getElementById('playerIdInput');
+      const zoneIdInput = document.getElementById('zoneIdInput');
       verifyBox.className = 'verify-result';
       verifyBox.style.display = 'none';
       playerIdInput.classList.remove('is-verified', 'is-invalid');
+      if (zoneIdInput) {
+        zoneIdInput.classList.remove('is-verified', 'is-invalid');
+      }
       verifiedNickname = null;
       isAccountValid = false;
       updateSummary();
@@ -1945,6 +2242,7 @@
       const topUpBtn = document.getElementById('btnTopUpNow');
       const nickRow = document.getElementById('summaryNickRow');
       const playerNickText = document.getElementById('summaryPlayerNick');
+      const verifyBox = document.getElementById('verifyResult');
 
       if (selectedPackage) {
         emptyBox.style.display = 'none';
@@ -1968,25 +2266,32 @@
         const needsZone = currentGameData && currentGameData.requiresZone;
         const hasZone = !needsZone || Boolean(zoneId);
 
-        // STRICT GATING: Only enable Top Up Now if:
+        // STRICT GATING:
+        // Only enable Top Up Now if:
         // 1. Package is selected
         // 2. Player ID is filled
         // 3. Zone ID is filled (if required)
         // 4. Account is successfully verified (isAccountValid === true)
         if (playerId && hasZone && isAccountValid) {
           topUpBtn.classList.add('active');
+          topUpBtn.classList.remove('btn-error-state');
           topUpBtn.disabled = false;
           topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
         } else {
           topUpBtn.classList.remove('active');
           topUpBtn.disabled = true;
-          if (playerIdInput.classList.contains('is-invalid')) {
+          const isError = playerIdInput.classList.contains('is-invalid') || (zoneIdInput && zoneIdInput.classList.contains('is-invalid'));
+          if (isError) {
+            topUpBtn.classList.add('btn-error-state');
             topUpBtn.innerHTML = '❌ គណនីមិនត្រឹមត្រូវ (Invalid Account)';
-          } else if (playerIdInput.classList.contains('loading')) {
+          } else if (verifyBox && verifyBox.classList.contains('loading')) {
+            topUpBtn.classList.remove('btn-error-state');
             topUpBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់គណនី...';
           } else if (!isAccountValid && playerId) {
-            topUpBtn.innerHTML = '⚠️ សូមរង់ចាំផ្ទៀងផ្ទាត់គណនី...';
+            topUpBtn.classList.remove('btn-error-state');
+            topUpBtn.innerHTML = '⚠️ សូមផ្ទៀងផ្ទាត់គណនីជាមុនសិន...';
           } else {
+            topUpBtn.classList.remove('btn-error-state');
             topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
           }
         }
@@ -1994,6 +2299,7 @@
         emptyBox.style.display = 'block';
         selectedBox.style.display = 'none';
         topUpBtn.classList.remove('active');
+        topUpBtn.classList.remove('btn-error-state');
         topUpBtn.disabled = true;
         topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
       }
