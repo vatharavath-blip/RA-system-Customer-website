@@ -2514,8 +2514,10 @@
     function updateSummary() {
       const playerIdInput = document.getElementById('playerIdInput');
       const zoneIdInput = document.getElementById('zoneIdInput');
-      const playerId = playerIdInput.value.trim();
+      const playerId = playerIdInput ? playerIdInput.value.trim() : '';
       const zoneId = zoneIdInput ? zoneIdInput.value.trim() : '';
+      const needsZone = Boolean(currentGameData && currentGameData.requiresZone);
+      const hasZone = !needsZone || Boolean(zoneId);
 
       const emptyBox = document.getElementById('summaryEmpty');
       const selectedBox = document.getElementById('summarySelected');
@@ -2541,10 +2543,6 @@
         } else {
           nickRow.style.display = 'none';
         }
-
-        // Check Zone ID requirement
-        const needsZone = currentGameData && currentGameData.requiresZone;
-        const hasZone = !needsZone || Boolean(zoneId);
 
         // STRICT GATING:
         // Only enable Top Up Now if:
