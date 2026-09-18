@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
+const QRCode = require('qrcode');
 const PORT = process.env.SERVER_PORT || process.env.PORT || 3000;
 const API_KEY = process.env.TOPUP_API_KEY;
 const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
@@ -12,6 +13,60 @@ const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
+
+// Tiered Profit Margin:
+// Under $10.00: +$0.25 profit
+// $10.00 - $49.99: +$1.00 profit
+// $50.00 and above: +$1.50 profit
+function applyMarkup(basePrice) {
+  const price = Number(basePrice) || 0;
+  if (price <= 0) return 0;
+  let markup = 0.25;
+  if (price >= 50.0) {
+    markup = 1.50;
+  } else if (price >= 10.0) {
+    markup = 1.00;
+  }
+  return Number((price + markup).toFixed(2));
+}
+
+// CRC16-CCITT for Bakong KHQR EMVCo Standard
+function crc16_ccitt(data) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= (data.charCodeAt(i) << 8);
+    for (let j = 0; j < 8; j++) {
+      if ((crc & 0x8000) !== 0) {
+        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+      } else {
+        crc = (crc << 1) & 0xFFFF;
+      }
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+// Generate Dynamic NBC Bakong KHQR for POV KIMHOV (ABA Bank USD)
+function generateDynamicKhqr(amount) {
+  const amtStr = Number(amount).toFixed(2);
+  const tag54 = '54' + String(amtStr.length).padStart(2, '0') + amtStr;
+  const parts = [
+    '000201',
+    '010212', // 12 = Dynamic QR
+    '30510016abaakhppxxx@abaa01151260917172414410208ABA Bank',
+    '52044814',
+    '5303840', // USD 840
+    tag54,
+    '5802KH',
+    '5910POV KIMHOV',
+    '6010BATTAMBANG',
+    '624268380010PAYWAY@ABA010719916270209032528705',
+    '6304'
+  ];
+  const raw = parts.join('');
+  const crc = crc16_ccitt(raw);
+  return raw + crc;
+}
 
 // Country & Region Flag Mapping with Official Logo Flag Image URLs
 function getCountryFlagInfo(name, slug) {
@@ -186,8 +241,14 @@ app.get('/api/topup/games', async (req, res) => {
     const games = await getGamesList();
     const formatted = games.map(g => {
       const flagInfo = getCountryFlagInfo(g.name, g.slug);
+      const markedUpPackages = (g.packages || []).map(pkg => ({
+        ...pkg,
+        base_price: pkg.price,
+        price: applyMarkup(pkg.price)
+      }));
       return {
         ...g,
+        packages: markedUpPackages,
         flag: flagInfo.emoji,
         flagUrl: flagInfo.flagUrl,
         countryCode: flagInfo.code,
@@ -237,9 +298,15 @@ app.get('/api/topup/game/:slug', async (req, res) => {
 
     const flagInfo = getCountryFlagInfo(game.name, game.slug);
     const serverVariants = getServerVariants(game, games);
+    const markedUpPackages = (game.packages || []).map(pkg => ({
+      ...pkg,
+      base_price: pkg.price,
+      price: applyMarkup(pkg.price)
+    }));
 
     res.json({
       ...game,
+      packages: markedUpPackages,
       flag: flagInfo.emoji,
       flagUrl: flagInfo.flagUrl,
       countryCode: flagInfo.code,
@@ -403,6 +470,42 @@ app.get('/api/topup/order-status/:orderCode', async (req, res) => {
   } catch (error) {
     console.error('Order Status Query Error:', error);
     res.status(500).json({ error: 'Failed to query order status', details: error.message });
+  }
+});
+
+// 6. Generate Dynamic KHQR (EMVCo Standard for POV KIMHOV)
+app.post('/api/payment/generate-khqr', async (req, res) => {
+  try {
+    const { amount, orderId, reference } = req.body;
+    const numAmount = Number(amount) || 0;
+    if (numAmount <= 0) {
+      return res.status(400).json({ error: 'Valid amount is required' });
+    }
+
+    const qrString = generateDynamicKhqr(numAmount);
+    const qrDataUrl = await QRCode.toDataURL(qrString, {
+      width: 320,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#ffffff'
+      }
+    });
+
+    res.json({
+      success: true,
+      orderId: orderId || reference || ('R1CKKY-' + Date.now().toString().slice(-8)),
+      amount: numAmount.toFixed(2),
+      currency: 'USD',
+      merchantName: 'POV KIMHOV',
+      bankName: 'ABA Bank',
+      qrString: qrString,
+      qrDataUrl: qrDataUrl,
+      paywayLink: 'https://link.payway.com.kh/ABAPAYTh526248G'
+    });
+  } catch (err) {
+    console.error('KHQR Generation Error:', err);
+    res.status(500).json({ error: 'Failed to generate KHQR', details: err.message });
   }
 });
 

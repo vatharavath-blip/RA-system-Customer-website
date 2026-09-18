@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="icon" type="image/png" href="images/Newlogo.png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <style>
     body {
@@ -783,6 +784,254 @@
         border-radius: 16px;
       }
     }
+
+    /* ── KHQR Dynamic Payment Modal ──────────────────────── */
+    .khqr-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .khqr-modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+    .khqr-modal-card {
+      background: #0b1322;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 26px;
+      width: 100%;
+      max-width: 430px;
+      box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 112, 243, 0.25);
+      overflow: hidden;
+      position: relative;
+      animation: modalSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(25px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .khqr-modal-header {
+      background: linear-gradient(135deg, #152238, #0b1322);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .khqr-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .khqr-modal-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+    .khqr-modal-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+    .khqr-modal-body {
+      padding: 22px 18px 20px;
+      text-align: center;
+    }
+    .khqr-stand-card {
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      max-width: 330px;
+      margin: 0 auto 16px;
+      position: relative;
+      color: #1e293b;
+    }
+    .khqr-stand-header {
+      background: #e11d48;
+      color: #fff;
+      padding: 12px 14px;
+      text-align: center;
+      position: relative;
+    }
+    .khqr-stand-header .khqr-tag-logo {
+      font-size: 1.45rem;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      line-height: 1;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .khqr-stand-info {
+      padding: 12px 16px 8px;
+      border-bottom: 1.5px dashed #cbd5e1;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .khqr-merchant-name {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: #0f172a;
+      letter-spacing: 0.5px;
+    }
+    .khqr-stand-amount {
+      font-weight: 900;
+      font-size: 1.35rem;
+      color: #0284c7;
+    }
+    .khqr-qr-container {
+      padding: 14px;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      min-height: 250px;
+    }
+    .khqr-qr-img {
+      width: 240px;
+      height: 240px;
+      display: block;
+      margin: 0 auto;
+      border-radius: 6px;
+    }
+    .khqr-center-badge {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+    }
+    .khqr-center-badge svg {
+      width: 32px;
+      height: 32px;
+    }
+    .khqr-stand-footer {
+      background: #f8fafc;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e2e8f0;
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .khqr-timer-box {
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px solid rgba(14, 165, 233, 0.25);
+      border-radius: 12px;
+      padding: 7px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: #38bdf8;
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .khqr-order-meta {
+      font-size: 0.86rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .khqr-order-meta span {
+      color: #fff;
+      font-weight: 600;
+    }
+    .khqr-modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn-khqr-tap {
+      background: linear-gradient(135deg, #0070f3, #0284c7);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-weight: 700;
+      font-size: 0.98rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0, 112, 243, 0.35);
+      transition: all 0.2s ease;
+    }
+    .btn-khqr-tap:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(0, 112, 243, 0.55);
+      color: #fff;
+    }
+    .btn-khqr-confirm {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-weight: 700;
+      font-size: 0.98rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-khqr-confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+    .btn-khqr-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-khqr-save {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-khqr-save:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -1443,6 +1692,22 @@
       }
     }
 
+    // Tiered Profit Margin:
+    // Under $10.00: +$0.25 profit
+    // $10.00 - $49.99: +$1.00 profit
+    // $50.00 and above: +$1.50 profit
+    function applyMarkup(basePrice) {
+      const price = Number(basePrice) || 0;
+      if (price <= 0) return 0;
+      let markup = 0.25;
+      if (price >= 50.0) {
+        markup = 1.50;
+      } else if (price >= 10.0) {
+        markup = 1.00;
+      }
+      return Number((price + markup).toFixed(2));
+    }
+
     // ── Render Packages to HTML ─────────────────────────────
     function renderPackages(packages, currencyName) {
       const grid = document.getElementById('packagesGrid');
@@ -1453,7 +1718,11 @@
         card.className = 'package-item';
         card.setAttribute('data-id', pkg.package_id || pkg.id);
         card.setAttribute('data-name', pkg.name);
-        card.setAttribute('data-price', pkg.price);
+
+        // Calculate final customer price with profit margin
+        const rawPrice = Number(pkg.price);
+        const finalPrice = pkg.base_price !== undefined ? rawPrice : applyMarkup(rawPrice);
+        card.setAttribute('data-price', finalPrice);
 
         // Tag badge (HOT, BEST, etc.)
         let badgeHtml = '';
@@ -1477,7 +1746,7 @@
             </svg>
           </div>
           <div class="package-amount">${escapeHtml(pkg.name)}</div>
-          <div class="package-price">$${Number(pkg.price).toFixed(2)}</div>
+          <div class="package-price">$${Number(finalPrice).toFixed(2)}</div>
         `;
 
         card.addEventListener('click', () => {
@@ -1486,7 +1755,7 @@
           selectedPackage = {
             id: pkg.package_id || pkg.id,
             amount: pkg.name,
-            price: Number(pkg.price)
+            price: Number(finalPrice)
           };
           updateSummary();
         });
@@ -1726,7 +1995,7 @@
       }
 
       const btn = document.getElementById('btnTopUpNow');
-      btn.innerHTML = '⚡ កំពុងដំណើរការ...';
+      btn.innerHTML = '⚡ កំពុងរៀបចំ QR...';
       btn.disabled = true;
 
       const orderRef = 'R1CKKY-' + Date.now().toString().slice(-8);
@@ -1739,36 +2008,175 @@
         playerNickname: verifiedNickname || null,
         packageId: selectedPackage.id,
         packageName: selectedPackage.amount,
-        amount: selectedPackage.price,
-        paymentMethod: selectedPayment,
+        amount: Number(selectedPackage.price).toFixed(2),
+        paymentMethod: selectedPayment || 'ABA Pay',
         createdAt: new Date().toISOString()
       };
 
       // Save to localStorage for order status page
       localStorage.setItem('currentOrder', JSON.stringify(orderData));
 
-      // Asynchronously trigger server order registration
+      // Open Dynamic KHQR Modal directly
+      openKhqrModal(orderData);
+    }
+
+    // ── Dynamic KHQR Generator (NBC Bakong EMVCo Standard) ──
+    function crc16_ccitt(data) {
+      let crc = 0xFFFF;
+      for (let i = 0; i < data.length; i++) {
+        crc ^= (data.charCodeAt(i) << 8);
+        for (let j = 0; j < 8; j++) {
+          if ((crc & 0x8000) !== 0) {
+            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+          } else {
+            crc = (crc << 1) & 0xFFFF;
+          }
+        }
+      }
+      return crc.toString(16).toUpperCase().padStart(4, '0');
+    }
+
+    function generateDynamicKhqr(amount) {
+      const amtStr = Number(amount).toFixed(2);
+      const tag54 = '54' + String(amtStr.length).padStart(2, '0') + amtStr;
+      const parts = [
+        '000201',
+        '010212', // 12 = Dynamic QR
+        '30510016abaakhppxxx@abaa01151260917172414410208ABA Bank',
+        '52044814',
+        '5303840', // USD 840
+        tag54,
+        '5802KH',
+        '5910POV KIMHOV',
+        '6010BATTAMBANG',
+        '624268380010PAYWAY@ABA010719916270209032528705',
+        '6304'
+      ];
+      const raw = parts.join('');
+      const crc = crc16_ccitt(raw);
+      return raw + crc;
+    }
+
+    // ── Modal State & Controls ──────────────────────────────
+    let khqrTimerInterval = null;
+    let currentModalOrder = null;
+    let currentKhqrString = '';
+
+    function openKhqrModal(orderData) {
+      currentModalOrder = orderData;
+      const modal = document.getElementById('khqrModal');
+      const amount = Number(orderData.amount).toFixed(2);
+
+      document.getElementById('modalAmount').textContent = '$' + amount;
+      document.getElementById('modalMerchantName').textContent = 'POV KIMHOV';
+      document.getElementById('modalPackageName').textContent = `${orderData.game} - ${orderData.packageName || orderData.packageId}`;
+      document.getElementById('modalPlayerId').textContent = orderData.playerId + (orderData.zoneId ? ` (${orderData.zoneId})` : '');
+
+      currentKhqrString = generateDynamicKhqr(amount);
+
+      const qrImg = document.getElementById('modalQrImg');
+      
+      // Immediate reliable visual QR generator
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(currentKhqrString)}`;
+
+      // Fetch official high-res server QR if backend is reachable
+      fetch('/api/payment/generate-khqr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount, orderId: orderData.orderId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.qrDataUrl) {
+          qrImg.src = data.qrDataUrl;
+        }
+      })
+      .catch(err => console.log('Client-side QR fallback active:', err));
+
+      // Setup ABA Mobile button link
+      const deepLink = document.getElementById('modalAbaDeepLink');
+      deepLink.href = 'https://link.payway.com.kh/ABAPAYTh526248G';
+
+      // 5-minute Countdown Timer
+      let timeLeft = 300;
+      clearInterval(khqrTimerInterval);
+      updateTimerDisplay(timeLeft);
+      khqrTimerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(khqrTimerInterval);
+          document.getElementById('modalTimer').textContent = 'EXPIRED';
+        } else {
+          updateTimerDisplay(timeLeft);
+        }
+      }, 1000);
+
+      modal.classList.add('active');
+    }
+
+    function updateTimerDisplay(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      document.getElementById('modalTimer').textContent = 
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function closeKhqrModal() {
+      const modal = document.getElementById('khqrModal');
+      modal.classList.remove('active');
+      clearInterval(khqrTimerInterval);
+      const btn = document.getElementById('btnTopUpNow');
+      if (btn) {
+        btn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
+        btn.disabled = false;
+      }
+    }
+
+    function downloadKhqrImage() {
+      const qrImg = document.getElementById('modalQrImg');
+      if (qrImg && qrImg.src) {
+        const a = document.createElement('a');
+        a.href = qrImg.src;
+        a.download = `KHQR-POV_KIMHOV-${(currentModalOrder && currentModalOrder.orderId) || 'ORDER'}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    }
+
+    function copyKhqrText() {
+      if (currentKhqrString) {
+        navigator.clipboard.writeText(currentKhqrString).then(() => {
+          alert('បានចម្លងកូដ KHQR ជោគជ័យ!');
+        }).catch(() => {
+          alert(currentKhqrString);
+        });
+      }
+    }
+
+    function confirmPaymentAndProceed() {
+      if (!currentModalOrder) return;
+      closeKhqrModal();
+
+      // Trigger order registration in background
       try {
         fetch('/api/topup/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            package_id: selectedPackage.id,
-            player_id: playerId,
-            server_id: zoneId || null,
-            reference: orderRef,
-            game: currentGameData.title,
-            slug: currentSlug
+            package_id: currentModalOrder.packageId,
+            player_id: currentModalOrder.playerId,
+            server_id: currentModalOrder.zoneId || null,
+            reference: currentModalOrder.orderId,
+            game: currentModalOrder.game,
+            slug: currentModalOrder.slug
           })
         }).catch(err => console.warn('Order background notice:', err));
       } catch (e) {
         console.warn('Order dispatch fetch error:', e);
       }
 
-      // Smooth transition to Order Status
-      setTimeout(() => {
-        window.location.href = 'order-status.html?id=' + orderData.orderId;
-      }, 350);
+      window.location.href = 'order-status.html?id=' + currentModalOrder.orderId;
     }
 
     function escapeHtml(str) {
@@ -1790,5 +2198,80 @@
       });
     }
   </script>
+
+  <!-- Dynamic KHQR Payment Modal -->
+  <div class="khqr-modal-overlay" id="khqrModal">
+    <div class="khqr-modal-card">
+      <div class="khqr-modal-header">
+        <div class="khqr-modal-title">
+          <img src="images/Newlogo.png" alt="Logo" style="height: 26px; width: auto;">
+          <span>ស្កេនទូទាត់ប្រាក់ (KHQR)</span>
+        </div>
+        <button class="khqr-modal-close" onclick="closeKhqrModal()" title="Close">✕</button>
+      </div>
+
+      <div class="khqr-modal-body">
+        <!-- Authentic KHQR Stand Card -->
+        <div class="khqr-stand-card">
+          <div class="khqr-stand-header">
+            <div class="khqr-tag-logo">KHQR</div>
+          </div>
+          <div class="khqr-stand-info">
+            <div>
+              <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Merchant</div>
+              <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount</div>
+              <div class="khqr-stand-amount" id="modalAmount">$0.00</div>
+            </div>
+          </div>
+
+          <div class="khqr-qr-container">
+            <img id="modalQrImg" class="khqr-qr-img" src="" alt="KHQR Code">
+            <div class="khqr-center-badge">
+              <!-- Bakong Red Emblem SVG -->
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#E11D48"/>
+                <circle cx="50" cy="50" r="38" stroke="#FFFFFF" stroke-width="4"/>
+                <path d="M50 20 L58 36 L76 38 L62 50 L66 68 L50 58 L34 68 L38 50 L24 38 L42 36 Z" fill="#FFFFFF"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="khqr-stand-footer">
+            <span>ABA Bank • USD</span>
+            <span style="color: #0284c7;">Auto-Amount</span>
+          </div>
+        </div>
+
+        <div class="khqr-timer-box">
+          <span>⏳ ផុតកំណត់ក្នុងរយៈពេល:</span>
+          <span id="modalTimer" style="font-weight: 800; font-size: 0.95rem;">05:00</span>
+        </div>
+
+        <div class="khqr-order-meta">
+          <div>កញ្ចប់: <span id="modalPackageName">-</span></div>
+          <div>គណនី: <span id="modalPlayerId">-</span></div>
+        </div>
+
+        <div class="khqr-modal-actions">
+          <!-- Direct Mobile Link -->
+          <a id="modalAbaDeepLink" href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" class="btn-khqr-tap">
+            <span>📱 បង់ប្រាក់តាម ABA Mobile (Tap to Pay)</span>
+          </a>
+
+          <div class="btn-khqr-row">
+            <button class="btn-khqr-save" onclick="downloadKhqrImage()">📥 រក្សាទុក QR</button>
+            <button class="btn-khqr-save" onclick="copyKhqrText()">📋 ចម្លងកូដ</button>
+          </div>
+
+          <button class="btn-khqr-confirm" onclick="confirmPaymentAndProceed()">
+            <span>✅ ខ្ញុំបានបង់ប្រាក់រួចរាល់ (Proceed)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
