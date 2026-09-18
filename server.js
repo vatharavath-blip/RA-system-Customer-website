@@ -15,17 +15,20 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
 // Tiered Profit Margin:
-// Under $10.00: +$0.25 profit
+// Under $5.00: +$0.15 profit
+// $5.00 - $9.99: +$0.25 profit
 // $10.00 - $49.99: +$1.00 profit
 // $50.00 and above: +$1.50 profit
 function applyMarkup(basePrice) {
   const price = Number(basePrice) || 0;
   if (price <= 0) return 0;
-  let markup = 0.25;
+  let markup = 0.15;
   if (price >= 50.0) {
     markup = 1.50;
   } else if (price >= 10.0) {
     markup = 1.00;
+  } else if (price >= 5.0) {
+    markup = 0.25;
   }
   return Number((price + markup).toFixed(2));
 }
