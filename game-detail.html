@@ -1191,28 +1191,6 @@
       box-shadow: 0 6px 20px rgba(0, 106, 179, 0.55);
       color: #fff;
     }
-    .btn-bakong-pay {
-      background: linear-gradient(135deg, #b91c1c, #e11d48);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.35);
-      transition: all 0.2s ease;
-    }
-    .btn-bakong-pay:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.55);
-      color: #fff;
-    }
     .btn-checkout-pay {
       background: linear-gradient(135deg, #0284c7, #06b6d4);
       color: #fff;
@@ -1528,28 +1506,12 @@
             </div>
           </div>
 
-          <div class="payments-grid">
-            <div class="payment-option selected" data-method="ABA Pay">
-              <div class="payment-icon-wrap" style="color: #00bcd4;">ABA</div>
+          <div class="payments-grid" style="grid-template-columns: 1fr;">
+            <div class="payment-option selected" data-method="ABA Pay" style="border-color: #0084d1; background: rgba(0, 86, 150, 0.12);">
+              <div class="payment-icon-wrap" style="background: #004F71; color: #00B5E2; font-weight: 900; font-size: 1rem; border-radius: 8px; padding: 6px 14px; letter-spacing: 0.5px;">ABA</div>
               <div>
-                <div class="payment-title">ABA Pay</div>
-                <div class="payment-sub">⚡ Instant QR</div>
-              </div>
-            </div>
-
-            <div class="payment-option" data-method="KHQR">
-              <div class="payment-icon-wrap" style="color: #e11d48;">KH</div>
-              <div>
-                <div class="payment-title">KHQR (Bakong)</div>
-                <div class="payment-sub">⚡ All Banks</div>
-              </div>
-            </div>
-
-            <div class="payment-option" data-method="ACLEDA">
-              <div class="payment-icon-wrap" style="color: #3b82f6;">AC</div>
-              <div>
-                <div class="payment-title">ACLEDA</div>
-                <div class="payment-sub">⚡ Direct Pay</div>
+                <div class="payment-title" style="color: #38bdf8; font-weight: 800; font-size: 1.05rem;">ABA Pay (ABA Mobile)</div>
+                <div class="payment-sub">⚡ ស្កេនទូទាត់ប្រាក់ភ្លាមៗតាម ABA KHQR Real</div>
               </div>
             </div>
           </div>
@@ -2757,16 +2719,16 @@
                           (paymentData.md5 ? `https://payway.payment-system.dev/api/v1/qr/${paymentData.md5}.png` : null);
 
       if (directQrUrl) {
-        // Official ABA PayWay QR PNG contains its own authentic KHQR header and Bakong logo
+        // Official ABA PayWay QR PNG contains its own authentic KHQR header and ABA logo
         qrImg.src = directQrUrl;
         if (standHeader) standHeader.style.display = 'none';
         if (standFooter) standFooter.style.display = 'none';
         if (centerBadge) centerBadge.style.display = 'none';
         qrImg.style.maxWidth = '290px';
       } else if (paymentData.qr_string) {
-        // Fallback to NBC Bakong Dynamic QR code
+        // Fallback to ABA KHQR Dynamic QR code with ABA Center Emblem
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
-        if (standHeader) standHeader.style.display = 'block';
+        if (standHeader) standHeader.style.display = 'flex';
         if (standFooter) standFooter.style.display = 'flex';
         if (centerBadge) centerBadge.style.display = 'flex';
         qrImg.style.maxWidth = '230px';
@@ -2775,7 +2737,7 @@
       qrImg.onerror = function() {
         if (paymentData.qr_string && !this.src.includes('qrserver.com')) {
           this.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
-          if (standHeader) standHeader.style.display = 'block';
+          if (standHeader) standHeader.style.display = 'flex';
           if (standFooter) standFooter.style.display = 'flex';
           if (centerBadge) centerBadge.style.display = 'flex';
           this.style.maxWidth = '230px';
@@ -2783,22 +2745,10 @@
       };
 
       // Wire Action Buttons
-      // 1. Pay with ABA
+      // 1. Pay with ABA Mobile
       const abaBtn = document.getElementById('modalAbaDeepLink');
       if (abaBtn) {
         abaBtn.href = paymentData.deeplink_aba || 'https://link.payway.com.kh/ABAPAYTh526248G';
-      }
-
-      // 2. Pay with Bakong
-      const bakongBtn = document.getElementById('modalBakongDeepLink');
-      if (bakongBtn) {
-        if (paymentData.deeplink_bakong) {
-          bakongBtn.href = paymentData.deeplink_bakong;
-          bakongBtn.style.display = 'flex';
-        } else {
-          bakongBtn.href = 'https://bakong-deeplink.nbc.gov.kh/';
-          bakongBtn.style.display = 'flex';
-        }
       }
 
       // 3. Open Checkout
@@ -3107,9 +3057,9 @@
   <div class="khqr-modal-overlay" id="khqrModal">
     <div class="khqr-modal-card">
       <div class="khqr-modal-header">
-        <div class="khqr-modal-title">
-          <img src="images/Newlogo.png" alt="Logo" style="height: 26px; width: auto;">
-          <span>KHQR PAYMENT</span>
+        <div class="khqr-modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span style="background: #00B5E2; color: #002D42; font-weight: 900; font-size: 0.85rem; padding: 2px 7px; border-radius: 5px; letter-spacing: 0.5px;">ABA</span>
+          <span>ABA PAY (KHQR)</span>
         </div>
         <button class="khqr-modal-close" onclick="closeKhqrModal()" title="Close">✕</button>
       </div>
@@ -3134,26 +3084,32 @@
               </div>
             </div>
 
-            <!-- Fallback header only shown if raw QR string is used -->
-            <div class="khqr-stand-header" id="khqrStandHeader" style="display: none;">
-              <div class="khqr-tag-logo">KHQR</div>
+            <!-- Authentic ABA Pay KHQR Header -->
+            <div class="khqr-stand-header" id="khqrStandHeader" style="display: none; background: linear-gradient(135deg, #004F71 0%, #002D42 100%); padding: 10px 14px; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="background: #00B5E2; color: #002D42; font-weight: 900; font-size: 0.85rem; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.5px;">ABA</span>
+                <span style="color: #ffffff; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.5px;">PAY</span>
+              </div>
+              <div style="background: #e11d48; color: #ffffff; font-weight: 900; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; letter-spacing: 1px;">KHQR</div>
             </div>
 
             <div class="khqr-qr-container" id="khqrQrContainer" style="padding: 10px; background: #ffffff;">
               <img id="modalQrImg" class="khqr-qr-img" src="" alt="Official ABA PayWay KHQR Code" style="width: 100%; max-width: 290px; height: auto; border-radius: 14px; display: block; margin: 0 auto;">
-              <div class="khqr-center-badge" id="khqrCenterBadge" style="display: none;">
-                <!-- Authentic Bakong Red Octagon Emblem SVG -->
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="48" fill="#E11D48"/>
-                  <circle cx="50" cy="50" r="38" stroke="#FFFFFF" stroke-width="3"/>
-                  <path d="M50 22 L56 36 L70 32 L66 46 L80 50 L66 54 L70 68 L56 64 L50 78 L44 64 L30 68 L34 54 L20 50 L34 46 L30 32 L44 36 Z" fill="#FFFFFF"/>
+              <div class="khqr-center-badge" id="khqrCenterBadge" style="display: none; background: #ffffff; padding: 2px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.35); width: 44px; height: 44px;">
+                <!-- Authentic ABA Bank Round Logo SVG -->
+                <svg viewBox="0 0 100 100" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="48" fill="#004F71"/>
+                  <circle cx="50" cy="50" r="44" fill="#004F71" stroke="#00B5E2" stroke-width="3"/>
+                  <text x="50" y="61" fill="#FFFFFF" font-size="32" font-weight="900" font-family="Arial, Helvetica, sans-serif" text-anchor="middle" letter-spacing="0.5">ABA</text>
                 </svg>
               </div>
             </div>
 
-            <div class="khqr-stand-footer" id="khqrStandFooter" style="display: none;">
-              <span>ABA Bank • USD</span>
-              <span id="modalMerchantFooter" style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
+            <div class="khqr-stand-footer" id="khqrStandFooter" style="display: none; background: #f8fafc; padding: 10px 14px; border-top: 1px solid #e2e8f0;">
+              <span style="font-weight: 700; color: #004F71; display: flex; align-items: center; gap: 5px;">
+                <span style="color: #00B5E2; font-size: 0.9rem;">●</span> ABA Mobile • USD
+              </span>
+              <span id="modalMerchantFooter" style="color: #0284c7; font-weight: 800;">POV KIMHOV</span>
             </div>
           </div>
 
@@ -3176,21 +3132,16 @@
           <!-- PayWay Action Buttons -->
           <div class="khqr-modal-actions">
             <!-- 1. Pay with ABA -->
-            <a id="modalAbaDeepLink" href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" class="btn-aba-pay">
-              <span>📱 Pay with ABA (បង់ប្រាក់តាម ABA)</span>
+            <a id="modalAbaDeepLink" href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" class="btn-aba-pay" style="padding: 13px 18px; font-size: 1rem;">
+              <span>📱 Pay with ABA (បង់ប្រាក់តាម ABA Mobile)</span>
             </a>
 
-            <!-- 2. Pay with Bakong -->
-            <a id="modalBakongDeepLink" href="https://bakong-deeplink.nbc.gov.kh/" target="_blank" rel="noopener noreferrer" class="btn-bakong-pay">
-              <span>🏛️ Pay with Bakong (បង់ប្រាក់តាម Bakong)</span>
-            </a>
-
-            <!-- 3. Open Checkout -->
+            <!-- 2. Open Checkout -->
             <a id="modalCheckoutLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-checkout-pay">
               <span>🌐 Open Checkout (បើកទំព័រទូទាត់ប្រាក់)</span>
             </a>
 
-            <!-- 4. Manual Check Payment -->
+            <!-- 3. Manual Check Payment -->
             <button id="btnManualCheck" class="btn-check-manual" onclick="checkPaymentStatusNow()">
               <span>🔄 Check Payment (ពិនិត្យការទូទាត់)</span>
             </button>

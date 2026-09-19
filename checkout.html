@@ -139,18 +139,10 @@
         <!-- Payment -->
         <div class="checkout-section">
           <h2>Payment Method</h2>
-          <div class="payment-methods">
+          <div class="payment-methods" style="grid-template-columns: 1fr;">
             <div class="payment-card selected" onclick="selectPayment(this)">
-              <h3 class="mb-1">ABA Pay</h3>
-              <span class="badge badge-blue">Instant</span>
-            </div>
-            <div class="payment-card" onclick="selectPayment(this)">
-              <h3 class="mb-1">KHQR</h3>
-              <span class="badge badge-blue">Scan</span>
-            </div>
-            <div class="payment-card disabled">
-              <h3 class="mb-1">Credit Card</h3>
-              <span class="badge badge-blue" style="background: rgba(255,255,255,0.1); color: #fff; border-color: transparent;">Coming Soon</span>
+              <h3 class="mb-1" style="color: #00bcd4;">ABA Pay</h3>
+              <span class="badge badge-blue">Instant QR (ABA Mobile)</span>
             </div>
           </div>
         </div>
