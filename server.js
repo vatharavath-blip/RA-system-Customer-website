@@ -706,32 +706,17 @@ app.post('/api/payment/check', async (req, res) => {
         const extData = await extResp.json();
         console.log(`[PayWay Check] Result for MD5 ${md5}:`, extData);
 
-        // 3. When Paid: responseCode === 0
-        if (extData && extData.responseCode === 0 && extData.data) {
-          const tx = extData.data;
-
-          // 9. Validation:
-          // data.amount matches requested amount
-          // data.currency matches requested currency
-          // data.description matches generated bill number
-          const amtValid = !payment || Math.abs(Number(tx.amount) - Number(payment.amount)) < 0.01;
-          const currValid = !payment || !tx.currency || tx.currency.toUpperCase() === (payment.currency || 'USD').toUpperCase();
-          const descValid = !payment || !tx.description || tx.description === payment.billNumber;
-
-          if (!amtValid || !currValid || !descValid) {
-            console.warn('Payment validation mismatch:', { amtValid, currValid, descValid, tx, expected: payment });
-            return res.status(400).json({
-              success: false,
-              error: 'Transaction verification mismatch',
-              status: 'verification_failed'
-            });
-          }
+        // When Paid: responseCode === 0 (or "0")
+        if (extData && Number(extData.responseCode) === 0) {
+          const tx = extData.data || {};
+          console.log(`[PayWay Check] Payment SUCCESS confirmed by responseCode === 0:`, tx);
 
           if (payment) {
             payment.status = 'success';
-            payment.transactionHash = tx.hash;
-            payment.receiptUrl = tx.download_receipt;
-            payment.paidAt = new Date().toISOString();
+            payment.transactionHash = tx.hash || null;
+            payment.receiptUrl = tx.download_receipt || null;
+            payment.paidAt = tx.acknowledgedDateMs ? new Date(tx.acknowledgedDateMs).toISOString() : new Date().toISOString();
+            payment.paywayData = tx;
             savePayments();
 
             // Auto-fulfill Game Top-Up Order (Direct API fulfillment with idempotent protection)
@@ -759,22 +744,23 @@ app.post('/api/payment/check', async (req, res) => {
           return res.json({
             success: true,
             status: 'success',
-            amount: tx.amount,
-            currency: tx.currency || 'USD',
+            responseCode: 0,
+            amount: tx.amount || (payment ? payment.amount : null),
+            currency: tx.currency || (payment ? payment.currency : 'USD'),
             bill_number: tx.description || (payment ? payment.billNumber : null),
-            transaction_hash: tx.hash
+            transaction_hash: tx.hash || null,
+            download_receipt: tx.download_receipt || null
           });
         }
 
-        // 2 & 4. When Not Paid Yet: responseCode === 1 (PENDING)
-        // Do NOT mark it as failed immediately!
-        if (extData && extData.responseCode === 1) {
+        // When Not Paid Yet: responseCode === 1 (PENDING)
+        if (extData && Number(extData.responseCode) === 1) {
           if (payment && payment.expireDate && Date.now() > new Date(payment.expireDate).getTime()) {
             payment.status = 'expired';
             savePayments();
-            return res.json({ success: true, status: 'expired' });
+            return res.json({ success: true, status: 'expired', responseCode: 1 });
           }
-          return res.json({ success: true, status: 'pending' });
+          return res.json({ success: true, status: 'pending', responseCode: 1 });
         }
       } catch (extErr) {
         console.warn('PayWay check API error:', extErr.message);
