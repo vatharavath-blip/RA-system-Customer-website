@@ -2750,22 +2750,35 @@
 
       // Render Official PayWay QR Code directly from link_qr_code
       const qrImg = document.getElementById('modalQrImg');
-      const centerBadge = document.querySelector('.khqr-center-badge');
+      const centerBadge = document.getElementById('khqrCenterBadge') || document.querySelector('.khqr-center-badge');
+      const standHeader = document.getElementById('khqrStandHeader');
+      const standFooter = document.getElementById('khqrStandFooter');
       const directQrUrl = paymentData.link_qr_code || 
                           (paymentData.md5 ? `https://payway.payment-system.dev/api/v1/qr/${paymentData.md5}.png` : null);
 
       if (directQrUrl) {
+        // Official ABA PayWay QR PNG contains its own authentic KHQR header and Bakong logo
         qrImg.src = directQrUrl;
+        if (standHeader) standHeader.style.display = 'none';
+        if (standFooter) standFooter.style.display = 'none';
         if (centerBadge) centerBadge.style.display = 'none';
+        qrImg.style.maxWidth = '290px';
       } else if (paymentData.qr_string) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
-        if (centerBadge) centerBadge.style.display = 'block';
+        // Fallback to NBC Bakong Dynamic QR code
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
+        if (standHeader) standHeader.style.display = 'block';
+        if (standFooter) standFooter.style.display = 'flex';
+        if (centerBadge) centerBadge.style.display = 'flex';
+        qrImg.style.maxWidth = '230px';
       }
 
       qrImg.onerror = function() {
         if (paymentData.qr_string && !this.src.includes('qrserver.com')) {
-          this.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
-          if (centerBadge) centerBadge.style.display = 'block';
+          this.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
+          if (standHeader) standHeader.style.display = 'block';
+          if (standFooter) standFooter.style.display = 'flex';
+          if (centerBadge) centerBadge.style.display = 'flex';
+          this.style.maxWidth = '230px';
         }
       };
 
@@ -3066,11 +3079,9 @@
         <!-- 1. Active Payment View -->
         <div id="khqrPaymentView">
           <!-- Authentic KHQR Stand Card -->
-          <div class="khqr-stand-card">
-            <div class="khqr-stand-header">
-              <div class="khqr-tag-logo">KHQR</div>
-            </div>
-            <div class="khqr-stand-info">
+          <div class="khqr-stand-card" id="khqrStandCard">
+            <!-- Merchant & Amount Info Header -->
+            <div class="khqr-stand-info" id="khqrStandInfo">
               <div>
                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Merchant</div>
                 <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
@@ -3084,19 +3095,24 @@
               </div>
             </div>
 
-            <div class="khqr-qr-container">
-              <img id="modalQrImg" class="khqr-qr-img" src="" alt="KHQR Code">
-              <div class="khqr-center-badge">
-                <!-- Bakong Red Emblem SVG -->
+            <!-- Fallback header only shown if raw QR string is used -->
+            <div class="khqr-stand-header" id="khqrStandHeader" style="display: none;">
+              <div class="khqr-tag-logo">KHQR</div>
+            </div>
+
+            <div class="khqr-qr-container" id="khqrQrContainer" style="padding: 10px; background: #ffffff;">
+              <img id="modalQrImg" class="khqr-qr-img" src="" alt="Official ABA PayWay KHQR Code" style="width: 100%; max-width: 290px; height: auto; border-radius: 14px; display: block; margin: 0 auto;">
+              <div class="khqr-center-badge" id="khqrCenterBadge" style="display: none;">
+                <!-- Authentic Bakong Red Octagon Emblem SVG -->
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="50" cy="50" r="48" fill="#E11D48"/>
-                  <circle cx="50" cy="50" r="38" stroke="#FFFFFF" stroke-width="4"/>
-                  <path d="M50 20 L58 36 L76 38 L62 50 L66 68 L50 58 L34 68 L38 50 L24 38 L42 36 Z" fill="#FFFFFF"/>
+                  <circle cx="50" cy="50" r="38" stroke="#FFFFFF" stroke-width="3"/>
+                  <path d="M50 22 L56 36 L70 32 L66 46 L80 50 L66 54 L70 68 L56 64 L50 78 L44 64 L30 68 L34 54 L20 50 L34 46 L30 32 L44 36 Z" fill="#FFFFFF"/>
                 </svg>
               </div>
             </div>
 
-            <div class="khqr-stand-footer">
+            <div class="khqr-stand-footer" id="khqrStandFooter" style="display: none;">
               <span>ABA Bank • USD</span>
               <span id="modalMerchantFooter" style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
             </div>
