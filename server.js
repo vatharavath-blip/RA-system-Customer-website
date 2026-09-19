@@ -13,7 +13,7 @@ const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 
 // PayWay Payment Gateway System API Configuration
 const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-system.dev/api/v1').replace(/\/$/, '');
-const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
+const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiZWZjYTE2YjBjZWJkNDVmZCJ9LCJpYXQiOjE3ODU4NjQ4MDcsImV4cCI6MTc5MzY0MDgwN30.lzyCQOImAxuiKau9OxlDbVZitbtyxJ1b3r_lFZUhqAh';
 const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
 
 // Realistic browser headers to prevent Cloudflare/WAF HTML 403 blocks on datacenter IPs
@@ -808,6 +808,7 @@ app.post('/api/payment/check', async (req, res) => {
   } catch (err) {
     console.error('Payment Check Error:', err);
     res.status(500).json({ success: false, error: 'Failed to check payment status', details: err.message });
+  }
 });
 
 // 6.3 Direct Payment Confirmation (Client-Side Direct Verification Fallback)
