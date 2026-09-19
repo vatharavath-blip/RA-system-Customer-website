@@ -2747,10 +2747,26 @@
       document.getElementById('modalPackageName').textContent = `${orderMeta.game} - ${orderMeta.packageName || orderMeta.packageId}`;
       document.getElementById('modalPlayerId').textContent = orderMeta.playerId + (orderMeta.zoneId ? ` (${orderMeta.zoneId})` : '');
 
-      // Render Dynamic QR Code with exact auto-filled price
+      // Render Official PayWay QR Code directly from link_qr_code
       const qrImg = document.getElementById('modalQrImg');
-      const qrDataToRender = paymentData.qr_string;
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=4&data=${encodeURIComponent(qrDataToRender)}`;
+      const centerBadge = document.querySelector('.khqr-center-badge');
+      const directQrUrl = paymentData.link_qr_code || 
+                          (paymentData.md5 ? `https://payway.payment-system.dev/api/v1/qr/${paymentData.md5}.png` : null);
+
+      if (directQrUrl) {
+        qrImg.src = directQrUrl;
+        if (centerBadge) centerBadge.style.display = 'none';
+      } else if (paymentData.qr_string) {
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
+        if (centerBadge) centerBadge.style.display = 'block';
+      }
+
+      qrImg.onerror = function() {
+        if (paymentData.qr_string && !this.src.includes('qrserver.com')) {
+          this.src = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
+          if (centerBadge) centerBadge.style.display = 'block';
+        }
+      };
 
       // Wire Action Buttons
       // 1. Pay with ABA

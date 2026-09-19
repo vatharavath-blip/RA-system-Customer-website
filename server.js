@@ -559,6 +559,7 @@ app.post('/api/payment/create', async (req, res) => {
 
         if (extData && (extData.success === true || extData.qr_string)) {
           const md5Val = extData.md5 || crypto.createHash('md5').update(billNumber + amtStr + Date.now()).digest('hex');
+          const linkQrCode = extData.link_qr_code || (extData.md5 ? `${PAYWAY_API_URL}/qr/${extData.md5}.png` : null);
 
           // Store transaction record with duplicate protection
           paymentStore.set(md5Val, {
@@ -570,7 +571,8 @@ app.post('/api/payment/create', async (req, res) => {
             currency: extData.currency || 'USD',
             status: 'pending',
             qrString: extData.qr_string,
-            downloadQr: extData.download_qr || null,
+            linkQrCode: linkQrCode,
+            downloadQr: extData.download_qr || linkQrCode,
             checkout: extData.checkout || null,
             deeplinkAba: extData.deeplink_aba || PAYWAY_LINK,
             deeplinkBakong: extData.deeplink_bakong || null,
@@ -593,7 +595,8 @@ app.post('/api/payment/create', async (req, res) => {
             amount: amtStr,
             currency: extData.currency || 'USD',
             qr_string: extData.qr_string,
-            download_qr: extData.download_qr || null,
+            link_qr_code: linkQrCode,
+            download_qr: extData.download_qr || linkQrCode,
             checkout: extData.checkout || null,
             deeplink_aba: extData.deeplink_aba || PAYWAY_LINK,
             deeplink_bakong: extData.deeplink_bakong || null,
