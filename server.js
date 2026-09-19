@@ -13,7 +13,7 @@ const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 
 // PayWay Payment Gateway System API Configuration
 const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-system.dev/api/v1').replace(/\/$/, '');
-const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '';
+const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
 const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
 
 // Persistent Transaction Store (Maps md5 -> payment record for duplicate protection and order processing)
