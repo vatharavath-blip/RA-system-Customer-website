@@ -558,8 +558,13 @@ app.post('/api/payment/create', async (req, res) => {
         const extData = await extResp.json();
 
         if (extData && (extData.success === true || extData.qr_string)) {
-          const md5Val = extData.md5 || crypto.createHash('md5').update(billNumber + amtStr + Date.now()).digest('hex');
-          const linkQrCode = extData.link_qr_code || (extData.md5 ? `${PAYWAY_API_URL}/qr/${extData.md5}.png` : null);
+          const md5Val = extData.md5;
+          if (!md5Val) {
+            console.error('PayWay external API did not return md5:', extData);
+            throw new Error('PayWay API missing official md5');
+          }
+          console.log(`[PayWay] Captured official MD5 directly from Generate: ${md5Val} (Invoice: ${extData.bill_number})`);
+          const linkQrCode = extData.link_qr_code || `${PAYWAY_API_URL}/qr/${md5Val}.png`;
 
           // Store transaction record with duplicate protection
           paymentStore.set(md5Val, {
@@ -696,8 +701,10 @@ app.post('/api/payment/check', async (req, res) => {
     if (PAYWAY_API_TOKEN) {
       try {
         const checkUrl = `${PAYWAY_API_URL}/check_transaction_by_md5/?md5=${encodeURIComponent(md5)}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
+        console.log(`[PayWay Check] Polling transaction status with MD5: ${md5}`);
         const extResp = await fetch(checkUrl, { signal: AbortSignal.timeout(35000) });
         const extData = await extResp.json();
+        console.log(`[PayWay Check] Result for MD5 ${md5}:`, extData);
 
         // 3. When Paid: responseCode === 0
         if (extData && extData.responseCode === 0 && extData.data) {

@@ -2697,6 +2697,7 @@
 
         currentPaymentData = data;
         currentOrderMeta = orderMeta;
+        console.log('[PayWay Generate] Official MD5 captured from API:', data.md5, 'Bill:', data.bill_number);
 
         // Persist order with md5 and bill_number to localStorage
         orderMeta.md5 = data.md5;
@@ -2840,6 +2841,7 @@
       isCheckingPayment = true;
 
       try {
+        console.log('[PayWay Poll] Checking transaction status using MD5:', currentPaymentData.md5);
         const resp = await fetch('/api/payment/check', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
