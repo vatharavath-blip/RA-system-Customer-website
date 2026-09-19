@@ -690,10 +690,10 @@ app.post('/api/payment/generate-khqr', (req, res, next) => {
   app.handle(req, res, next);
 });
 
-// 6.2 Check Transaction Status (Idempotent with Duplicate Protection)
-app.post('/api/payment/check', async (req, res) => {
+// 6.2 Check Transaction Status (Supports POST and GET)
+app.all('/api/payment/check', async (req, res) => {
   try {
-    const { md5 } = req.body;
+    const md5 = req.body?.md5 || req.query?.md5;
     if (!md5) {
       return res.status(400).json({ success: false, error: 'md5 parameter is required' });
     }

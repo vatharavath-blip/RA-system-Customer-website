@@ -2821,7 +2821,7 @@
         // This guarantees that Cloudflare datacenter IP blocks NEVER prevent payment detection!
         if (!resData || (resData.status !== 'success' && resData.responseCode !== 0)) {
           try {
-            const token = '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiZWZjYTE2YjBjZWJkNDVmZCJ9LCJpYXQiOjE3ODU4NjQ4MDcsImV4cCI6MTc5MzY0MDgwN30.lzyCQOImAxuiKau9OxlDbVZitbtyxJ1b3r_lFZUhqAh';
             const directUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(token)}`;
             const directResp = await fetch(directUrl);
             const directData = await directResp.json();
