@@ -2733,7 +2733,7 @@
       document.getElementById('modalInvoiceNum').textContent = paymentData.bill_number;
 
       // Extract merchant name dynamically from KHQR string tag 59 or fallback
-      let merchantName = 'YOUT CHENG by Pay System';
+      let merchantName = 'POV KIMHOV';
       if (paymentData.qr_string) {
         const m59 = paymentData.qr_string.match(/59(\d{2})(.+?)60/);
         if (m59 && m59[2]) {
@@ -3055,7 +3055,7 @@
             <div class="khqr-stand-info">
               <div>
                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Merchant</div>
-                <div class="khqr-merchant-name" id="modalMerchantName">YOUT CHENG by Pay System</div>
+                <div class="khqr-merchant-name" id="modalMerchantName">POV KIMHOV</div>
               </div>
               <div style="text-align: right;">
                 <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Amount to Pay</div>
@@ -3080,7 +3080,7 @@
 
             <div class="khqr-stand-footer">
               <span>ABA Bank • USD</span>
-              <span id="modalMerchantFooter" style="color: #0284c7; font-weight: 700;">YOUT CHENG by Pay System</span>
+              <span id="modalMerchantFooter" style="color: #0284c7; font-weight: 700;">POV KIMHOV</span>
             </div>
           </div>
 

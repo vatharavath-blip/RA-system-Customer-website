@@ -537,7 +537,7 @@ app.post('/api/payment/create', async (req, res) => {
     if (PAYWAY_API_TOKEN) {
       try {
         const externalUrl = `${PAYWAY_API_URL}/generate_qr/?payway_link=${encodeURIComponent(PAYWAY_LINK)}&amount=${amtStr}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
-        const extResp = await fetch(externalUrl, { signal: AbortSignal.timeout(15000) });
+        const extResp = await fetch(externalUrl, { signal: AbortSignal.timeout(35000) });
         const extData = await extResp.json();
 
         if (extData && (extData.success === true || extData.qr_string)) {
@@ -676,7 +676,7 @@ app.post('/api/payment/check', async (req, res) => {
     if (PAYWAY_API_TOKEN) {
       try {
         const checkUrl = `${PAYWAY_API_URL}/check_transaction_by_md5/?md5=${encodeURIComponent(md5)}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
-        const extResp = await fetch(checkUrl, { timeout: 8000 });
+        const extResp = await fetch(checkUrl, { signal: AbortSignal.timeout(15000) });
         const extData = await extResp.json();
 
         // 3. When Paid: responseCode === 0
