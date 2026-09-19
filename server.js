@@ -427,13 +427,11 @@ app.post('/api/topup/check-id', async (req, res) => {
   }
 });
 
-// 4. Place Top-Up Order (POST /api/v1/orders)
-app.post('/api/topup/order', async (req, res) => {
-  const { package_id, packageId, player_id, playerId, server_id, zoneId, serverId, reference, game } = req.body;
-  
-  const targetPackageId = package_id || packageId;
-  let targetPlayerId = String(player_id || playerId || '').trim();
-  let targetServerId = String(server_id || zoneId || serverId || '').trim();
+// Core Helper: Direct Top-Up Order Execution with Khmer Top-Up API
+async function executeTopUpOrder({ packageId, playerId, serverId, zoneId, reference, game, slug }) {
+  let targetPlayerId = String(playerId || '').trim();
+  let targetServerId = String(serverId || zoneId || '').trim();
+  const targetPackageId = packageId;
   const targetReference = reference || ('R1CKKY-' + Date.now().toString().slice(-8));
 
   const combinedMatch = targetPlayerId.match(/^([^(]+)\s*\(([^)]+)\)$/);
@@ -448,11 +446,11 @@ app.post('/api/topup/order', async (req, res) => {
   targetServerId = targetServerId ? targetServerId.replace(/[\s()\[\]]/g, '') : null;
 
   if (!targetPlayerId || !targetPackageId) {
-    return res.status(400).json({ error: 'player_id and package_id are required' });
+    throw new Error('player_id and package_id are required');
   }
 
   if (!API_KEY) {
-    return res.json({
+    return {
       order_code: 'SIM-' + Date.now().toString().slice(-8),
       status: 'processing',
       simulated: true,
@@ -462,30 +460,49 @@ app.post('/api/topup/order', async (req, res) => {
       server_id: targetServerId,
       reference: targetReference,
       message: 'Simulated order created locally.'
-    });
+    };
   }
 
+  const payload = {
+    package_id: Number(targetPackageId),
+    player_id: String(targetPlayerId),
+    reference: targetReference
+  };
+  if (targetServerId) {
+    payload.server_id = String(targetServerId);
+  }
+
+  console.log(`[Top-Up Provider] Fulfilling order for player ${targetPlayerId} (package ${targetPackageId}):`, payload);
+  const response = await fetch(`${API_URL}/orders`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await response.json();
+  console.log(`[Top-Up Provider] Order response:`, data);
+  return { status: response.status, data };
+}
+
+// 4. Place Top-Up Order (POST /api/v1/orders)
+app.post('/api/topup/order', async (req, res) => {
+  const { package_id, packageId, player_id, playerId, server_id, zoneId, serverId, reference, game, slug } = req.body;
   try {
-    const payload = {
-      package_id: Number(targetPackageId),
-      player_id: String(targetPlayerId),
-      reference: targetReference
-    };
-    if (targetServerId) {
-      payload.server_id = String(targetServerId);
-    }
-
-    const response = await fetch(`${API_URL}/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
-      },
-      body: JSON.stringify(payload)
+    const result = await executeTopUpOrder({
+      packageId: package_id || packageId,
+      playerId: player_id || playerId,
+      serverId: server_id || zoneId || serverId,
+      reference,
+      game,
+      slug
     });
-
-    const data = await response.json();
-    res.status(response.status).json(data);
+    if (result.status) {
+      return res.status(result.status).json(result.data);
+    }
+    return res.json(result);
   } catch (error) {
     console.error('Order Dispatch Error:', error);
     res.status(500).json({ error: 'Failed to dispatch top-up order', details: error.message });
@@ -676,7 +693,7 @@ app.post('/api/payment/check', async (req, res) => {
     if (PAYWAY_API_TOKEN) {
       try {
         const checkUrl = `${PAYWAY_API_URL}/check_transaction_by_md5/?md5=${encodeURIComponent(md5)}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
-        const extResp = await fetch(checkUrl, { signal: AbortSignal.timeout(15000) });
+        const extResp = await fetch(checkUrl, { signal: AbortSignal.timeout(35000) });
         const extData = await extResp.json();
 
         // 3. When Paid: responseCode === 0
@@ -707,22 +724,25 @@ app.post('/api/payment/check', async (req, res) => {
             payment.paidAt = new Date().toISOString();
             savePayments();
 
-            // Auto-fulfill Game Top-Up Order (Only once with idempotent protection)
+            // Auto-fulfill Game Top-Up Order (Direct API fulfillment with idempotent protection)
             if (!payment.orderFulfilled && payment.orderDetails && payment.orderDetails.playerId) {
               payment.orderFulfilled = true;
               savePayments();
-              fetch(`http://localhost:${PORT}/api/topup/order`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  package_id: payment.orderDetails.packageId,
-                  player_id: payment.orderDetails.playerId,
-                  server_id: payment.orderDetails.zoneId || null,
-                  reference: payment.billNumber,
-                  game: payment.orderDetails.game,
-                  slug: payment.orderDetails.slug
-                })
-              }).catch(e => console.warn('Auto topup background dispatch notice:', e.message));
+              executeTopUpOrder({
+                packageId: payment.orderDetails.packageId,
+                playerId: payment.orderDetails.playerId,
+                serverId: payment.orderDetails.zoneId || null,
+                zoneId: payment.orderDetails.zoneId || null,
+                reference: payment.billNumber,
+                game: payment.orderDetails.game,
+                slug: payment.orderDetails.slug
+              }).then(topupRes => {
+                if (topupRes && topupRes.data) {
+                  payment.orderCode = topupRes.data.order_code || topupRes.data.id || null;
+                  payment.topupStatus = topupRes.data.status || 'completed';
+                  savePayments();
+                }
+              }).catch(e => console.warn('Auto topup dispatch notice:', e.message));
             }
           }
 
