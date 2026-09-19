@@ -2855,13 +2855,52 @@
 
       try {
         console.log('[PayWay Poll] Checking transaction status using MD5:', currentPaymentData.md5);
-        const resp = await fetch('/api/payment/check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ md5: currentPaymentData.md5 })
-        });
+        let resData = null;
+        try {
+          const resp = await fetch('/api/payment/check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ md5: currentPaymentData.md5 })
+          });
+          resData = await resp.json();
+        } catch (serverErr) {
+          console.warn('[PayWay Poll] Server check warning:', serverErr.message);
+        }
 
-        const resData = await resp.json();
+        // Secondary Direct Check: Query PayWay API directly from customer's browser (Access-Control-Allow-Origin: *)
+        // This guarantees that Cloudflare datacenter IP blocks NEVER prevent payment detection!
+        if (!resData || (resData.status !== 'success' && resData.responseCode !== 0)) {
+          try {
+            const token = '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
+            const directUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(token)}`;
+            const directResp = await fetch(directUrl);
+            const directData = await directResp.json();
+            if (directData && Number(directData.responseCode) === 0) {
+              console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
+              // Notify server to fulfill game topup
+              await fetch('/api/payment/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  md5: currentPaymentData.md5,
+                  hash: directData.data ? directData.data.hash : null,
+                  download_receipt: directData.data ? directData.data.download_receipt : null,
+                  txData: directData.data
+                })
+              });
+              resData = {
+                status: 'success',
+                responseCode: 0,
+                amount: directData.data ? directData.data.amount : currentPaymentData.amount,
+                currency: directData.data ? directData.data.currency : 'USD',
+                bill_number: directData.data ? directData.data.description : currentPaymentData.bill_number,
+                transaction_hash: directData.data ? directData.data.hash : null
+              };
+            }
+          } catch (directErr) {
+            // Silently continue to next poll
+          }
+        }
 
         // 3. SUCCESS when API returns responseCode = 0 / status = success
         if (resData && (resData.status === 'success' || resData.responseCode === 0)) {

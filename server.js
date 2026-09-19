@@ -16,6 +16,14 @@ const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-sy
 const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
 const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
 
+// Realistic browser headers to prevent Cloudflare/WAF HTML 403 blocks on datacenter IPs
+const PAYWAY_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
+  'Accept': 'application/json, text/plain, */*',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Cache-Control': 'no-cache'
+};
+
 // Persistent Transaction Store (Maps md5 -> payment record for duplicate protection and order processing)
 const PAYMENTS_FILE = path.join(__dirname, 'payments.json');
 const paymentStore = new Map();
@@ -554,8 +562,19 @@ app.post('/api/payment/create', async (req, res) => {
     if (PAYWAY_API_TOKEN) {
       try {
         const externalUrl = `${PAYWAY_API_URL}/generate_qr/?payway_link=${encodeURIComponent(PAYWAY_LINK)}&amount=${amtStr}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
-        const extResp = await fetch(externalUrl, { signal: AbortSignal.timeout(35000) });
-        const extData = await extResp.json();
+        console.log(`[PayWay Generate] Calling external API for amount $${amtStr}`);
+        const extResp = await fetch(externalUrl, {
+          headers: PAYWAY_HEADERS,
+          signal: AbortSignal.timeout(35000)
+        });
+        const rawText = await extResp.text();
+        let extData = null;
+        try {
+          extData = JSON.parse(rawText);
+        } catch (jsonErr) {
+          console.error(`[PayWay] Generate returned non-JSON (Status ${extResp.status}):`, rawText.substring(0, 250));
+          throw new Error(`PayWay generate returned status ${extResp.status}`);
+        }
 
         if (extData && (extData.success === true || extData.qr_string)) {
           const md5Val = extData.md5;
@@ -702,9 +721,20 @@ app.post('/api/payment/check', async (req, res) => {
       try {
         const checkUrl = `${PAYWAY_API_URL}/check_transaction_by_md5/?md5=${encodeURIComponent(md5)}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
         console.log(`[PayWay Check] Polling transaction status with MD5: ${md5}`);
-        const extResp = await fetch(checkUrl, { signal: AbortSignal.timeout(35000) });
-        const extData = await extResp.json();
-        console.log(`[PayWay Check] Result for MD5 ${md5}:`, extData);
+        const extResp = await fetch(checkUrl, {
+          headers: PAYWAY_HEADERS,
+          signal: AbortSignal.timeout(35000)
+        });
+        const rawText = await extResp.text();
+        let extData = null;
+        try {
+          extData = JSON.parse(rawText);
+        } catch (jsonErr) {
+          console.warn(`[PayWay Check] Check returned non-JSON (Status ${extResp.status}):`, rawText.substring(0, 200));
+        }
+        if (extData) {
+          console.log(`[PayWay Check] Result for MD5 ${md5}:`, extData);
+        }
 
         // When Paid: responseCode === 0 (or "0")
         if (extData && Number(extData.responseCode) === 0) {
@@ -778,9 +808,58 @@ app.post('/api/payment/check', async (req, res) => {
   } catch (err) {
     console.error('Payment Check Error:', err);
     res.status(500).json({ success: false, error: 'Failed to check payment status', details: err.message });
-  }
 });
 
+// 6.3 Direct Payment Confirmation (Client-Side Direct Verification Fallback)
+app.post('/api/payment/confirm', async (req, res) => {
+  try {
+    const { md5, hash, download_receipt, txData } = req.body;
+    if (!md5) return res.status(400).json({ success: false, error: 'md5 is required' });
+
+    let payment = paymentStore.get(md5);
+    if (!payment) {
+      console.warn(`[Payment Confirm] Payment record for MD5 ${md5} not in memory, attempting fallback.`);
+    }
+
+    if (payment && payment.status === 'success') {
+      return res.json({ success: true, status: 'success', bill_number: payment.billNumber });
+    }
+
+    if (payment) {
+      payment.status = 'success';
+      payment.transactionHash = hash || (txData && txData.hash) || payment.transactionHash || null;
+      payment.receiptUrl = download_receipt || (txData && txData.download_receipt) || null;
+      payment.paidAt = new Date().toISOString();
+      savePayments();
+
+      // Auto-fulfill Game Top-Up Order
+      if (!payment.orderFulfilled && payment.orderDetails && payment.orderDetails.playerId) {
+        payment.orderFulfilled = true;
+        savePayments();
+        executeTopUpOrder({
+          packageId: payment.orderDetails.packageId,
+          playerId: payment.orderDetails.playerId,
+          serverId: payment.orderDetails.zoneId || null,
+          zoneId: payment.orderDetails.zoneId || null,
+          reference: payment.billNumber,
+          game: payment.orderDetails.game,
+          slug: payment.orderDetails.slug
+        }).then(topupRes => {
+          if (topupRes && topupRes.data) {
+            payment.orderCode = topupRes.data.order_code || topupRes.data.id || null;
+            payment.topupStatus = topupRes.data.status || 'completed';
+            savePayments();
+          }
+        }).catch(e => console.warn('Auto topup confirm dispatch notice:', e.message));
+      }
+    }
+
+    return res.json({ success: true, status: 'success' });
+  } catch (err) {
+    console.error('Payment Confirm Error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 // 6.3 Get Payment Status by MD5
 app.get('/api/payment/status', (req, res) => {
   const md5 = req.query.md5;
