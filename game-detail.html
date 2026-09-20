@@ -2606,15 +2606,36 @@
         return;
       }
 
-      const btn = document.getElementById('btnTopUpNow');
-      const originalBtnText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '⚡ កំពុងរៀបចំ QR...';
-        btn.disabled = true;
+    let currentGenerateAbortCtrl = null;
+
+    // ── Handle Order Submission (Instant Modal + Fast Generation) ──
+    async function handlePlaceOrder() {
+      const playerIdInput = document.getElementById('playerIdInput');
+      const playerId = playerIdInput ? playerIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
+      const zoneIdInput = document.getElementById('zoneIdInput');
+      const zoneId = zoneIdInput ? zoneIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
+
+      if (!playerId) {
+        alert('សូមបញ្ចូល Player ID របស់អ្នក!');
+        if (playerIdInput) playerIdInput.focus();
+        return;
       }
 
-      const mBtn = document.getElementById('mobileBtnPay');
-      if (mBtn) mBtn.disabled = true;
+      if (currentGameData && currentGameData.requiresZone && !zoneId) {
+        alert('សូមបញ្ចូល Zone / Server ID!');
+        if (zoneIdInput) zoneIdInput.focus();
+        return;
+      }
+
+      if (!isAccountValid) {
+        alert('❌ គណនីមិនត្រឹមត្រូវ ឬរកមិនឃើញឡើយ! សូមពិនិត្យ Player ID និង Zone ID ឡើងវិញ។');
+        return;
+      }
+
+      if (!selectedPackage) {
+        alert('សូមជ្រើសរើសកញ្ចប់ដែលអ្នកចង់បញ្ចូល!');
+        return;
+      }
 
       const orderRef = 'INV-' + Date.now();
       const amountVal = Number(selectedPackage.price).toFixed(2);
@@ -2634,17 +2655,34 @@
         createdAt: new Date().toISOString()
       };
 
+      currentOrderMeta = orderMeta;
+
+      // 1. Instantly open Modal with Skeleton Loading (Zero latency experience!)
+      openKhqrModalSkeleton(orderMeta);
+
+      const btn = document.getElementById('btnTopUpNow');
+      if (btn) btn.disabled = false;
+      const mBtn = document.getElementById('mobileBtnPay');
+      if (mBtn) mBtn.disabled = false;
+
+      // 2. Fetch QR in background
+      if (currentGenerateAbortCtrl) {
+        try { currentGenerateAbortCtrl.abort(); } catch (e) {}
+      }
+      currentGenerateAbortCtrl = new AbortController();
+      const signal = currentGenerateAbortCtrl.signal;
+
       try {
         let data = null;
 
-        // 1. Direct Browser Generation (100% bypasses foreign Cloudflare/Datacenter IP blocks on Render)
+        // Step A: Direct Browser Generation (Fastest from Cambodian customer IPs)
         try {
           console.log('[PayWay Client] Calling official PayWay API directly from browser...');
           const directPaywayLink = 'https://link.payway.com.kh/ABAPAYTh526248G';
           const directToken = '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
           const directUrl = `https://payway.payment-system.dev/api/v1/generate_qr/?payway_link=${encodeURIComponent(directPaywayLink)}&amount=${amountVal}&api_token=${encodeURIComponent(directToken)}`;
           
-          const directResp = await fetch(directUrl);
+          const directResp = await fetch(directUrl, { signal });
           const directData = await directResp.json();
 
           if (directData && (directData.success === true || directData.qr_string)) {
@@ -2666,7 +2704,7 @@
               expire_date: directData.expire_date
             };
 
-            // Register transaction with backend store for order tracking & fulfillment
+            // Register transaction with backend store asynchronously without blocking UI
             fetch('/api/payment/register', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -2685,11 +2723,12 @@
             }).catch(regErr => console.warn('[PayWay Sync] Register note:', regErr.message));
           }
         } catch (directErr) {
+          if (signal.aborted) return;
           console.warn('[PayWay Client] Direct browser call notice:', directErr.message);
         }
 
-        // 2. Fallback to Backend Proxy (if direct browser call had issue)
-        if (!data) {
+        // Step B: Fallback to Backend Proxy
+        if (!data && !signal.aborted) {
           console.log('[PayWay Generate] Calling backend proxy /api/payment/create...');
           const resp = await fetch('/api/payment/create', {
             method: 'POST',
@@ -2703,46 +2742,91 @@
               zoneId: orderMeta.zoneId,
               packageId: orderMeta.packageId,
               packageName: orderMeta.packageName
-            })
+            }),
+            signal
           });
           data = await resp.json();
         }
+
+        if (signal.aborted) return;
 
         if (!data || !data.success || !data.qr_string) {
           throw new Error(data && data.error ? data.error : 'Failed to generate KHQR');
         }
 
         currentPaymentData = data;
-        currentOrderMeta = orderMeta;
-        console.log('[PayWay Generate] Official MD5 captured from API:', data.md5, 'Bill:', data.bill_number);
-
-        // Persist order with md5 and bill_number to localStorage
         orderMeta.md5 = data.md5;
         orderMeta.billNumber = data.bill_number;
         localStorage.setItem('currentOrder', JSON.stringify(orderMeta));
 
-        // Open PayWay Payment System Modal
-        openKhqrModal(data, orderMeta);
+        // 3. Render High-Speed QR into Modal immediately
+        populateKhqrModal(data, orderMeta);
+
       } catch (err) {
+        if (signal.aborted) return;
         console.error('Payment Create Error:', err);
         alert('⚠️ មានបញ្ហាក្នុងការបង្កើត QR Code: ' + err.message + '\nសូមព្យាយាមម្ដងទៀត។');
-        if (btn) {
-          btn.innerHTML = originalBtnText || '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
-          btn.disabled = false;
-        }
-        if (mBtn) mBtn.disabled = false;
+        closeKhqrModal();
       }
     }
 
-    // ── Open Modern PayWay Payment Modal ─────────────────────
-    function openKhqrModal(paymentData, orderMeta) {
+    // ── Show Instant Skeleton Loading Modal ───────────────────
+    function openKhqrModalSkeleton(orderMeta) {
       const modal = document.getElementById('khqrModal');
       if (!modal) return;
 
-      // Reset modal sub-views
       document.getElementById('khqrPaymentView').style.display = 'block';
       document.getElementById('khqrSuccessView').style.display = 'none';
       document.getElementById('khqrExpiredView').style.display = 'none';
+
+      const amtStr = Number(orderMeta.amount).toFixed(2);
+      document.getElementById('modalAmount').textContent = `$${amtStr} USD`;
+      document.getElementById('modalInvoiceNum').textContent = 'កំពុងបង្កើត...';
+      document.getElementById('modalTimer').textContent = '03:00';
+      document.getElementById('modalPackageName').textContent = `${orderMeta.game} - ${orderMeta.packageName || orderMeta.packageId}`;
+      document.getElementById('modalPlayerId').textContent = orderMeta.playerId + (orderMeta.zoneId ? ` (${orderMeta.zoneId})` : '');
+      document.getElementById('modalMerchantName').textContent = 'POV KIMHOV';
+
+      // Show loader box, hide QR canvas & images
+      const loadingBox = document.getElementById('khqrLoadingBox');
+      if (loadingBox) loadingBox.style.display = 'flex';
+      
+      const canvasEl = document.getElementById('modalQrCanvas');
+      if (canvasEl) {
+        canvasEl.innerHTML = '';
+        canvasEl.style.display = 'none';
+      }
+      const qrImg = document.getElementById('modalQrImg');
+      if (qrImg) qrImg.style.display = 'none';
+
+      const standHeader = document.getElementById('khqrStandHeader');
+      if (standHeader) standHeader.style.display = 'none';
+      const standFooter = document.getElementById('khqrStandFooter');
+      if (standFooter) standFooter.style.display = 'none';
+      const centerBadge = document.getElementById('khqrCenterBadge');
+      if (centerBadge) centerBadge.style.display = 'none';
+
+      // Deactivate action buttons while preparing
+      const abaBtn = document.getElementById('modalAbaDeepLink');
+      if (abaBtn) abaBtn.style.opacity = '0.5';
+      const bakongBtn = document.getElementById('modalBakongDeepLink');
+      if (bakongBtn) bakongBtn.style.display = 'none';
+      const checkoutBtn = document.getElementById('modalCheckoutLink');
+      if (checkoutBtn) checkoutBtn.style.opacity = '0.5';
+
+      updateModalStatusPill('checking', '⚡ កំពុងរៀបចំ ABA KHQR...');
+
+      modal.classList.add('active');
+    }
+
+    // ── Populate Modal with High-Speed Client QR Render ───────
+    function populateKhqrModal(paymentData, orderMeta) {
+      const modal = document.getElementById('khqrModal');
+      if (!modal) return;
+
+      // Hide loading box
+      const loadingBox = document.getElementById('khqrLoadingBox');
+      if (loadingBox) loadingBox.style.display = 'none';
 
       // Set Display Details
       const amtStr = Number(paymentData.amount).toFixed(2);
@@ -2750,7 +2834,7 @@
       document.getElementById('modalAmount').textContent = `$${amtStr} ${currStr}`;
       document.getElementById('modalInvoiceNum').textContent = paymentData.bill_number;
 
-      // Extract merchant name dynamically from KHQR string tag 59 or fallback
+      // Extract merchant name dynamically from KHQR string tag 59
       let merchantName = 'POV KIMHOV';
       if (paymentData.qr_string) {
         const m59 = paymentData.qr_string.match(/59(\d{2})(.+?)60/);
@@ -2765,44 +2849,44 @@
       document.getElementById('modalPackageName').textContent = `${orderMeta.game} - ${orderMeta.packageName || orderMeta.packageId}`;
       document.getElementById('modalPlayerId').textContent = orderMeta.playerId + (orderMeta.zoneId ? ` (${orderMeta.zoneId})` : '');
 
-      // Render Official PayWay QR Code directly from link_qr_code
-      const qrImg = document.getElementById('modalQrImg');
-      const centerBadge = document.getElementById('khqrCenterBadge') || document.querySelector('.khqr-center-badge');
+      // Show Stand Header & Footer
       const standHeader = document.getElementById('khqrStandHeader');
+      if (standHeader) standHeader.style.display = 'flex';
       const standFooter = document.getElementById('khqrStandFooter');
-      const directQrUrl = paymentData.link_qr_code || 
-                          (paymentData.md5 ? `https://payway.payment-system.dev/api/v1/qr/${paymentData.md5}.png` : null);
+      if (standFooter) standFooter.style.display = 'flex';
 
-      if (directQrUrl) {
-        // Official ABA PayWay QR PNG contains its own authentic KHQR header and ABA logo
-        qrImg.src = directQrUrl;
-        if (standHeader) standHeader.style.display = 'none';
-        if (standFooter) standFooter.style.display = 'none';
-        if (centerBadge) centerBadge.style.display = 'none';
-        qrImg.style.maxWidth = '290px';
-      } else if (paymentData.qr_string) {
-        // Fallback to ABA KHQR Dynamic QR code with ABA Center Emblem
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
-        if (standHeader) standHeader.style.display = 'flex';
-        if (standFooter) standFooter.style.display = 'flex';
+      // ── ULTRA FAST CLIENT-SIDE QR RENDER (3ms) ─────────────
+      const canvasEl = document.getElementById('modalQrCanvas');
+      const qrImg = document.getElementById('modalQrImg');
+      const centerBadge = document.getElementById('khqrCenterBadge');
+
+      if (canvasEl && paymentData.qr_string && typeof QRCode !== 'undefined') {
+        canvasEl.innerHTML = '';
+        canvasEl.style.display = 'flex';
+        if (qrImg) qrImg.style.display = 'none';
+        new QRCode(canvasEl, {
+          text: paymentData.qr_string,
+          width: 230,
+          height: 230,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
         if (centerBadge) centerBadge.style.display = 'flex';
-        qrImg.style.maxWidth = '230px';
-      }
-
-      qrImg.onerror = function() {
-        if (paymentData.qr_string && !this.src.includes('qrserver.com')) {
-          this.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=4&data=${encodeURIComponent(paymentData.qr_string)}`;
-          if (standHeader) standHeader.style.display = 'flex';
-          if (standFooter) standFooter.style.display = 'flex';
-          if (centerBadge) centerBadge.style.display = 'flex';
-          this.style.maxWidth = '230px';
+      } else if (paymentData.link_qr_code) {
+        if (canvasEl) canvasEl.style.display = 'none';
+        if (qrImg) {
+          qrImg.src = paymentData.link_qr_code;
+          qrImg.style.display = 'block';
         }
-      };
+        if (centerBadge) centerBadge.style.display = 'none';
+      }
 
       // 1. Pay with ABA Mobile
       const abaBtn = document.getElementById('modalAbaDeepLink');
       if (abaBtn) {
         abaBtn.href = paymentData.deeplink_aba || 'https://link.payway.com.kh/ABAPAYTh526248G';
+        abaBtn.style.opacity = '1';
       }
 
       // 2. Pay with Bakong
@@ -2819,13 +2903,9 @@
       // 3. Open Checkout
       const checkoutBtn = document.getElementById('modalCheckoutLink');
       if (checkoutBtn) {
-        if (paymentData.checkout) {
-          checkoutBtn.href = paymentData.checkout;
-          checkoutBtn.style.display = 'flex';
-        } else {
-          checkoutBtn.href = `https://payway.payment-system.dev/api/v1/checkout/${encodeURIComponent(paymentData.md5)}`;
-          checkoutBtn.style.display = 'flex';
-        }
+        checkoutBtn.href = paymentData.checkout || `https://payway.payment-system.dev/api/v1/checkout/${encodeURIComponent(paymentData.md5)}`;
+        checkoutBtn.style.opacity = '1';
+        checkoutBtn.style.display = 'flex';
       }
 
       // Reset Live Status Pill
@@ -3033,6 +3113,9 @@
     function closeKhqrModal() {
       const modal = document.getElementById('khqrModal');
       if (modal) modal.classList.remove('active');
+      if (currentGenerateAbortCtrl) {
+        try { currentGenerateAbortCtrl.abort(); } catch (e) {}
+      }
       clearInterval(khqrTimerInterval);
       clearInterval(paymentPollInterval);
 
@@ -3045,21 +3128,21 @@
       if (mBtn) mBtn.disabled = false;
     }
 
-    function copyAmountText() {
-      if (currentPaymentData && currentPaymentData.amount) {
-        navigator.clipboard.writeText(currentPaymentData.amount).then(() => {
-          alert(`បានចម្លងចំនួនទឹកប្រាក់ $${currentPaymentData.amount} ជោគជ័យ!`);
-        }).catch(() => {
-          prompt('សូមចម្លងចំនួនទឹកប្រាក់:', currentPaymentData.amount);
-        });
-      }
-    }
-
     function downloadKhqrImage() {
+      const canvas = document.querySelector('#modalQrCanvas canvas');
+      const canvasImg = document.querySelector('#modalQrCanvas img');
       const qrImg = document.getElementById('modalQrImg');
-      if (qrImg && qrImg.src) {
+      let downloadUrl = null;
+      if (canvas) {
+        downloadUrl = canvas.toDataURL('image/png');
+      } else if (canvasImg && canvasImg.src) {
+        downloadUrl = canvasImg.src;
+      } else if (qrImg && qrImg.src) {
+        downloadUrl = qrImg.src;
+      }
+      if (downloadUrl) {
         const a = document.createElement('a');
-        a.href = qrImg.src;
+        a.href = downloadUrl;
         a.download = `KHQR-${(currentPaymentData && currentPaymentData.bill_number) || 'ORDER'}.png`;
         document.body.appendChild(a);
         a.click();
@@ -3155,9 +3238,21 @@
               <div style="background: #e11d48; color: #ffffff; font-weight: 900; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; letter-spacing: 1px;">KHQR</div>
             </div>
 
-            <div class="khqr-qr-container" id="khqrQrContainer" style="padding: 10px; background: #ffffff;">
-              <img id="modalQrImg" class="khqr-qr-img" src="" alt="Official ABA PayWay KHQR Code" style="width: 100%; max-width: 290px; height: auto; border-radius: 14px; display: block; margin: 0 auto;">
-              <div class="khqr-center-badge" id="khqrCenterBadge" style="display: none; background: #ffffff; padding: 2px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.35); width: 44px; height: 44px;">
+            <div class="khqr-qr-container" id="khqrQrContainer" style="padding: 10px; background: #ffffff; min-height: 250px; display: flex; align-items: center; justify-content: center; position: relative;">
+              <!-- Loading Skeleton State -->
+              <div id="khqrLoadingBox" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 35px 10px; gap: 14px; width: 100%;">
+                <div style="width: 48px; height: 48px; border: 4px solid #e2e8f0; border-top-color: #004F71; border-right-color: #00B5E2; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                <div style="font-size: 0.96rem; font-weight: 800; color: #004F71;">⚡ កំពុងភ្ជាប់ ABA PayWay KHQR...</div>
+                <div style="font-size: 0.78rem; color: #64748b;">សូមរង់ចាំបន្តិច ប្រព័ន្ធកំពុងបង្កើត QR Code ផ្ទាល់ពី ABA</div>
+              </div>
+
+              <!-- High-speed Canvas QR Container -->
+              <div id="modalQrCanvas" style="display: flex; align-items: center; justify-content: center; margin: 0 auto;"></div>
+
+              <!-- Direct Image Fallback -->
+              <img id="modalQrImg" class="khqr-qr-img" src="" alt="Official ABA PayWay KHQR Code" style="display: none; width: 100%; max-width: 290px; height: auto; border-radius: 14px; margin: 0 auto;">
+
+              <div class="khqr-center-badge" id="khqrCenterBadge" style="display: none; background: #ffffff; padding: 2px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.35); width: 44px; height: 44px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
                 <!-- Authentic ABA Bank Round Logo SVG -->
                 <svg viewBox="0 0 100 100" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="50" cy="50" r="48" fill="#004F71"/>
