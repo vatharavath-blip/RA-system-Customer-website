@@ -629,55 +629,19 @@ app.post('/api/payment/create', async (req, res) => {
           });
         }
       } catch (extErr) {
-        console.warn('PayWay external API call error, using local NBC Bakong dynamic engine:', extErr.message);
+        console.error('PayWay external API call error:', extErr.message);
+        return res.status(502).json({
+          success: false,
+          error: 'PayWay payment service unavailable. Please try again shortly.',
+          details: extErr.message
+        });
       }
+    } else {
+      return res.status(500).json({
+        success: false,
+        error: 'PAYWAY_API_TOKEN is not configured on server.'
+      });
     }
-
-    // 2. High-reliability NBC Bakong Dynamic KHQR Engine (Auto-Price Embedded)
-    const dynamicKhqr = generateDynamicKhqr(numAmount);
-    const md5Val = crypto.createHash('md5').update(billNumber + amtStr + Date.now()).digest('hex');
-    const expireSec = 180;
-    const expireDate = new Date(Date.now() + expireSec * 1000).toISOString();
-
-    paymentStore.set(md5Val, {
-      id: billNumber,
-      billNumber: billNumber,
-      md5: md5Val,
-      paywayLink: PAYWAY_LINK,
-      amount: numAmount,
-      currency: 'USD',
-      status: 'pending',
-      qrString: dynamicKhqr,
-      downloadQr: null,
-      checkout: null,
-      deeplinkAba: PAYWAY_LINK,
-      deeplinkBakong: null,
-      expireInSec: expireSec,
-      expireDate: expireDate,
-      checkCount: 0,
-      lastCheckAt: null,
-      paidAt: null,
-      createdAt: new Date().toISOString(),
-      orderFulfilled: false,
-      orderDetails: { game, slug, playerId, zoneId, packageId, packageName, orderId: billNumber }
-    });
-    savePayments();
-
-    res.json({
-      success: true,
-      status: 'pending',
-      md5: md5Val,
-      bill_number: billNumber,
-      amount: amtStr,
-      currency: 'USD',
-      qr_string: dynamicKhqr,
-      download_qr: null,
-      checkout: null,
-      deeplink_aba: PAYWAY_LINK,
-      deeplink_bakong: null,
-      expire_in_sec: expireSec,
-      expire_date: expireDate
-    });
   } catch (err) {
     console.error('Payment Create Error:', err);
     res.status(500).json({ success: false, error: 'Failed to create payment', details: err.message });

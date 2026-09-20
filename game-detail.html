@@ -2635,74 +2635,22 @@
       };
 
       try {
-        let data = null;
-
-        // 1. Direct Browser Generation (100% bypasses Cloudflare/WAF datacenter blocks on hosting)
-        try {
-          console.log('[PayWay Client] Requesting official QR directly from browser...');
-          const clientDirectUrl = `https://payway.payment-system.dev/api/v1/generate_qr/?payway_link=${encodeURIComponent('https://link.payway.com.kh/ABAPAYTh526248G')}&amount=${amountVal}&api_token=${encodeURIComponent('501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a')}`;
-          const directResp = await fetch(clientDirectUrl);
-          const directData = await directResp.json();
-
-          if (directData && (directData.success === true || directData.qr_string)) {
-            console.log('[PayWay Client] Official QR generated directly from PayWay API! MD5:', directData.md5);
-            data = {
-              success: true,
-              status: 'pending',
-              md5: directData.md5,
-              bill_number: directData.bill_number || orderRef,
-              amount: amountVal,
-              currency: directData.currency || 'USD',
-              qr_string: directData.qr_string,
-              link_qr_code: directData.link_qr_code || `https://payway.payment-system.dev/api/v1/qr/${directData.md5}.png`,
-              download_qr: directData.download_qr,
-              checkout: directData.checkout,
-              deeplink_aba: directData.deeplink_aba,
-              deeplink_bakong: directData.deeplink_bakong,
-              expire_in_sec: Number(directData.expire_in_sec) || 180,
-              expire_date: directData.expire_date
-            };
-
-            // Register transaction with backend store for order fulfillment
-            fetch('/api/payment/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                ...data,
-                orderDetails: {
-                  game: orderMeta.game,
-                  slug: orderMeta.slug,
-                  playerId: orderMeta.playerId,
-                  zoneId: orderMeta.zoneId,
-                  packageId: orderMeta.packageId,
-                  packageName: orderMeta.packageName,
-                  orderId: data.bill_number
-                }
-              })
-            }).catch(syncErr => console.warn('[PayWay Sync] Register note:', syncErr.message));
-          }
-        } catch (directErr) {
-          console.warn('[PayWay Client] Direct browser generate failed, falling back to server:', directErr.message);
-        }
-
-        // 2. Server Fallback (if direct browser call had network issue)
-        if (!data) {
-          const resp = await fetch('/api/payment/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount: amountVal,
-              orderId: orderRef,
-              game: orderMeta.game,
-              slug: orderMeta.slug,
-              playerId: orderMeta.playerId,
-              zoneId: orderMeta.zoneId,
-              packageId: orderMeta.packageId,
-              packageName: orderMeta.packageName
-            })
-          });
-          data = await resp.json();
-        }
+        // Secure Backend Proxy Call (Rule 7: Never expose api_token in frontend JavaScript)
+        const resp = await fetch('/api/payment/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: amountVal,
+            orderId: orderRef,
+            game: orderMeta.game,
+            slug: orderMeta.slug,
+            playerId: orderMeta.playerId,
+            zoneId: orderMeta.zoneId,
+            packageId: orderMeta.packageId,
+            packageName: orderMeta.packageName
+          })
+        });
+        const data = await resp.json();
 
         if (!data || !data.success || !data.qr_string) {
           throw new Error(data && data.error ? data.error : 'Failed to generate KHQR');
@@ -2795,11 +2743,21 @@
         }
       };
 
-      // Wire Action Buttons
       // 1. Pay with ABA Mobile
       const abaBtn = document.getElementById('modalAbaDeepLink');
       if (abaBtn) {
         abaBtn.href = paymentData.deeplink_aba || 'https://link.payway.com.kh/ABAPAYTh526248G';
+      }
+
+      // 2. Pay with Bakong
+      const bakongBtn = document.getElementById('modalBakongDeepLink');
+      if (bakongBtn) {
+        if (paymentData.deeplink_bakong) {
+          bakongBtn.href = paymentData.deeplink_bakong;
+          bakongBtn.style.display = 'flex';
+        } else {
+          bakongBtn.style.display = 'none';
+        }
       }
 
       // 3. Open Checkout
@@ -2868,40 +2826,7 @@
           console.warn('[PayWay Poll] Server check warning:', serverErr.message);
         }
 
-        // Secondary Direct Check: Query PayWay API directly from customer's browser (Access-Control-Allow-Origin: *)
-        // This guarantees that Cloudflare datacenter IP blocks NEVER prevent payment detection!
-        if (!resData || (resData.status !== 'success' && resData.responseCode !== 0)) {
-          try {
-            const token = '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
-            const directUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(token)}`;
-            const directResp = await fetch(directUrl);
-            const directData = await directResp.json();
-            if (directData && Number(directData.responseCode) === 0) {
-              console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
-              // Notify server to fulfill game topup
-              await fetch('/api/payment/confirm', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  md5: currentPaymentData.md5,
-                  hash: directData.data ? directData.data.hash : null,
-                  download_receipt: directData.data ? directData.data.download_receipt : null,
-                  txData: directData.data
-                })
-              });
-              resData = {
-                status: 'success',
-                responseCode: 0,
-                amount: directData.data ? directData.data.amount : currentPaymentData.amount,
-                currency: directData.data ? directData.data.currency : 'USD',
-                bill_number: directData.data ? directData.data.description : currentPaymentData.bill_number,
-                transaction_hash: directData.data ? directData.data.hash : null
-              };
-            }
-          } catch (directErr) {
-            // Silently continue to next poll
-          }
-        }
+        // Check via backend proxy /api/payment/check (Rule 7: api_token is secure on backend)
 
         // 3. SUCCESS when API returns responseCode = 0 / status = success
         if (resData && (resData.status === 'success' || resData.responseCode === 0)) {
@@ -3187,7 +3112,12 @@
               <span>📱 Pay with ABA (បង់ប្រាក់តាម ABA Mobile)</span>
             </a>
 
-            <!-- 2. Open Checkout -->
+            <!-- 2. Pay with Bakong -->
+            <a id="modalBakongDeepLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-bakong-pay" style="display: none; padding: 12px 18px; font-size: 0.95rem; background: linear-gradient(135deg, #e11d48, #be123c); color: #ffffff; border-radius: 10px; font-weight: 700; text-decoration: none; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px; transition: all 0.2s ease;">
+              <span>🏦 Pay with Bakong (បង់ប្រាក់តាម Bakong App)</span>
+            </a>
+
+            <!-- 3. Open Checkout -->
             <a id="modalCheckoutLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-checkout-pay">
               <span>🌐 Open Checkout (បើកទំព័រទូទាត់ប្រាក់)</span>
             </a>
