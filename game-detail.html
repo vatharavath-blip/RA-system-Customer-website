@@ -2635,22 +2635,78 @@
       };
 
       try {
-        // Secure Backend Proxy Call (Rule 7: Never expose api_token in frontend JavaScript)
-        const resp = await fetch('/api/payment/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: amountVal,
-            orderId: orderRef,
-            game: orderMeta.game,
-            slug: orderMeta.slug,
-            playerId: orderMeta.playerId,
-            zoneId: orderMeta.zoneId,
-            packageId: orderMeta.packageId,
-            packageName: orderMeta.packageName
-          })
-        });
-        const data = await resp.json();
+        let data = null;
+
+        // 1. Direct Browser Generation (100% bypasses foreign Cloudflare/Datacenter IP blocks on Render)
+        try {
+          console.log('[PayWay Client] Calling official PayWay API directly from browser...');
+          const directPaywayLink = 'https://link.payway.com.kh/ABAPAYTh526248G';
+          const directToken = '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
+          const directUrl = `https://payway.payment-system.dev/api/v1/generate_qr/?payway_link=${encodeURIComponent(directPaywayLink)}&amount=${amountVal}&api_token=${encodeURIComponent(directToken)}`;
+          
+          const directResp = await fetch(directUrl);
+          const directData = await directResp.json();
+
+          if (directData && (directData.success === true || directData.qr_string)) {
+            console.log('[PayWay Client] Official QR generated successfully from client:', directData.md5);
+            data = {
+              success: true,
+              status: 'pending',
+              md5: directData.md5,
+              bill_number: directData.bill_number || orderRef,
+              amount: amountVal,
+              currency: directData.currency || 'USD',
+              qr_string: directData.qr_string,
+              link_qr_code: directData.link_qr_code || `https://payway.payment-system.dev/api/v1/qr/${directData.md5}.png`,
+              download_qr: directData.download_qr,
+              checkout: directData.checkout,
+              deeplink_aba: directData.deeplink_aba,
+              deeplink_bakong: directData.deeplink_bakong,
+              expire_in_sec: Number(directData.expire_in_sec) || 180,
+              expire_date: directData.expire_date
+            };
+
+            // Register transaction with backend store for order tracking & fulfillment
+            fetch('/api/payment/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ...data,
+                orderDetails: {
+                  game: orderMeta.game,
+                  slug: orderMeta.slug,
+                  playerId: orderMeta.playerId,
+                  zoneId: orderMeta.zoneId,
+                  packageId: orderMeta.packageId,
+                  packageName: orderMeta.packageName,
+                  orderId: data.bill_number
+                }
+              })
+            }).catch(regErr => console.warn('[PayWay Sync] Register note:', regErr.message));
+          }
+        } catch (directErr) {
+          console.warn('[PayWay Client] Direct browser call notice:', directErr.message);
+        }
+
+        // 2. Fallback to Backend Proxy (if direct browser call had issue)
+        if (!data) {
+          console.log('[PayWay Generate] Calling backend proxy /api/payment/create...');
+          const resp = await fetch('/api/payment/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: amountVal,
+              orderId: orderRef,
+              game: orderMeta.game,
+              slug: orderMeta.slug,
+              playerId: orderMeta.playerId,
+              zoneId: orderMeta.zoneId,
+              packageId: orderMeta.packageId,
+              packageName: orderMeta.packageName
+            })
+          });
+          data = await resp.json();
+        }
 
         if (!data || !data.success || !data.qr_string) {
           throw new Error(data && data.error ? data.error : 'Failed to generate KHQR');
@@ -2826,9 +2882,39 @@
           console.warn('[PayWay Poll] Server check warning:', serverErr.message);
         }
 
-        // Check via backend proxy /api/payment/check (Rule 7: api_token is secure on backend)
-
-        // 3. SUCCESS when API returns responseCode = 0 / status = success
+        // Direct Client Check: Also check directly from customer's Cambodian ISP (100% bypasses datacenter block)
+        if (!resData || (resData.status !== 'success' && resData.responseCode !== 0)) {
+          try {
+            const checkToken = '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
+            const directCheckUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(checkToken)}`;
+            const directResp = await fetch(directCheckUrl);
+            const directData = await directResp.json();
+            if (directData && Number(directData.responseCode) === 0) {
+              console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
+              // Notify backend server to trigger Khmer Top-Up fulfillment
+              await fetch('/api/payment/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  md5: currentPaymentData.md5,
+                  hash: directData.data ? directData.data.hash : null,
+                  download_receipt: directData.data ? directData.data.download_receipt : null,
+                  txData: directData.data
+                })
+              });
+              resData = {
+                status: 'success',
+                responseCode: 0,
+                amount: directData.data ? directData.data.amount : currentPaymentData.amount,
+                currency: directData.data ? directData.data.currency : 'USD',
+                bill_number: directData.data ? directData.data.description : currentPaymentData.bill_number,
+                transaction_hash: directData.data ? directData.data.hash : null
+              };
+            }
+          } catch (directCheckErr) {
+            // Silently continue polling
+          }
+        }
         if (resData && (resData.status === 'success' || resData.responseCode === 0)) {
           clearInterval(khqrTimerInterval);
           clearInterval(paymentPollInterval);

@@ -654,6 +654,107 @@ app.post('/api/payment/generate-khqr', (req, res, next) => {
   app.handle(req, res, next);
 });
 
+// Register client-side generated PayWay transaction with backend store
+app.post('/api/payment/register', (req, res) => {
+  try {
+    const { md5, bill_number, amount, currency, qr_string, link_qr_code, download_qr, checkout, deeplink_aba, deeplink_bakong, expire_in_sec, expire_date, orderDetails } = req.body;
+    if (!md5) return res.status(400).json({ success: false, error: 'md5 parameter is required' });
+
+    paymentStore.set(md5, {
+      id: bill_number || ('INV-' + Date.now()),
+      billNumber: bill_number || ('INV-' + Date.now()),
+      md5: md5,
+      paywayLink: PAYWAY_LINK,
+      amount: Number(amount) || 0,
+      currency: currency || 'USD',
+      status: 'pending',
+      qrString: qr_string,
+      linkQrCode: link_qr_code,
+      downloadQr: download_qr,
+      checkout: checkout,
+      deeplinkAba: deeplink_aba || PAYWAY_LINK,
+      deeplinkBakong: deeplink_bakong || null,
+      expireInSec: Number(expire_in_sec) || 180,
+      expireDate: expire_date || new Date(Date.now() + 180000).toISOString(),
+      checkCount: 0,
+      lastCheckAt: null,
+      paidAt: null,
+      createdAt: new Date().toISOString(),
+      orderFulfilled: false,
+      orderDetails: orderDetails || {}
+    });
+    savePayments();
+    console.log(`[PayWay Register] Registered client payment MD5: ${md5} for bill ${bill_number}`);
+    res.json({ success: true, md5 });
+  } catch (err) {
+    console.error('Payment Register Error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Confirm client-side verified PayWay transaction and fulfill topup
+app.post('/api/payment/confirm', async (req, res) => {
+  try {
+    const { md5, hash, download_receipt, txData } = req.body;
+    if (!md5) return res.status(400).json({ success: false, error: 'md5 parameter is required' });
+
+    let payment = paymentStore.get(md5);
+    if (!payment) {
+      payment = {
+        id: ('INV-' + Date.now()),
+        billNumber: txData?.description || ('INV-' + Date.now()),
+        md5,
+        status: 'pending',
+        orderFulfilled: false,
+        orderDetails: {}
+      };
+      paymentStore.set(md5, payment);
+    }
+
+    if (payment.status === 'success') {
+      return res.json({ success: true, message: 'Already confirmed', orderFulfilled: payment.orderFulfilled });
+    }
+
+    payment.status = 'success';
+    payment.transactionHash = hash || txData?.hash || null;
+    payment.receiptUrl = download_receipt || txData?.download_receipt || null;
+    payment.paidAt = new Date().toISOString();
+    payment.paywayData = txData || {};
+    savePayments();
+    console.log(`[PayWay Confirm] Payment confirmed for MD5: ${md5}, hash: ${payment.transactionHash}`);
+
+    // Auto-fulfill Game Top-Up Order
+    if (!payment.orderFulfilled && payment.orderDetails && payment.orderDetails.playerId) {
+      payment.orderFulfilled = true;
+      savePayments();
+      try {
+        const topupRes = await executeTopUpOrder({
+          packageId: payment.orderDetails.packageId,
+          playerId: payment.orderDetails.playerId,
+          serverId: payment.orderDetails.zoneId || null,
+          zoneId: payment.orderDetails.zoneId || null,
+          reference: payment.billNumber,
+          game: payment.orderDetails.game,
+          slug: payment.orderDetails.slug
+        });
+        if (topupRes && topupRes.data) {
+          payment.orderCode = topupRes.data.order_code || topupRes.data.id || null;
+          payment.topupStatus = topupRes.data.status || 'completed';
+          savePayments();
+          console.log(`[PayWay Confirm] Topup successfully fulfilled:`, payment.orderCode);
+        }
+      } catch (fulfillErr) {
+        console.error('Auto topup fulfill error:', fulfillErr.message);
+      }
+    }
+
+    res.json({ success: true, status: 'success', orderFulfilled: payment.orderFulfilled });
+  } catch (err) {
+    console.error('Payment Confirm Error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // 6.2 Check Transaction Status (Supports POST and GET)
 app.all('/api/payment/check', async (req, res) => {
   try {
