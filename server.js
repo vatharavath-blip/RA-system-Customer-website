@@ -53,6 +53,36 @@ function loadPayments() {
 
 loadPayments();
 
+// Security Headers Middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// High-Performance In-Memory Rate Limiter (Recognizes Cloudflare CF-Connecting-IP)
+const rateLimitMap = new Map();
+function rateLimit({ windowMs = 60000, max = 30, message = 'Too many requests, please try again later.' }) {
+  return (req, res, next) => {
+    const ip = req.headers['cf-connecting-ip'] || (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : req.ip) || 'unknown';
+    const now = Date.now();
+    let client = rateLimitMap.get(ip);
+    if (!client || now > client.resetTime) {
+      client = { count: 1, resetTime: now + windowMs };
+    } else {
+      client.count++;
+    }
+    rateLimitMap.set(ip, client);
+    if (client.count > max) {
+      console.warn(`[Security RateLimit] Blocked request from IP: ${ip}`);
+      return res.status(429).json({ success: false, error: message });
+    }
+    next();
+  };
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -546,8 +576,8 @@ app.get('/api/topup/order-status/:orderCode', async (req, res) => {
 
 // 6. PayWay Payment System API Endpoints
 
-// 6.1 Create Payment & Generate Dynamic KHQR (Auto-filled Price)
-app.post('/api/payment/create', async (req, res) => {
+// 6.1 Create Payment & Generate Dynamic KHQR (Auto-filled Price, Rate-Limited)
+app.post('/api/payment/create', rateLimit({ windowMs: 60000, max: 25, message: 'Too many payment creation requests' }), async (req, res) => {
   try {
     const { amount, orderId, reference, game, slug, playerId, zoneId, packageId, packageName } = req.body;
     const numAmount = Number(amount) || 0;
@@ -692,36 +722,54 @@ app.post('/api/payment/register', (req, res) => {
   }
 });
 
-// Confirm client-side verified PayWay transaction and fulfill topup
-app.post('/api/payment/confirm', async (req, res) => {
+// Confirm client-side verified PayWay transaction and fulfill topup (Protected against fake requests)
+app.post('/api/payment/confirm', rateLimit({ windowMs: 60000, max: 15, message: 'Too many confirm requests' }), async (req, res) => {
   try {
     const { md5, hash, download_receipt, txData } = req.body;
-    if (!md5) return res.status(400).json({ success: false, error: 'md5 parameter is required' });
-
-    let payment = paymentStore.get(md5);
-    if (!payment) {
-      payment = {
-        id: ('INV-' + Date.now()),
-        billNumber: txData?.description || ('INV-' + Date.now()),
-        md5,
-        status: 'pending',
-        orderFulfilled: false,
-        orderDetails: {}
-      };
-      paymentStore.set(md5, payment);
+    if (!md5 || typeof md5 !== 'string' || md5.length < 16) {
+      return res.status(400).json({ success: false, error: 'Invalid or missing MD5 parameter' });
     }
 
-    if (payment.status === 'success') {
-      return res.json({ success: true, message: 'Already confirmed', orderFulfilled: payment.orderFulfilled });
+    const payment = paymentStore.get(md5);
+    if (!payment) {
+      console.warn(`[Security Alert] Unregistered MD5 attempted confirm: ${md5}`);
+      return res.status(404).json({ success: false, error: 'Transaction record not found in payment store' });
+    }
+
+    if (payment.status === 'success' || payment.orderFulfilled) {
+      return res.json({ success: true, message: 'Payment already confirmed and processed', orderFulfilled: payment.orderFulfilled });
+    }
+
+    // Security Verification 1: Require genuine transaction hash
+    const txHash = hash || txData?.hash;
+    if (!txHash) {
+      console.warn(`[Security Alert] Confirm attempt missing transaction hash for MD5: ${md5}`);
+      return res.status(400).json({ success: false, error: 'Transaction verification hash is required' });
+    }
+
+    // Security Verification 2: Verify transaction responseCode is 0 (Success)
+    if (txData && typeof txData.responseCode !== 'undefined' && Number(txData.responseCode) !== 0) {
+      console.warn(`[Security Alert] Non-success responseCode (${txData.responseCode}) received for MD5: ${md5}`);
+      return res.status(400).json({ success: false, error: 'Transaction is not in verified state' });
+    }
+
+    // Security Verification 3: Verify amount paid matches expected order amount
+    if (txData && (txData.amount || txData.original_amount)) {
+      const paidAmt = parseFloat(txData.amount || txData.original_amount);
+      const expectedAmt = parseFloat(payment.amount);
+      if (expectedAmt > 0 && Math.abs(paidAmt - expectedAmt) > 0.05) {
+        console.error(`[Security Alert] Paid amount mismatch for ${md5}: expected $${expectedAmt}, received $${paidAmt}`);
+        return res.status(400).json({ success: false, error: 'Paid amount does not match order amount' });
+      }
     }
 
     payment.status = 'success';
-    payment.transactionHash = hash || txData?.hash || null;
+    payment.transactionHash = txHash;
     payment.receiptUrl = download_receipt || txData?.download_receipt || null;
     payment.paidAt = new Date().toISOString();
     payment.paywayData = txData || {};
     savePayments();
-    console.log(`[PayWay Confirm] Payment confirmed for MD5: ${md5}, hash: ${payment.transactionHash}`);
+    console.log(`[PayWay Confirm] Authenticated payment confirmed for MD5: ${md5}, hash: ${payment.transactionHash}`);
 
     // Auto-fulfill Game Top-Up Order
     if (!payment.orderFulfilled && payment.orderDetails && payment.orderDetails.playerId) {
