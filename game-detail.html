@@ -2577,35 +2577,6 @@
     let currentOrderMeta = null;
     let isCheckingPayment = false;
 
-    // ── Handle Order Submission (Calls /api/payment/create) ──
-    async function handlePlaceOrder() {
-      const playerIdInput = document.getElementById('playerIdInput');
-      const playerId = playerIdInput ? playerIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
-      const zoneIdInput = document.getElementById('zoneIdInput');
-      const zoneId = zoneIdInput ? zoneIdInput.value.replace(/[\s()\[\]]/g, '').trim() : '';
-
-      if (!playerId) {
-        alert('សូមបញ្ចូល Player ID របស់អ្នក!');
-        if (playerIdInput) playerIdInput.focus();
-        return;
-      }
-
-      if (currentGameData && currentGameData.requiresZone && !zoneId) {
-        alert('សូមបញ្ចូល Zone / Server ID!');
-        if (zoneIdInput) zoneIdInput.focus();
-        return;
-      }
-
-      if (!isAccountValid) {
-        alert('❌ គណនីមិនត្រឹមត្រូវ ឬរកមិនឃើញឡើយ! សូមពិនិត្យ Player ID និង Zone ID ឡើងវិញ។');
-        return;
-      }
-
-      if (!selectedPackage) {
-        alert('សូមជ្រើសរើសកញ្ចប់ដែលអ្នកចង់បញ្ចូល!');
-        return;
-      }
-
     let currentGenerateAbortCtrl = null;
 
     // ── Handle Order Submission (Instant Modal + Fast Generation) ──
