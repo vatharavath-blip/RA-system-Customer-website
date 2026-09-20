@@ -13,7 +13,7 @@ const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 
 // PayWay Payment Gateway System API Configuration
 const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-system.dev/api/v1').replace(/\/$/, '');
-const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiZWZjYTE2YjBjZWJkNDVmZCJ9LCJpYXQiOjE3ODU4NjQ4MDcsImV4cCI6MTc5MzY0MDgwN30.lzyCQOImAxuiKau9OxlDbVZitbtyxJ1b3r_lFZUhqAh';
+const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
 const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
 
 // Realistic browser headers to prevent Cloudflare/WAF HTML 403 blocks on datacenter IPs
@@ -859,6 +859,45 @@ app.post('/api/payment/confirm', async (req, res) => {
   } catch (err) {
     console.error('Payment Confirm Error:', err);
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 6.4 Register Client-Generated PayWay Payment
+app.post('/api/payment/register', (req, res) => {
+  try {
+    const p = req.body;
+    if (!p || !p.md5) {
+      return res.status(400).json({ success: false, error: 'md5 is required' });
+    }
+    paymentStore.set(p.md5, {
+      id: p.bill_number || p.id,
+      billNumber: p.bill_number,
+      md5: p.md5,
+      paywayLink: PAYWAY_LINK,
+      amount: Number(p.amount) || 0,
+      currency: p.currency || 'USD',
+      status: 'pending',
+      qrString: p.qr_string,
+      linkQrCode: p.link_qr_code,
+      downloadQr: p.download_qr || p.link_qr_code,
+      checkout: p.checkout,
+      deeplinkAba: p.deeplink_aba || PAYWAY_LINK,
+      deeplinkBakong: p.deeplink_bakong,
+      expireInSec: p.expire_in_sec || 180,
+      expireDate: p.expire_date || new Date(Date.now() + 180000).toISOString(),
+      checkCount: 0,
+      lastCheckAt: null,
+      paidAt: null,
+      createdAt: new Date().toISOString(),
+      orderFulfilled: false,
+      orderDetails: p.orderDetails || null
+    });
+    savePayments();
+    console.log(`[Payment Registered] Direct Client MD5 stored: ${p.md5} (Invoice: ${p.bill_number})`);
+    return res.json({ success: true, status: 'registered' });
+  } catch (e) {
+    console.error('Payment Register Error:', e.message);
+    res.status(500).json({ success: false, error: e.message });
   }
 });
 // 6.3 Get Payment Status by MD5
