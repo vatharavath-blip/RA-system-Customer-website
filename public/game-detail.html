@@ -2668,7 +2668,7 @@
         if (signal.aborted) return;
 
         if (!data || !data.success || !data.qr_string) {
-          throw new Error(data && data.error ? data.error : 'Failed to generate KHQR');
+          throw new Error('សេវាទូទាត់ប្រាក់កំពុងរវល់');
         }
 
         currentPaymentData = data;
@@ -2682,7 +2682,7 @@
       } catch (err) {
         if (signal.aborted) return;
         console.error('Payment Create Error:', err);
-        alert('⚠️ មានបញ្ហាក្នុងការបង្កើត QR Code: ' + err.message + '\nសូមព្យាយាមម្ដងទៀត។');
+        alert('⚠️ សូមអភ័យទោស ប្រព័ន្ធទូទាត់ប្រាក់កំពុងដំណើរការ សូមព្យាយាមម្ដងទៀតក្នុងពេលបន្តិចទៀតនេះ។');
         closeKhqrModal();
       }
     }
