@@ -87,6 +87,8 @@ function rateLimit({ windowMs = 60000, max = 30, message = 'Too many requests, p
 app.use(cors());
 app.use(express.json());
 
+const PUBLIC_DIR = path.join(__dirname, 'public');
+
 // Strict Security Shield: Block direct browser access to sensitive backend files & logs
 app.use((req, res, next) => {
   const reqPath = (req.path || '').toLowerCase();
@@ -94,9 +96,9 @@ app.use((req, res, next) => {
 
   const blockedExact = [
     'server.js', 'index.js', 'payments.json', 'package.json', 'package-lock.json',
-    '.env', '.gitignore', 'web.config', 'procfile'
+    '.env', '.gitignore', 'web.config', 'procfile', 'schema.sql'
   ];
-  const blockedExtensions = ['.json', '.env', '.lock', '.log', '.git', '.yml', '.yaml', '.sh', '.bat', '.ps1', '.md'];
+  const blockedExtensions = ['.json', '.env', '.lock', '.log', '.git', '.yml', '.yaml', '.sh', '.bat', '.ps1', '.sql'];
 
   if (
     blockedExact.includes(baseName) ||
@@ -105,12 +107,13 @@ app.use((req, res, next) => {
     baseName.startsWith('.')
   ) {
     console.warn(`[Security Alert] Blocked attempt to read protected file: ${req.path} from IP: ${req.headers['cf-connecting-ip'] || req.ip}`);
-    return res.status(404).send('Not Found');
+    return res.status(404).sendFile(path.join(PUBLIC_DIR, '404.html'));
   }
   next();
 });
 
-app.use(express.static(path.join(__dirname)));
+// Serve ONLY files from the public directory
+app.use(express.static(PUBLIC_DIR));
 
 
 // Tiered Profit Margin:
@@ -1056,6 +1059,17 @@ app.get('/api/payment/status', (req, res) => {
   });
 });
 
+
+// Fallback 404 Handler: Serve custom 404 page for unknown routes or invalid URLs
+app.use((req, res) => {
+  if (req.accepts('html')) {
+    return res.status(404).sendFile(path.join(PUBLIC_DIR, '404.html'));
+  }
+  if (req.accepts('json')) {
+    return res.status(404).json({ success: false, error: 'Route not found' });
+  }
+  res.status(404).type('txt').send('404 Not Found');
+});
 
 // Start Server
 app.listen(PORT, () => {

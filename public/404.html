@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>404 - រកទំព័រនេះមិនឃើញ | R1ckky Store</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Kantumruy+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: #050b14;
+      color: #e2e8f0;
+      font-family: 'Kantumruy Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Top Announcement Ticker */
+    .top-ticker {
+      background: linear-gradient(90deg, #ff416c, #ff4b2b);
+      color: #ffffff;
+      padding: 6px 0;
+      font-size: 0.82rem;
+      font-weight: 700;
+      overflow: hidden;
+      white-space: nowrap;
+      text-align: center;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 10px rgba(255, 75, 43, 0.35);
+      z-index: 100;
+    }
+
+    .ticker-content {
+      display: inline-block;
+      animation: marquee 25s linear infinite;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Navbar */
+    .site-nav {
+      background: rgba(8, 14, 26, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .brand-logo img {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 0 15px rgba(0, 112, 243, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin: 0;
+      background: linear-gradient(135deg, #ffffff, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      margin: 0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: #38bdf8;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-tg {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0088cc;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 136, 204, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-tg:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 136, 204, 0.5);
+    }
+
+    /* 404 Main Stage */
+    .not-found-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px 80px;
+      text-align: center;
+      position: relative;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* Ambient Glow Behind 404 */
+    .not-found-stage::before {
+      content: '';
+      position: absolute;
+      width: 550px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(0, 112, 243, 0.18) 0%, rgba(5, 11, 20, 0) 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .error-card {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      width: 100%;
+      animation: floatUp 0.6s ease-out;
+    }
+
+    @keyframes floatUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Massive 404 Typography */
+    .number-404 {
+      font-size: clamp(6.5rem, 16vw, 11rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -4px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 45%, #64748b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+      user-select: none;
+      margin-bottom: 15px;
+    }
+
+    /* Magnifying Glass Icon Circle */
+    .search-icon-badge {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 24px;
+      background: radial-gradient(circle at 30% 30%, #38bdf8, #0284c7);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      animation: pulseGlow 3s infinite alternate ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+        transform: scale(1);
+      }
+      100% {
+        box-shadow: 0 0 40px rgba(56, 189, 248, 0.65);
+        transform: scale(1.06);
+      }
+    }
+
+    .error-title-khmer {
+      font-size: clamp(1.6rem, 4vw, 2.3rem);
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .error-subtitle-en {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .error-desc {
+      font-size: 1.02rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Home Button */
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #ffffff;
+      color: #050b14;
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 14px 34px;
+      border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-home:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3), 0 6px 16px rgba(0, 0, 0, 0.6);
+      background: #f8fafc;
+      color: #0284c7;
+    }
+
+    .btn-home:active {
+      transform: translateY(-1px);
+    }
+
+    /* Floating Game Background Details */
+    .floating-icon {
+      position: absolute;
+      opacity: 0.15;
+      font-size: 2.2rem;
+      pointer-events: none;
+      user-select: none;
+      filter: blur(0.5px);
+    }
+
+    .f-1 { top: 20%; left: 8%; animation: floatSlow 6s ease-in-out infinite; }
+    .f-2 { top: 35%; right: 10%; animation: floatSlow 7s ease-in-out infinite 1s; }
+    .f-3 { bottom: 25%; left: 12%; animation: floatSlow 8s ease-in-out infinite 2s; }
+    .f-4 { bottom: 20%; right: 14%; animation: floatSlow 6.5s ease-in-out infinite 0.5s; }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+
+    /* Footer */
+    .site-footer {
+      background: #03070e;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 24px 20px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    .site-footer a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .not-found-stage {
+        padding: 40px 16px 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Marquee Ticker -->
+  <div class="top-ticker">
+    <div class="ticker-content">
+      ⚡ រហ័សភ្លាមៗ - KHQR គ្រប់ធនាគារ - 24/7 TELEGRAM &nbsp;&nbsp;|&nbsp;&nbsp; បញ្ចូលទឹកប្រាក់ភ្លាមៗ - KHQR គ្រប់ធនាគារ - 24/7 TELEGRAM &nbsp;&nbsp;|&nbsp;&nbsp; សេវាកម្មសុវត្ថិភាពខ្ពស់ ១០០%
+    </div>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="site-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-logo">
+        <img src="images/Newlogo.png" alt="R1ckky Store Logo" onerror="this.src='images/rakh.png'">
+        <div class="brand-text">
+          <h1>R1ckky Store</h1>
+          <p>Instant • Secure • 24/7</p>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="/">ទំព័រដើម</a></li>
+        <li><a href="/games.html">ហ្គេមទាំងអស់</a></li>
+        <li><a href="/order-status.html">ពិនិត្យវិក្កយបត្រ</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="https://t.me/rithstorecambodia" target="_blank" rel="noopener noreferrer" class="btn-tg">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
+          </svg>
+          <span>Telegram</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 404 Not Found Stage -->
+  <main class="not-found-stage">
+    <!-- Floating Background Icons -->
+    <div class="floating-icon f-1">🎮</div>
+    <div class="floating-icon f-2">💎</div>
+    <div class="floating-icon f-3">⚡</div>
+    <div class="floating-icon f-4">🛡️</div>
+
+    <div class="error-card">
+      <div class="number-404">404</div>
+
+      <div class="search-icon-badge">
+        🔍
+      </div>
+
+      <h2 class="error-title-khmer">អូ! រកទំព័រនេះមិនឃើញ</h2>
+      <div class="error-subtitle-en">Page Not Found</div>
+
+      <p class="error-desc">
+        ទំព័រដែលអ្នកកំពុងស្វែងរកមិនមាន ឬត្រូវបានផ្លាស់ប្តូរហើយ។
+      </p>
+
+      <a href="/" class="btn-home">
+        🏠 ទំព័រដើម
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>© 2026 R1ckky Store. រក្សាសិទ្ធិគ្រប់យ៉ាង។ ដំណើរការដោយស្វ័យប្រវត្តិតាមរយៈ KHQR & PayWay 24/7</p>
+  </footer>
+
+</body>
+</html>
