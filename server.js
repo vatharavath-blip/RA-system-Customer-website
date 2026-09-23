@@ -11,10 +11,10 @@ const PORT = process.env.SERVER_PORT || process.env.PORT || 3000;
 const API_KEY = process.env.TOPUP_API_KEY;
 const API_URL = process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1';
 
-// PayWay Payment Gateway System API Configuration
+// PayWay Payment Gateway System API Configuration (Loaded securely from Environment Variables)
 const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-system.dev/api/v1').replace(/\/$/, '');
-const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
-const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
+const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '';
+const PAYWAY_LINK = process.env.PAYWAY_LINK || '';
 
 // Realistic browser headers to prevent Cloudflare/WAF HTML 403 blocks on datacenter IPs
 const PAYWAY_HEADERS = {
@@ -86,6 +86,30 @@ function rateLimit({ windowMs = 60000, max = 30, message = 'Too many requests, p
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Strict Security Shield: Block direct browser access to sensitive backend files & logs
+app.use((req, res, next) => {
+  const reqPath = (req.path || '').toLowerCase();
+  const baseName = path.basename(reqPath);
+
+  const blockedExact = [
+    'server.js', 'index.js', 'payments.json', 'package.json', 'package-lock.json',
+    '.env', '.gitignore', 'web.config', 'procfile'
+  ];
+  const blockedExtensions = ['.json', '.env', '.lock', '.log', '.git', '.yml', '.yaml', '.sh', '.bat', '.ps1', '.md'];
+
+  if (
+    blockedExact.includes(baseName) ||
+    blockedExtensions.some(ext => reqPath.endsWith(ext)) ||
+    (reqPath.endsWith('.js') && (baseName.includes('server') || baseName.includes('index') || baseName.includes('backend'))) ||
+    baseName.startsWith('.')
+  ) {
+    console.warn(`[Security Alert] Blocked attempt to read protected file: ${req.path} from IP: ${req.headers['cf-connecting-ip'] || req.ip}`);
+    return res.status(404).send('Not Found');
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname)));
 
 
