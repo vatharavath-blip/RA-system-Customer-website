@@ -2026,20 +2026,23 @@
     }
 
     // Tiered Profit Margin:
-    // Under $5.00: +$0.15 profit
-    // $5.00 - $9.99: +$0.25 profit
-    // $10.00 - $49.99: +$1.00 profit
-    // $50.00 and above: +$1.50 profit
+    // Under $5.00: +$0.01 profit
+    // $5.00 - $9.99: +$0.20 profit
+    // $10.00 - $19.99: +$0.30 profit
+    // $20.00 - $29.99: +$0.50 profit
+    // $30.00 and above: +$0.70 profit
     function applyMarkup(basePrice) {
       const price = Number(basePrice) || 0;
       if (price <= 0) return 0;
-      let markup = 0.15;
-      if (price >= 50.0) {
-        markup = 1.50;
+      let markup = 0.01;
+      if (price >= 30.0) {
+        markup = 0.70;
+      } else if (price >= 20.0) {
+        markup = 0.50;
       } else if (price >= 10.0) {
-        markup = 1.00;
+        markup = 0.30;
       } else if (price >= 5.0) {
-        markup = 0.25;
+        markup = 0.20;
       }
       return Number((price + markup).toFixed(2));
     }
