@@ -597,7 +597,13 @@
       document.getElementById('pendingPackage').textContent = localOrder.packageName || '-';
       document.getElementById('pendingAmount').textContent = '$' + Number(localOrder.amount || 0).toFixed(2);
 
-      // Check if already completed in localStorage
+      const urlStatus = urlParams.get('status');
+      if (urlStatus === 'success' || urlStatus === 'completed') {
+        localOrder.status = 'completed';
+        localOrder.paymentStatus = 'success';
+      }
+
+      // Check if already completed in localStorage or URL parameter
       if (localOrder && (localOrder.status === 'success' || localOrder.status === 'completed')) {
         renderSuccessReceipt(localOrder);
       } else {
