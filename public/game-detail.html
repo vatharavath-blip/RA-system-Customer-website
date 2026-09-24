@@ -2908,115 +2908,130 @@
         }
       }, 1000);
 
-      // Automatic Transaction Checking Loop (Polls every 5 seconds to prevent rate limiting)
-      clearInterval(paymentPollInterval);
-      paymentPollInterval = setInterval(() => {
-        checkPaymentTransaction(false);
-      }, 5000);
+      // Automatic Transaction Checking Sequential Loop
+      isPollActive = true;
+      (async function runAutoPoll() {
+        while (isPollActive && currentPaymentData && currentPaymentData.md5) {
+          const ok = await checkPaymentTransaction(false);
+          if (ok || !isPollActive) break;
+          await new Promise(r => setTimeout(r, 2500));
+        }
+      })();
 
       modal.classList.add('active');
     }
 
+    let isPollActive = false;
+    let activeCheckPromise = null;
+
     // ── Check Transaction by MD5 ─────────────────────────────
     async function checkPaymentTransaction(isFinalCheck = false) {
-      if (!currentPaymentData || !currentPaymentData.md5 || isCheckingPayment) return false;
+      if (!currentPaymentData || !currentPaymentData.md5) return false;
+      if (isCheckingPayment && activeCheckPromise) {
+        return await activeCheckPromise;
+      }
       isCheckingPayment = true;
 
-      try {
-        console.log('[PayWay Poll] Checking transaction status using MD5:', currentPaymentData.md5);
-        let resData = null;
-
-        // 1. Direct Client Check to PayWay FIRST (Zero-latency direct from customer's Cambodian IP)
+      activeCheckPromise = (async () => {
         try {
-          const checkToken = atob('NTAxYjg3NGY1NTI5MjEwMjE1NTllMDVkYmUyYjQ2MDRhODg5MjIxZTVjYTk2YTg2MGEwZTAzOWUwZWUyMWMwYQ==');
-          const directCheckUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(checkToken)}`;
-          
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 12000);
-          const directResp = await fetch(directCheckUrl, { signal: controller.signal });
-          clearTimeout(timeoutId);
-          
-          const directData = await directResp.json();
-          if (directData && Number(directData.responseCode) === 0) {
-            console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
-            // Notify backend server to trigger Khmer Top-Up fulfillment
-            await fetch('/api/payment/confirm', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                md5: currentPaymentData.md5,
-                hash: directData.data ? directData.data.hash : null,
-                download_receipt: directData.data ? directData.data.download_receipt : null,
-                txData: directData.data,
-                orderDetails: currentOrderMeta
-              })
-            }).catch(e => console.warn('Confirm sync notice:', e.message));
+          console.log('[PayWay Poll] Checking transaction status using MD5:', currentPaymentData.md5);
+          let resData = null;
 
-            resData = {
-              status: 'success',
-              responseCode: 0,
-              amount: directData.data ? directData.data.amount : currentPaymentData.amount,
-              currency: directData.data ? directData.data.currency : 'USD',
-              bill_number: directData.data ? directData.data.description : currentPaymentData.bill_number,
-              transaction_hash: directData.data ? directData.data.hash : null
-            };
-          }
-        } catch (directCheckErr) {
-          console.warn('[PayWay Direct] Direct check notice:', directCheckErr.message);
-        }
-
-        // 2. Server-side proxy check if direct client check did not return success
-        if (!resData || (resData.status !== 'success' && resData.responseCode !== 0)) {
+          // 1. Direct Client Check to PayWay FIRST (Zero-latency direct from customer's Cambodian IP)
           try {
+            const checkToken = atob('NTAxYjg3NGY1NTI5MjEwMjE1NTllMDVkYmUyYjQ2MDRhODg5MjIxZTVjYTk2YTg2MGEwZTAzOWUwZWUyMWMwYQ==');
+            const directCheckUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(checkToken)}`;
+            
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
-            const resp = await fetch('/api/payment/check', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ md5: currentPaymentData.md5 }),
-              signal: controller.signal
-            });
+            const timeoutId = setTimeout(() => controller.abort(), 35000);
+            const directResp = await fetch(directCheckUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
-            resData = await resp.json();
-          } catch (serverErr) {
-            console.warn('[PayWay Poll] Server check warning:', serverErr.message);
+            
+            const directData = await directResp.json();
+            if (directData && Number(directData.responseCode) === 0) {
+              console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
+              // Notify backend server to trigger Khmer Top-Up fulfillment
+              await fetch('/api/payment/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  md5: currentPaymentData.md5,
+                  hash: directData.data ? directData.data.hash : null,
+                  download_receipt: directData.data ? directData.data.download_receipt : null,
+                  txData: directData.data,
+                  orderDetails: currentOrderMeta
+                })
+              }).catch(e => console.warn('Confirm sync notice:', e.message));
+
+              resData = {
+                status: 'success',
+                responseCode: 0,
+                amount: directData.data ? directData.data.amount : currentPaymentData.amount,
+                currency: directData.data ? directData.data.currency : 'USD',
+                bill_number: directData.data ? directData.data.description : currentPaymentData.bill_number,
+                transaction_hash: directData.data ? directData.data.hash : null
+              };
+            }
+          } catch (directCheckErr) {
+            console.warn('[PayWay Direct] Direct check notice:', directCheckErr.message);
           }
-        }
 
-        if (resData && (resData.status === 'success' || resData.responseCode === 0)) {
-          clearInterval(khqrTimerInterval);
-          clearInterval(paymentPollInterval);
-
-          // Update saved order with transaction hash
-          if (currentOrderMeta) {
-            currentOrderMeta.status = 'success';
-            currentOrderMeta.transactionHash = resData.transaction_hash;
-            localStorage.setItem('currentOrder', JSON.stringify(currentOrderMeta));
+          // 2. Server-side proxy check if direct client check did not return success
+          if (!resData || (resData.status !== 'success' && resData.responseCode !== 0)) {
+            try {
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 35000);
+              const resp = await fetch('/api/payment/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ md5: currentPaymentData.md5 }),
+                signal: controller.signal
+              });
+              clearTimeout(timeoutId);
+              resData = await resp.json();
+            } catch (serverErr) {
+              console.warn('[PayWay Poll] Server check warning:', serverErr.message);
+            }
           }
 
-          showSuccessScreen(resData);
-          return true;
-        }
+          if (resData && (resData.status === 'success' || resData.responseCode === 0)) {
+            isPollActive = false;
+            clearInterval(khqrTimerInterval);
 
-        // When Expired
-        if (resData && resData.status === 'expired') {
-          clearInterval(khqrTimerInterval);
-          clearInterval(paymentPollInterval);
-          showExpiredScreen();
+            // Update saved order with transaction hash
+            if (currentOrderMeta) {
+              currentOrderMeta.status = 'success';
+              currentOrderMeta.transactionHash = resData.transaction_hash;
+              localStorage.setItem('currentOrder', JSON.stringify(currentOrderMeta));
+            }
+
+            showSuccessScreen(resData);
+            return true;
+          }
+
+          // When Expired
+          if (resData && resData.status === 'expired') {
+            isPollActive = false;
+            clearInterval(khqrTimerInterval);
+            showExpiredScreen();
+            return false;
+          }
+
+          // Still Pending (responseCode = 1) -> Stay in PENDING, do NOT mark failed
+          if (!isFinalCheck) {
+            updateModalStatusPill('pending', 'Waiting for payment (កំពុងរង់ចាំការទូទាត់)');
+          }
           return false;
+        } catch (err) {
+          console.warn('Payment check error:', err.message);
+          return false;
+        } finally {
+          isCheckingPayment = false;
+          activeCheckPromise = null;
         }
+      })();
 
-        // Still Pending (responseCode = 1) -> Stay in PENDING, do NOT mark failed
-        if (!isFinalCheck) {
-          updateModalStatusPill('pending', 'Waiting for payment (កំពុងរង់ចាំការទូទាត់)');
-        }
-        return false;
-      } catch (err) {
-        console.warn('Payment check error:', err.message);
-        return false;
-      } finally {
-        isCheckingPayment = false;
-      }
+      return await activeCheckPromise;
     }
 
     // Manual check trigger from [ 🔄 Check Payment ] button
@@ -3024,21 +3039,17 @@
       const checkBtn = document.getElementById('btnManualCheck');
       if (checkBtn) {
         checkBtn.disabled = true;
-        checkBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់...';
+        checkBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់ជាមួយធនាគារ...';
       }
       updateModalStatusPill('checking', 'Checking transaction status (កំពុងពិនិត្យ)...');
 
-      // Reset checking lock to allow manual trigger
-      isCheckingPayment = false;
       const success = await checkPaymentTransaction(false);
       if (!success) {
-        setTimeout(() => {
-          if (checkBtn) {
-            checkBtn.disabled = false;
-            checkBtn.innerHTML = '🔄 Check Payment (ពិនិត្យការទូទាត់)';
-          }
-          updateModalStatusPill('pending', 'Waiting for payment (មិនទាន់ឃើញការទូទាត់ទេ)');
-        }, 800);
+        if (checkBtn) {
+          checkBtn.disabled = false;
+          checkBtn.innerHTML = '🔄 Check Payment (ពិនិត្យការទូទាត់)';
+        }
+        updateModalStatusPill('pending', 'Waiting for payment (មិនទាន់ឃើញការទូទាត់ទេ)');
       }
     }
 
@@ -3106,6 +3117,7 @@
       if (currentGenerateAbortCtrl) {
         try { currentGenerateAbortCtrl.abort(); } catch (e) {}
       }
+      isPollActive = false;
       clearInterval(khqrTimerInterval);
       clearInterval(paymentPollInterval);
 

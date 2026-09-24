@@ -41,10 +41,16 @@ function loadPayments() {
   try {
     if (fs.existsSync(PAYMENTS_FILE)) {
       const data = JSON.parse(fs.readFileSync(PAYMENTS_FILE, 'utf8'));
+      const now = Date.now();
       for (const [k, v] of Object.entries(data)) {
-        paymentStore.set(k, v);
+        const createdMs = v.createdAt ? new Date(v.createdAt).getTime() : 0;
+        // Keep only recent active records (last 2 hours), auto-clean old stale server data
+        if (now - createdMs < 2 * 3600 * 1000) {
+          paymentStore.set(k, v);
+        }
       }
-      console.log(`Loaded ${paymentStore.size} payment records from payments.json`);
+      savePayments();
+      console.log(`Loaded ${paymentStore.size} active payment records (old server data cleaned)`);
     }
   } catch (e) {
     console.error('Error loading payments.json:', e.message);
@@ -965,7 +971,7 @@ app.all('/api/payment/check', async (req, res) => {
         console.log(`[PayWay Check] Polling transaction status with MD5: ${md5}`);
         const extResp = await fetch(checkUrl, {
           headers: PAYWAY_HEADERS,
-          signal: AbortSignal.timeout(8000)
+          signal: AbortSignal.timeout(35000)
         });
         const rawText = await extResp.text();
         let extData = null;
@@ -1071,6 +1077,14 @@ app.get('/api/payment/status', (req, res) => {
     paid_at: p.paidAt || null,
     transaction_hash: p.transactionHash || null
   });
+});
+
+// 6.4 Clear Server Payment Data / Cache
+app.all('/api/payment/clear', (req, res) => {
+  paymentStore.clear();
+  savePayments();
+  console.log('[Admin] Server payment data cleared successfully.');
+  res.json({ success: true, message: 'All server payment data cleared successfully.' });
 });
 
 
