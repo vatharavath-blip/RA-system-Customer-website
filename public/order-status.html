@@ -1,158 +1,302 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="km">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Status | R1ckky Store</title>
+  <title>វិក្កយបត្របញ្ជាទិញ (Order Status) | R1ckky Store</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
 
   <style>
-    .status-container {
-      max-width: 800px;
-      margin: 60px auto;
+    :root {
+      --receipt-bg: #ffffff;
+      --receipt-text: #0f172a;
+      --receipt-sub: #475569;
+      --receipt-border: #0f172a;
+      --badge-green: #bbf7d0;
+      --badge-green-text: #15803d;
     }
 
-    .status-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border-color);
+    body {
+      background: radial-gradient(circle at 50% 0%, #172554 0%, #030712 70%);
+      font-family: 'Kantumruy Pro', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      color: #f8fafc;
+      margin: 0;
+      padding: 0;
     }
 
-    .order-id {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary-color);
+    .status-wrapper {
+      max-width: 500px;
+      margin: 30px auto 60px;
+      padding: 0 16px;
     }
 
-    .order-date {
-      color: var(--text-muted);
-    }
-
-    .timeline {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 50px;
+    /* ── Image 2 Exact Receipt Card Style ── */
+    .receipt-card {
+      background: var(--receipt-bg);
+      color: var(--receipt-text);
+      border-radius: 36px;
+      padding: 36px 30px 30px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
       position: relative;
+      animation: receiptPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .timeline::before {
-      content: '';
-      position: absolute;
-      top: 15px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--border-color);
-      z-index: 1;
+    @keyframes receiptPop {
+      0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
-    .timeline-step {
-      position: relative;
-      z-index: 2;
+    .receipt-badge-container {
       text-align: center;
-      width: 100px;
+      margin-bottom: 24px;
     }
 
-    .step-circle {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--bg-color);
-      border: 2px solid var(--border-color);
-      margin: 0 auto 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
+    .receipt-badge {
+      display: inline-block;
+      background: var(--badge-green);
+      color: var(--badge-green-text);
+      font-weight: 800;
+      font-size: 1.35rem;
+      padding: 10px 38px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
     }
 
-    .timeline-step.active .step-circle {
-      border-color: var(--primary-color);
-      background: var(--primary-color);
-      box-shadow: 0 0 10px var(--glow-color);
+    .receipt-section-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--receipt-text);
+      margin: 22px 0 6px 0;
+      letter-spacing: -0.3px;
     }
 
-    .timeline-step.completed .step-circle {
-      border-color: #10b981;
-      background: #10b981;
+    .receipt-divider {
+      border: none;
+      height: 2px;
+      background: #0f172a;
+      margin: 0 0 16px 0;
     }
 
-    .step-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .timeline-step.active .step-label,
-    .timeline-step.completed .step-label {
-      color: var(--text-main);
-    }
-
-    .order-details-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 30px;
-    }
-
-    .detail-row {
+    .receipt-row {
       display: flex;
       justify-content: space-between;
-      padding: 15px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      align-items: center;
+      padding: 9px 0;
+      font-size: 1.05rem;
     }
 
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-
-    .detail-label {
-      color: var(--text-muted);
-    }
-
-    .detail-value {
+    .receipt-label {
+      color: var(--receipt-sub);
       font-weight: 500;
     }
 
-    @media (max-width: 576px) {
-      .status-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
+    .receipt-value {
+      font-weight: 700;
+      color: var(--receipt-text);
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-      .timeline {
-        flex-direction: column;
-        gap: 30px;
-      }
+    .copy-chip {
+      background: transparent;
+      border: none;
+      color: #0284c7;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
 
-      .timeline::before {
-        top: 0;
-        left: 15px;
-        bottom: 0;
-        height: auto;
-        width: 2px;
-      }
+    .copy-chip:hover {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
 
-      .timeline-step {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        text-align: left;
-        gap: 15px;
-      }
+    .copy-chip:active {
+      transform: scale(0.94);
+    }
 
-      .step-circle {
-        margin: 0;
-      }
+    /* Package Inset Card */
+    .receipt-package-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 22px;
+      padding: 16px 20px;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    .package-icon-wrap {
+      width: 76px;
+      height: 76px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #f1f5f9;
+      flex-shrink: 0;
+    }
+
+    .package-icon-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .package-info-wrap {
+      text-align: right;
+    }
+
+    .package-diamonds {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--receipt-text);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .package-price {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--receipt-text);
+      margin-top: 4px;
+    }
+
+    .receipt-footer-text {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #1e293b;
+      letter-spacing: -0.5px;
+    }
+
+    /* Actions below ticket */
+    .receipt-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: center;
+    }
+
+    .btn-receipt {
+      flex: 1;
+      padding: 14px 20px;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-receipt-primary {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-receipt-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(2, 132, 199, 0.45);
+    }
+
+    .btn-receipt-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-receipt-secondary:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
+    }
+
+    /* ── Pending View Card ── */
+    .pending-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 28px;
+      padding: 36px 28px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .spinner-ring {
+      width: 58px;
+      height: 58px;
+      border: 4px solid rgba(2, 132, 199, 0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .toast-copy {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid #38bdf8;
+      padding: 10px 24px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 9999;
+    }
+
+    .toast-copy.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media print {
+      body { background: #fff !important; }
+      .site-header, .receipt-actions, .floating-telegram { display: none !important; }
+      .receipt-card { box-shadow: none !important; border: none !important; padding: 0 !important; width: 100% !important; }
     }
   </style>
   <link rel="icon" type="image/png" href="images/Newlogo.png">
@@ -169,134 +313,301 @@
       </a>
 
       <div class="header-actions">
-        <a href="index.html" class="btn btn-secondary">Back to Store</a>
+        <a href="index.html" class="btn btn-secondary" style="font-weight: 600; border-radius: 12px;">← Back to Store</a>
       </div>
     </div>
   </header>
 
   <main class="container">
+    <div class="status-wrapper">
 
-    <div class="status-container">
-      <div class="status-header">
-        <div>
-          <h1 style="font-size: 2rem; margin-bottom: 5px;">Order Status</h1>
-          <div class="order-id" id="orderIdText">R1CKKY-20260825-0001</div>
-        </div>
-        <div class="order-date" id="orderDateText">August 25, 2026</div>
-      </div>
+      <!-- View 1: SUCCESSFUL PURCHASE RECEIPT (Exact Image 2 Match) -->
+      <div id="viewSuccess" style="display: none;">
+        <div class="receipt-card" id="receiptPrintArea">
+          <!-- Top Green Pill -->
+          <div class="receipt-badge-container">
+            <div class="receipt-badge">ការទិញជោគជ័យ</div>
+          </div>
 
-      <div class="timeline">
-        <div class="timeline-step completed">
-          <div class="step-circle">✓</div>
-          <div class="step-label">Placed</div>
-        </div>
-        <div class="timeline-step active">
-          <div class="step-circle">2</div>
-          <div class="step-label">Processing</div>
-        </div>
-        <div class="timeline-step">
-          <div class="step-circle">3</div>
-          <div class="step-label">Completed</div>
-        </div>
-      </div>
+          <!-- Section 1: Order Information -->
+          <div class="receipt-section-title">Order Information</div>
+          <hr class="receipt-divider">
 
-      <div class="order-details-card">
-        <h2 style="font-size: 1.25rem; margin-bottom: 20px;">Order Details</h2>
+          <div class="receipt-row">
+            <span class="receipt-label">Order ID</span>
+            <span class="receipt-value">
+              <span id="rOrderId">INV-000000000000</span>
+              <button class="copy-chip" onclick="copyValue('rOrderId')">[Copy]</button>
+            </span>
+          </div>
 
-        <div class="detail-row">
-          <span class="detail-label">Product</span>
-          <span class="detail-value" id="productText">Mobile Legends - 172 Diamonds</span>
+          <div class="receipt-row">
+            <span class="receipt-label">Date & Time</span>
+            <span class="receipt-value" id="rDateTime">--/--/---- --:--</span>
+          </div>
+
+          <div class="receipt-row">
+            <span class="receipt-label">Payment Method</span>
+            <span class="receipt-value" id="rPaymentMethod" style="font-weight: 800;">ABA KHQR</span>
+          </div>
+
+          <!-- Section 2: Player Information -->
+          <div class="receipt-section-title" style="margin-top: 24px;">Player Information</div>
+          <hr class="receipt-divider">
+
+          <div class="receipt-row">
+            <span class="receipt-label">Game</span>
+            <span class="receipt-value" id="rGame" style="color: #0284c7; font-weight: 800;">-</span>
+          </div>
+
+          <div class="receipt-row">
+            <span class="receipt-label">Player ID</span>
+            <span class="receipt-value">
+              <span id="rPlayerId">-</span>
+              <button class="copy-chip" onclick="copyValue('rPlayerId')">[Copy]</button>
+            </span>
+          </div>
+
+          <div class="receipt-row" id="rowPlayerName">
+            <span class="receipt-label">Player Name</span>
+            <span class="receipt-value" id="rPlayerName" style="color: #0f172a; font-weight: 800;">-</span>
+          </div>
+
+          <!-- Section 3: Package Box -->
+          <div class="receipt-package-card">
+            <div class="package-icon-wrap">
+              <img id="rPackageImg" src="images/diamond_chest.jpg" alt="Package Diamond Chest">
+            </div>
+            <div class="package-info-wrap">
+              <div class="package-diamonds" id="rPackageName">-- 💎</div>
+              <div class="package-price" id="rPackagePrice">$0.00</div>
+            </div>
+          </div>
+
+          <!-- Section 4: Footer Message -->
+          <div class="receipt-footer-text">សូមអរគុណ!</div>
         </div>
 
-        <div class="detail-row">
-          <span class="detail-label">Player ID</span>
-          <span class="detail-value" id="playerIdText">123456789 (1234)</span>
-        </div>
-
-        <div class="detail-row" id="nickDetailRow" style="display: none;">
-          <span class="detail-label">Player Name</span>
-          <span class="detail-value" id="playerNickText" style="color: #38bdf8; font-weight: 700;">-</span>
-        </div>
-
-        <div class="detail-row">
-          <span class="detail-label">Total Amount</span>
-          <span class="detail-value" id="totalAmountText"
-            style="color: var(--primary-color); font-weight: 700;">$0.00</span>
-        </div>
-
-        <div class="detail-row">
-          <span class="detail-label">Payment Method</span>
-          <span class="detail-value" id="paymentMethodText">ABA Pay</span>
-        </div>
-
-        <div class="detail-row">
-          <span class="detail-label">Payment Status</span>
-          <span class="badge badge-green">Placed / Ready to Pay</span>
-        </div>
-
-        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center;">
-          <a href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; font-weight: 700; font-size: 1rem; border-radius: 12px; background: linear-gradient(135deg, #0070f3, #0284c7); text-decoration: none; color: #fff; box-shadow: 0 4px 15px rgba(0, 112, 243, 0.4);">
-            <span>📱 បង់ប្រាក់តាម ABA Mobile (POV KIMHOV)</span>
+        <!-- Action Buttons -->
+        <div class="receipt-actions">
+          <a href="index.html" class="btn-receipt btn-receipt-primary">
+            <span>🛒 ទិញបន្ថែម (Buy More)</span>
           </a>
+          <button onclick="window.print()" class="btn-receipt btn-receipt-secondary">
+            <span>📥 រក្សាទុកវិក្កយបត្រ</span>
+          </button>
         </div>
       </div>
 
-      <div class="text-center mt-4">
-        <p class="text-muted">Need help with your order?</p>
-        <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Contact
-          Support on Telegram</a>
+      <!-- View 2: PENDING PAYMENT VIEW (Auto-detecting) -->
+      <div id="viewPending">
+        <div class="pending-card">
+          <div class="spinner-ring"></div>
+          <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; color: #fff;">កំពុងពិនិត្យការទូទាត់ប្រាក់...</h2>
+          <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 24px;">
+            Order ID: <strong id="pendingOrderId" style="color: #38bdf8;">--</strong><br>
+            ប្រព័ន្ធកំពុងផ្ទៀងផ្ទាត់ជាមួយធនាគារ ABA ដោយស្វ័យប្រវត្តិ
+          </p>
+
+          <div style="background: rgba(255,255,255,0.04); border-radius: 18px; padding: 18px; margin-bottom: 24px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="color: #94a3b8;">ហ្គេម (Game)</span>
+              <strong style="color: #fff;" id="pendingGame">-</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="color: #94a3b8;">Player ID</span>
+              <strong style="color: #38bdf8;" id="pendingPlayerId">-</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span style="color: #94a3b8;">កញ្ចប់ (Item)</span>
+              <strong style="color: #fff;" id="pendingPackage">-</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;">
+              <span style="color: #94a3b8;">ចំនួនទឹកប្រាក់</span>
+              <strong style="color: #22c55e; font-size: 1.2rem;" id="pendingAmount">$0.00</strong>
+            </div>
+          </div>
+
+          <button id="btnManualVerify" onclick="triggerManualVerification()" class="btn-receipt btn-receipt-primary" style="width: 100%;">
+            <span>⚡ ខ្ញុំបានបង់ប្រាក់រួចរាល់ (ពិនិត្យឥឡូវនេះ)</span>
+          </button>
+
+          <div style="margin-top: 18px;">
+            <a href="https://link.payway.com.kh/ABAPAYTh526248G" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-size: 0.9rem;">
+              📱 បើក ABA Mobile ដើម្បីបង់ប្រាក់ (POV KIMHOV)
+            </a>
+          </div>
+        </div>
       </div>
 
     </div>
-
   </main>
 
+  <!-- Copy Toast Notification -->
+  <div class="toast-copy" id="toastCopy">✓ បានចម្លងរួចរាល់ (Copied!)</div>
+
   <!-- Floating Telegram Support Button -->
-  <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="floating-telegram"
-    title="Contact Support on Telegram">
-    <svg viewBox="0 0 24 24">
-      <path
-        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
+  <a href="https://t.me/Cam_Kiro" target="_blank" rel="noopener noreferrer" class="floating-telegram" title="Contact Support on Telegram">
+    <svg viewBox="0 0 24 24" style="width: 28px; height: 28px; fill: #fff;">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
     </svg>
   </a>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const order = JSON.parse(localStorage.getItem('currentOrder') || '{}');
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlId = urlParams.get('id');
+    let activeOrderId = '';
+    let activeMd5 = '';
+    let pollInterval = null;
+    let localOrder = {};
 
-        if (urlId || order.orderId) {
-          document.getElementById('orderIdText').textContent = urlId || order.orderId;
-          document.getElementById('orderDateText').textContent = new Date().toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-          });
+    function formatReceiptDate(d) {
+      const date = d ? new Date(d) : new Date();
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
+
+    function copyValue(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toastCopy');
+        if (toast) {
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2000);
         }
-        if (order.playerId) {
-          document.getElementById('playerIdText').textContent = order.playerId + (order.zoneId ? ` (${order.zoneId})` : '');
-        }
-        if (order.playerNickname) {
-          const nickRow = document.getElementById('nickDetailRow');
-          if (nickRow) {
-            nickRow.style.display = 'flex';
-            document.getElementById('playerNickText').textContent = order.playerNickname;
+      }).catch(err => {
+        console.warn('Copy failed:', err);
+      });
+    }
+
+    function renderSuccessReceipt(orderData) {
+      if (pollInterval) clearInterval(pollInterval);
+
+      document.getElementById('viewPending').style.display = 'none';
+      const viewSuccess = document.getElementById('viewSuccess');
+      viewSuccess.style.display = 'block';
+
+      // 1. Order ID
+      const orderId = orderData.bill_number || orderData.id || orderData.orderId || activeOrderId;
+      document.getElementById('rOrderId').textContent = orderId;
+
+      // 2. Date & Time
+      const dateVal = orderData.paid_at || orderData.paidAt || orderData.created_at || orderData.createdAt;
+      document.getElementById('rDateTime').textContent = formatReceiptDate(dateVal);
+
+      // 3. Payment Method
+      document.getElementById('rPaymentMethod').textContent = 'ABA KHQR';
+
+      // 4. Game
+      const gameVal = orderData.game || orderData.order_details?.game || localOrder.game || 'FreeFire';
+      document.getElementById('rGame').textContent = gameVal;
+
+      // 5. Player ID
+      const rawPid = orderData.playerId || orderData.order_details?.playerId || localOrder.playerId || '-';
+      const rawZone = orderData.zoneId || orderData.order_details?.zoneId || localOrder.zoneId;
+      document.getElementById('rPlayerId').textContent = rawPid + (rawZone ? ` (${rawZone})` : '');
+
+      // 6. Player Name
+      const pNick = orderData.playerNickname || orderData.playerName || orderData.order_details?.playerNickname || localOrder.playerNickname;
+      if (pNick) {
+        document.getElementById('rPlayerName').textContent = pNick;
+        document.getElementById('rowPlayerName').style.display = 'flex';
+      } else {
+        document.getElementById('rowPlayerName').style.display = 'none';
+      }
+
+      // 7. Package Info & Diamonds Box
+      const pkgName = orderData.packageName || orderData.order_details?.packageName || localOrder.packageName || 'Diamond Package';
+      // Format like "100 💎" or "55 Diamonds 💎"
+      let displayPkg = pkgName;
+      if (!displayPkg.includes('💎')) {
+        displayPkg = displayPkg + ' 💎';
+      }
+      document.getElementById('rPackageName').textContent = displayPkg;
+
+      const amtVal = orderData.amount || orderData.order_details?.amount || localOrder.amount || 0;
+      document.getElementById('rPackagePrice').textContent = '$' + Number(amtVal).toFixed(2);
+
+      // Set image if game matches
+      const pkgImg = document.getElementById('rPackageImg');
+      if (pkgImg) {
+        pkgImg.src = 'images/diamond_chest.jpg';
+      }
+    }
+
+    async function checkOrderStatus(isManual = false) {
+      if (!activeOrderId && !activeMd5) return;
+
+      const btn = document.getElementById('btnManualVerify');
+      if (isManual && btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់ជាមួយធនាគារ ABA...';
+      }
+
+      try {
+        const queryParam = activeOrderId ? `id=${encodeURIComponent(activeOrderId)}` : `md5=${encodeURIComponent(activeMd5)}`;
+        const resp = await fetch(`/api/payment/status?${queryParam}&check=true`);
+        
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data && (data.status === 'success' || data.status === 'completed')) {
+            // Update local storage
+            localOrder.status = 'completed';
+            localOrder.paymentStatus = 'success';
+            if (data.transaction_hash) localOrder.transactionHash = data.transaction_hash;
+            localStorage.setItem('currentOrder', JSON.stringify(localOrder));
+
+            renderSuccessReceipt({ ...localOrder, ...data });
+            return;
           }
         }
-        if (order.game) {
-          const itemText = order.packageName || order.packageId || 'Top-Up';
-          document.getElementById('productText').textContent = `${order.game} - ${itemText}`;
-        }
-        if (order.amount !== undefined) {
-          document.getElementById('totalAmountText').textContent = '$' + Number(order.amount).toFixed(2);
-        }
-        if (order.paymentMethod) {
-          document.getElementById('paymentMethodText').textContent = order.paymentMethod;
-        }
       } catch (e) {
-        console.error('Error loading order:', e);
+        console.warn('Status check warning:', e.message);
+      } finally {
+        if (isManual && btn) {
+          btn.disabled = false;
+          btn.innerHTML = '⚡ ខ្ញុំបានបង់ប្រាក់រួចរាល់ (ពិនិត្យឥឡូវនេះ)';
+        }
+      }
+    }
+
+    function triggerManualVerification() {
+      checkOrderStatus(true);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        localOrder = JSON.parse(localStorage.getItem('currentOrder') || '{}');
+      } catch (e) {
+        localOrder = {};
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      activeOrderId = urlParams.get('id') || localOrder.billNumber || localOrder.orderId || '';
+      activeMd5 = urlParams.get('md5') || localOrder.md5 || '';
+
+      // Populate initial pending card
+      document.getElementById('pendingOrderId').textContent = activeOrderId || 'N/A';
+      document.getElementById('pendingGame').textContent = localOrder.game || '-';
+      document.getElementById('pendingPlayerId').textContent = (localOrder.playerId || '-') + (localOrder.zoneId ? ` (${localOrder.zoneId})` : '');
+      document.getElementById('pendingPackage').textContent = localOrder.packageName || '-';
+      document.getElementById('pendingAmount').textContent = '$' + Number(localOrder.amount || 0).toFixed(2);
+
+      // Check if already completed in localStorage
+      if (localOrder && (localOrder.status === 'success' || localOrder.status === 'completed')) {
+        renderSuccessReceipt(localOrder);
+      } else {
+        // Run immediate check
+        checkOrderStatus(false);
+
+        // Auto poll every 3 seconds
+        pollInterval = setInterval(() => {
+          checkOrderStatus(false);
+        }, 3000);
       }
     });
   </script>

@@ -2911,10 +2911,12 @@
       // Automatic Transaction Checking Sequential Loop
       isPollActive = true;
       (async function runAutoPoll() {
+        // Wait 3.5s initially so the customer has time to open ABA Mobile and scan
+        await new Promise(r => setTimeout(r, 3500));
         while (isPollActive && currentPaymentData && currentPaymentData.md5) {
           const ok = await checkPaymentTransaction(false);
           if (ok || !isPollActive) break;
-          await new Promise(r => setTimeout(r, 2500));
+          await new Promise(r => setTimeout(r, 2000));
         }
       })();
 
@@ -2923,6 +2925,7 @@
 
     let isPollActive = false;
     let activeCheckPromise = null;
+    let currentCheckAbortCtrl = null;
 
     // ── Check Transaction by MD5 ─────────────────────────────
     async function checkPaymentTransaction(isFinalCheck = false) {
@@ -2942,16 +2945,18 @@
             const checkToken = atob('NTAxYjg3NGY1NTI5MjEwMjE1NTllMDVkYmUyYjQ2MDRhODg5MjIxZTVjYTk2YTg2MGEwZTAzOWUwZWUyMWMwYQ==');
             const directCheckUrl = `https://payway.payment-system.dev/api/v1/check_transaction_by_md5/?md5=${encodeURIComponent(currentPaymentData.md5)}&api_token=${encodeURIComponent(checkToken)}`;
             
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 35000);
-            const directResp = await fetch(directCheckUrl, { signal: controller.signal });
+            currentCheckAbortCtrl = new AbortController();
+            const timeoutId = setTimeout(() => {
+              if (currentCheckAbortCtrl) currentCheckAbortCtrl.abort();
+            }, 35000);
+            const directResp = await fetch(directCheckUrl, { signal: currentCheckAbortCtrl.signal });
             clearTimeout(timeoutId);
             
             const directData = await directResp.json();
             if (directData && Number(directData.responseCode) === 0) {
               console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
-              // Notify backend server to trigger Khmer Top-Up fulfillment
-              await fetch('/api/payment/confirm', {
+              // Notify backend server to trigger Khmer Top-Up fulfillment asynchronously without blocking UI
+              fetch('/api/payment/confirm', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2998,10 +3003,12 @@
             isPollActive = false;
             clearInterval(khqrTimerInterval);
 
-            // Update saved order with transaction hash
+            // Update saved order with transaction hash and COMPLETED status
             if (currentOrderMeta) {
-              currentOrderMeta.status = 'success';
+              currentOrderMeta.status = 'completed';
+              currentOrderMeta.paymentStatus = 'success';
               currentOrderMeta.transactionHash = resData.transaction_hash;
+              currentOrderMeta.paidAt = new Date().toISOString();
               localStorage.setItem('currentOrder', JSON.stringify(currentOrderMeta));
             }
 
@@ -3028,26 +3035,35 @@
         } finally {
           isCheckingPayment = false;
           activeCheckPromise = null;
+          currentCheckAbortCtrl = null;
         }
       })();
 
       return await activeCheckPromise;
     }
 
-    // Manual check trigger from [ 🔄 Check Payment ] button
+    // Manual check trigger from [ ⚡ ខ្ញុំបានបង់ប្រាក់រួចរាល់ ] button
     async function checkPaymentStatusNow() {
       const checkBtn = document.getElementById('btnManualCheck');
       if (checkBtn) {
         checkBtn.disabled = true;
-        checkBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់ជាមួយធនាគារ...';
+        checkBtn.innerHTML = '⏳ កំពុងផ្ទៀងផ្ទាត់ជាមួយធនាគារ ABA...';
       }
       updateModalStatusPill('checking', 'Checking transaction status (កំពុងពិនិត្យ)...');
+
+      // Instantly abort any stale in-flight background check so this manual check sends a fresh query immediately!
+      if (currentCheckAbortCtrl) {
+        try { currentCheckAbortCtrl.abort(); } catch (e) {}
+        currentCheckAbortCtrl = null;
+      }
+      isCheckingPayment = false;
+      activeCheckPromise = null;
 
       const success = await checkPaymentTransaction(false);
       if (!success) {
         if (checkBtn) {
           checkBtn.disabled = false;
-          checkBtn.innerHTML = '🔄 Check Payment (ពិនិត្យការទូទាត់)';
+          checkBtn.innerHTML = '⚡ ខ្ញុំបានបង់ប្រាក់រួចរាល់ (ពិនិត្យឥឡូវនេះ)';
         }
         updateModalStatusPill('pending', 'Waiting for payment (មិនទាន់ឃើញការទូទាត់ទេ)');
       }
@@ -3086,11 +3102,11 @@
         successHash.parentElement.style.display = 'block';
       }
 
-      // Auto redirect to order status page after 2.5s
+      // Fast auto redirect to order status receipt page after 1.5s
       setTimeout(() => {
         const billNum = txData.bill_number || (currentPaymentData && currentPaymentData.bill_number) || '';
         window.location.href = `order-status.html?id=${encodeURIComponent(billNum)}`;
-      }, 2500);
+      }, 1500);
     }
 
     // ── Show Expired Screen ──────────────────────────────────
@@ -3306,8 +3322,8 @@
             </a>
 
             <!-- 3. Manual Check Payment -->
-            <button id="btnManualCheck" class="btn-check-manual" onclick="checkPaymentStatusNow()">
-              <span>🔄 Check Payment (ពិនិត្យការទូទាត់)</span>
+            <button id="btnManualCheck" class="btn-check-manual" onclick="checkPaymentStatusNow()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); padding: 12px 18px; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">
+              <span>⚡ ខ្ញុំបានបង់ប្រាក់រួចរាល់ (ពិនិត្យឥឡូវនេះ)</span>
             </button>
 
             <!-- Save / Copy Row -->

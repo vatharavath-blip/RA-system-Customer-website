@@ -1060,22 +1060,73 @@ app.all('/api/payment/check', async (req, res) => {
 });
 
 
-// 6.3 Get Payment Status by MD5
-app.get('/api/payment/status', (req, res) => {
+// 6.3 Get Payment Status by MD5 or Bill Number / Order ID
+app.get('/api/payment/status', async (req, res) => {
   const md5 = req.query.md5;
-  if (!md5 || !paymentStore.has(md5)) {
+  const id = req.query.id || req.query.bill_number || req.query.orderId;
+  let p = null;
+
+  if (md5 && paymentStore.has(md5)) {
+    p = paymentStore.get(md5);
+  } else if (id) {
+    for (const val of paymentStore.values()) {
+      if (val.id === id || val.billNumber === id || (val.orderDetails && val.orderDetails.orderId === id)) {
+        p = val;
+        break;
+      }
+    }
+  }
+
+  if (!p) {
     return res.status(404).json({ success: false, error: 'Transaction not found' });
   }
-  const p = paymentStore.get(md5);
+
+  // If pending and caller asked for live check, verify with PayWay
+  if (req.query.check === 'true' && p.status === 'pending' && p.md5 && PAYWAY_API_TOKEN) {
+    try {
+      const checkUrl = `${PAYWAY_API_URL}/check_transaction_by_md5/?md5=${encodeURIComponent(p.md5)}&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
+      const extResp = await fetch(checkUrl, { headers: PAYWAY_HEADERS, signal: AbortSignal.timeout(35000) });
+      const extData = await extResp.json();
+      if (extData && Number(extData.responseCode) === 0) {
+        p.status = 'success';
+        p.transactionHash = extData.data?.hash || null;
+        p.receiptUrl = extData.data?.download_receipt || null;
+        p.paidAt = extData.data?.acknowledgedDateMs ? new Date(extData.data.acknowledgedDateMs).toISOString() : new Date().toISOString();
+        p.paywayData = extData.data || {};
+        savePayments();
+
+        if (!p.orderFulfilled && p.orderDetails && p.orderDetails.playerId) {
+          p.orderFulfilled = true;
+          savePayments();
+          executeTopUpOrder({
+            packageId: p.orderDetails.packageId,
+            playerId: p.orderDetails.playerId,
+            serverId: p.orderDetails.zoneId || null,
+            zoneId: p.orderDetails.zoneId || null,
+            reference: p.billNumber,
+            game: p.orderDetails.game,
+            slug: p.orderDetails.slug
+          }).catch(e => console.warn('Auto topup dispatch error:', e.message));
+        }
+      }
+    } catch (e) {
+      console.warn('Status check PayWay error:', e.message);
+    }
+  }
+
   res.json({
     success: true,
     status: p.status,
     bill_number: p.billNumber,
+    id: p.id,
     amount: p.amount,
     currency: p.currency,
     created_at: p.createdAt,
     paid_at: p.paidAt || null,
-    transaction_hash: p.transactionHash || null
+    transaction_hash: p.transactionHash || null,
+    receipt_url: p.receiptUrl || null,
+    order_fulfilled: p.orderFulfilled || false,
+    order_details: p.orderDetails || {}
   });
 });
 
