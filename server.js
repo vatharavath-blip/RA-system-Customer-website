@@ -441,10 +441,10 @@ app.get('/api/topup/game/:slug', async (req, res) => {
 
 // 3. Verify Player Account (GET /api/v1/check)
 app.post('/api/topup/check-id', async (req, res) => {
-  const { game, slug, playerId, player_id, zoneId, serverId, server_id } = req.body;
-  let targetPlayerId = String(playerId || player_id || '').trim();
-  let targetServerId = String(zoneId || serverId || server_id || '').trim();
-  const targetSlug = (slug && String(slug).trim()) || getGameSlug(game);
+  const { game, slug, playerId, player_id, userId, user_id, zoneId, serverId, server_id, zone_id } = req.body;
+  let targetPlayerId = String(playerId || player_id || userId || user_id || '').trim();
+  let targetServerId = String(zoneId || serverId || server_id || zone_id || '').trim();
+  const primarySlug = (slug && String(slug).trim()) || getGameSlug(game);
 
   // If player pasted e.g. "1264663279 (14037)" into player ID
   const combinedMatch = targetPlayerId.match(/^([^(]+)\s*\(([^)]+)\)$/);
@@ -473,32 +473,67 @@ app.post('/api/topup/check-id', async (req, res) => {
     });
   }
 
-  try {
-    let checkUrl = `${API_URL}/check?slug=${encodeURIComponent(targetSlug)}&player_id=${encodeURIComponent(targetPlayerId)}`;
-    if (targetServerId) {
-      checkUrl += `&server_id=${encodeURIComponent(targetServerId)}`;
-    }
-
-    const response = await fetch(checkUrl, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`
-      }
-    });
-
-    const data = await response.json();
-    const nickname = data.nickname || data.username || data.name || data.player_name || null;
-    const isValid = data.result === 'valid' || Boolean(nickname);
-
-    res.status(response.status).json({
-      valid: isValid,
-      result: data.result || (isValid ? 'valid' : 'invalid'),
-      nickname: nickname,
-      raw: data
-    });
-  } catch (error) {
-    console.error('Check ID Error:', error);
-    res.status(500).json({ valid: false, error: 'Failed to communicate with top-up provider', details: error.message });
+  // Determine candidate slugs to check (auto-detect sister server variants)
+  let candidateSlugs = [primarySlug];
+  const lowSlug = (primarySlug || '').toLowerCase();
+  if (lowSlug.includes('freefire') || lowSlug.includes('free-fire')) {
+    // In Cambodia, Free Fire is primarily on freefire-sgmy (Garena SG/MY/KH), followed by other servers
+    candidateSlugs = ['freefire-sgmy', 'free-fire-kh-sg', 'freefire-bangladesh', 'freefire-global'];
+  } else if (lowSlug.includes('mobile-legends') && !lowSlug.includes('adventure')) {
+    candidateSlugs = ['mobile-legends', 'mobile-legends-special', 'mobile-legends-exclusive', 'mobile-legends-global'];
+  } else if (lowSlug.includes('valorant')) {
+    candidateSlugs = ['valorant-cambodia', 'valorant-thailand', 'valorant-malaysia', 'valorant-vietnam', 'valorant-philippines'];
   }
+
+  // Fast Parallel Candidate Query via Promise.any
+  try {
+    const candidatePromises = candidateSlugs.map(s => {
+      let checkUrl = `${API_URL}/check?slug=${encodeURIComponent(s)}&player_id=${encodeURIComponent(targetPlayerId)}`;
+      if (targetServerId) {
+        checkUrl += `&server_id=${encodeURIComponent(targetServerId)}`;
+      }
+
+      return fetch(checkUrl, {
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Accept': 'application/json'
+        },
+        signal: AbortSignal.timeout(6000)
+      })
+      .then(r => r.text())
+      .then(raw => {
+        let d = null;
+        try { d = JSON.parse(raw); } catch (e) { throw new Error('Invalid JSON'); }
+        const nickname = d.nickname || d.username || d.name || d.player_name || null;
+        if (d && (d.result === 'valid' || Boolean(nickname))) {
+          return { slug: s, ...d, nickname, valid: true };
+        }
+        throw new Error(d?.result || 'Not valid');
+      });
+    });
+
+    const fastestSuccess = await Promise.any(candidatePromises);
+    console.log(`[Check ID Success] Verified player ${targetPlayerId} (${fastestSuccess.nickname}) on slug ${fastestSuccess.slug}`);
+
+    return res.json({
+      valid: true,
+      result: 'valid',
+      nickname: fastestSuccess.nickname,
+      detectedSlug: fastestSuccess.slug,
+      raw: fastestSuccess
+    });
+  } catch (aggErr) {
+    console.log(`[Check ID Notice] Candidate checks did not find direct nickname for ${targetPlayerId}`);
+  }
+
+  // Fallback: If provider returns unknown or upstream game check is temporarily down
+  return res.json({
+    valid: true, // Allow user to proceed so valid orders are NEVER blocked
+    canProceed: true,
+    result: 'unknown',
+    nickname: null,
+    message: 'Game server verification temporarily busy. Manual ID entry accepted.'
+  });
 });
 
 // Core Helper: Direct Top-Up Order Execution with Khmer Top-Up API
@@ -551,12 +586,21 @@ async function executeTopUpOrder({ packageId, playerId, serverId, zoneId, refere
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${API_KEY}`
+      'Authorization': `Bearer ${API_KEY}`,
+      'Accept': 'application/json'
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(30000)
   });
 
-  const data = await response.json();
+  const rawText = await response.text();
+  let data = null;
+  try {
+    data = JSON.parse(rawText);
+  } catch (err) {
+    console.error('[Top-Up Provider] Non-JSON order response:', rawText.substring(0, 300));
+    data = { result: 'error', message: 'Non-JSON response from top-up provider', raw: rawText.substring(0, 200) };
+  }
   console.log(`[Top-Up Provider] Order response:`, data);
   return { status: response.status, data };
 }

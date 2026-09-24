@@ -2418,10 +2418,13 @@
         const data = await response.json();
         verifySpinner.style.display = 'none';
 
-        // STRICT VALIDATION: Must have valid === true AND have a valid non-empty nickname
+        // 1. Success Verified Nickname
         if (data.valid && data.nickname && data.result !== 'invalid') {
           isAccountValid = true;
           verifiedNickname = data.nickname;
+          if (data.detectedSlug) {
+            currentSlug = data.detectedSlug;
+          }
           verifyBox.className = 'verify-result success';
           verifyText.innerHTML = `✓ ឈ្មោះគណនី: <strong style="color: #38bdf8;">${escapeHtml(data.nickname)}</strong> (Verified)`;
           playerIdInput.classList.add('is-verified');
@@ -2430,8 +2433,20 @@
             zoneIdInput.classList.add('is-verified');
             zoneIdInput.classList.remove('is-invalid');
           }
-        } else {
-          // STRICT INVALID: Do NOT allow Top Up Now
+        } else if (data.canProceed || data.result === 'unknown' || data.result === 'incomplete') {
+          // 2. Provider verification service busy or unknown: Allow customer to proceed!
+          isAccountValid = true;
+          verifiedNickname = null;
+          verifyBox.className = 'verify-result loading';
+          verifyBox.style.background = 'rgba(245, 158, 11, 0.1)';
+          verifyBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+          verifyText.innerHTML = `⚠️ មិនអាចផ្ទៀងផ្ទាត់ឈ្មោះស្វ័យប្រវត្តិបានទេ ប៉ុន្តែអ្នកអាចបន្តទូទាត់បាន (សូមពិនិត្យ Player ID ឱ្យបានត្រឹមត្រូវ)`;
+          playerIdInput.classList.remove('is-invalid');
+          if (zoneIdInput) {
+            zoneIdInput.classList.remove('is-invalid');
+          }
+        } else if (data.result === 'invalid') {
+          // 3. Strictly confirmed invalid ID by game provider
           isAccountValid = false;
           verifiedNickname = null;
           verifyBox.className = 'verify-result error';
@@ -2443,17 +2458,32 @@
             zoneIdInput.classList.add('is-invalid');
             zoneIdInput.classList.remove('is-verified');
           }
+        } else {
+          // 4. Any unexpected provider response, unknown status or server busy -> Allow customer to proceed!
+          isAccountValid = true;
+          verifiedNickname = null;
+          verifyBox.className = 'verify-result loading';
+          verifyBox.style.background = 'rgba(245, 158, 11, 0.1)';
+          verifyBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+          verifyText.innerHTML = `⚠️ មិនអាចផ្ទៀងផ្ទាត់ឈ្មោះស្វ័យប្រវត្តិបានទេ ប៉ុន្តែអ្នកអាចបន្តទូទាត់បាន (សូមពិនិត្យ Player ID ឱ្យបានត្រឹមត្រូវ)`;
+          playerIdInput.classList.remove('is-invalid');
+          if (zoneIdInput) {
+            zoneIdInput.classList.remove('is-invalid');
+          }
         }
       } catch (err) {
         console.error('Check ID network error:', err);
         verifySpinner.style.display = 'none';
-        verifyBox.className = 'verify-result error';
-        verifyText.innerHTML = '⚠️ មិនអាចភ្ជាប់ទៅកាន់ Server បានទេ។ សូមសាកល្បងម្ដងទៀត។';
-        isAccountValid = false;
+        // Network warning: allow customer to proceed so sales are not blocked
+        verifyBox.className = 'verify-result loading';
+        verifyBox.style.background = 'rgba(245, 158, 11, 0.1)';
+        verifyBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+        verifyText.innerHTML = '⚠️ ប្រព័ន្ធពិនិត្យឈ្មោះកំពុងរវល់ ប៉ុន្តែអ្នកនៅតែអាចបន្តទូទាត់ប្រាក់បាន។';
+        isAccountValid = true;
         verifiedNickname = null;
-        playerIdInput.classList.add('is-invalid');
+        playerIdInput.classList.remove('is-invalid');
         if (zoneIdInput) {
-          zoneIdInput.classList.add('is-invalid');
+          zoneIdInput.classList.remove('is-invalid');
         }
       }
 
