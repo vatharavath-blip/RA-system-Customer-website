@@ -794,6 +794,30 @@ app.post('/api/payment/generate-khqr', (req, res, next) => {
   app.handle(req, res, next);
 });
 
+// Diagnostics endpoint to find why PayWay call fails on server
+app.get('/api/payment/diag', async (req, res) => {
+  const testUrl = `${PAYWAY_API_URL}/generate_qr/?payway_link=${encodeURIComponent(PAYWAY_LINK)}&amount=0.26&api_token=${encodeURIComponent(PAYWAY_API_TOKEN)}`;
+  try {
+    const extResp = await fetch(testUrl, {
+      headers: PAYWAY_HEADERS,
+      signal: AbortSignal.timeout(15000)
+    });
+    const text = await extResp.text();
+    res.json({
+      status: extResp.status,
+      tokenLen: (PAYWAY_API_TOKEN || '').length,
+      tokenPrefix: (PAYWAY_API_TOKEN || '').substring(0, 8),
+      bodySnippet: text.substring(0, 300)
+    });
+  } catch (e) {
+    res.json({
+      error: e.message,
+      tokenLen: (PAYWAY_API_TOKEN || '').length,
+      tokenPrefix: (PAYWAY_API_TOKEN || '').substring(0, 8)
+    });
+  }
+});
+
 // Register client-side generated PayWay transaction with backend store
 app.post('/api/payment/register', (req, res) => {
   try {
