@@ -834,17 +834,35 @@ app.post('/api/payment/register', (req, res) => {
 });
 
 // Confirm client-side verified PayWay transaction and fulfill topup (Protected against fake requests)
-app.post('/api/payment/confirm', rateLimit({ windowMs: 60000, max: 15, message: 'Too many confirm requests' }), async (req, res) => {
+app.post('/api/payment/confirm', rateLimit({ windowMs: 60000, max: 25, message: 'Too many confirm requests' }), async (req, res) => {
   try {
-    const { md5, hash, download_receipt, txData } = req.body;
+    const { md5, hash, download_receipt, txData, orderDetails } = req.body;
     if (!md5 || typeof md5 !== 'string' || md5.length < 16) {
       return res.status(400).json({ success: false, error: 'Invalid or missing MD5 parameter' });
     }
 
-    const payment = paymentStore.get(md5);
+    let payment = paymentStore.get(md5);
     if (!payment) {
-      console.warn(`[Security Alert] Unregistered MD5 attempted confirm: ${md5}`);
-      return res.status(404).json({ success: false, error: 'Transaction record not found in payment store' });
+      if (orderDetails && (hash || txData?.hash)) {
+        payment = {
+          id: orderDetails.orderId || ('INV-' + Date.now()),
+          billNumber: orderDetails.orderId || ('INV-' + Date.now()),
+          md5: md5,
+          paywayLink: PAYWAY_LINK,
+          amount: Number(orderDetails.amount) || (txData?.amount ? Number(txData.amount) : 0),
+          currency: 'USD',
+          status: 'pending',
+          orderFulfilled: false,
+          orderDetails: orderDetails,
+          createdAt: new Date().toISOString()
+        };
+        paymentStore.set(md5, payment);
+        savePayments();
+        console.log(`[PayWay Confirm] Auto-recovered payment record for MD5: ${md5}`);
+      } else {
+        console.warn(`[Security Alert] Unregistered MD5 attempted confirm: ${md5}`);
+        return res.status(404).json({ success: false, error: 'Transaction record not found in payment store' });
+      }
     }
 
     if (payment.status === 'success' || payment.orderFulfilled) {
@@ -947,7 +965,7 @@ app.all('/api/payment/check', async (req, res) => {
         console.log(`[PayWay Check] Polling transaction status with MD5: ${md5}`);
         const extResp = await fetch(checkUrl, {
           headers: PAYWAY_HEADERS,
-          signal: AbortSignal.timeout(35000)
+          signal: AbortSignal.timeout(8000)
         });
         const rawText = await extResp.text();
         let extData = null;
