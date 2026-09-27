@@ -43,20 +43,30 @@ function saveJson(file, data) {
   }
 }
 
+const ADMIN_CONFIG_FILE = path.join(DATA_DIR, 'admin_config.json');
+
 // Telegram Bot Configuration
 let BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 let ADMIN_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '';
 const TOPUP_API_KEY = process.env.TOPUP_API_KEY || '';
 const TOPUP_API_URL = (process.env.TOPUP_API_URL || 'https://khmer-topup.com/api/v1').replace(/\/$/, '');
 
-let isPolling = false;
-let pollingAbortCtrl = null;
-let lastUpdateId = 0;
+function getAdminChatId() {
+  if (process.env.TELEGRAM_ADMIN_CHAT_ID) return process.env.TELEGRAM_ADMIN_CHAT_ID;
+  const cfg = loadJson(ADMIN_CONFIG_FILE, {});
+  return cfg.adminChatId || ADMIN_CHAT_ID || '';
+}
+
+function saveAdminChatId(id) {
+  ADMIN_CHAT_ID = String(id);
+  saveJson(ADMIN_CONFIG_FILE, { adminChatId: String(id), claimedAt: new Date().toISOString() });
+}
 
 // Check if a chat ID is authorized admin
 function isAdmin(chatId) {
-  if (!ADMIN_CHAT_ID) return true; // If not set yet, allow to configure
-  const authorized = String(ADMIN_CHAT_ID).split(',').map(s => s.trim());
+  const currentAdmin = getAdminChatId();
+  if (!currentAdmin) return true; // If not set yet, allow first user to claim
+  const authorized = String(currentAdmin).split(',').map(s => s.trim());
   return authorized.includes(String(chatId));
 }
 
@@ -328,7 +338,8 @@ ${order.playerNickname ? `🏷️ <b>ឈ្មោះ:</b> <code>${escapeHtml(ord
 🏦 <b>Balance នៅសល់ក្នុង Wallet:</b> <b>${balanceStr}</b>
 ⏰ <b>កាលបរិច្ឆេទ:</b> ${saved.formattedDate || new Date().toLocaleString('km-KH', { timeZone: 'Asia/Phnom_Penh' })}`;
 
-  const targetChats = ADMIN_CHAT_ID ? String(ADMIN_CHAT_ID).split(',').map(s => s.trim()) : [];
+  const adminId = getAdminChatId();
+  const targetChats = adminId ? String(adminId).split(',').map(s => s.trim()) : [];
   for (const chatId of targetChats) {
     if (chatId) {
       await sendMessage(chatId, text);
@@ -357,9 +368,13 @@ async function handleMessage(msg) {
   console.log(`[TelegramBot] Message from ${user} (${chatId}): ${text}`);
 
   // Auto-register first admin if ADMIN_CHAT_ID is empty
-  if (!ADMIN_CHAT_ID) {
-    ADMIN_CHAT_ID = String(chatId);
-    console.log(`[TelegramBot] First admin auto-claimed: ${chatId}`);
+  let currentAdminId = getAdminChatId();
+  let justClaimed = false;
+  if (!currentAdminId) {
+    saveAdminChatId(chatId);
+    currentAdminId = String(chatId);
+    justClaimed = true;
+    console.log(`[TelegramBot] First admin auto-claimed and saved: ${chatId}`);
   }
 
   // 1. /start or /menu or ម៉ឺនុយដើម
@@ -368,7 +383,7 @@ async function handleMessage(msg) {
 `👋 <b>សួស្តី ${escapeHtml(user)}!</b>
 សូមស្វាគមន៍មកកាន់ <b>R1ckky Store Admin Bot</b> 🤖
 
-Bot នេះជួយសម្រួលការងារលោកអ្នក៖
+${justClaimed ? `✅ <b>គណនីរបស់អ្នកត្រូវបានភ្ជាប់ជា Admin ទទួលដំណឹងដោយជោគជ័យ!</b> (Chat ID: <code>${chatId}</code>)\n\n` : ''}Bot នេះជួយសម្រួលការងារលោកអ្នក៖
 • 📊 មើលប្រាក់ចំណេញពីការលក់ពេជ្រ
 • 💰 ពិនិត្យ Balance ផ្ទាល់ក្នុង Khmer Top Up
 • 💸 កត់ត្រាចំណាយ (Apsara Hosting, Domain, Server)
@@ -716,6 +731,20 @@ function initTelegramBot() {
       addDeposit(10.81, 'សមតុល្យដើម Khmer Top Up Balance', 'Initial Balance');
     }
   } catch (e) {}
+
+  // Register command list in Telegram UI
+  callTelegram('setMyCommands', {
+    commands: [
+      { command: 'menu', description: '🏠 ម៉ឺនុយដើម (Main Menu)' },
+      { command: 'profit', description: '📊 របាយការណ៍ប្រាក់ចំណេញ' },
+      { command: 'balance', description: '💰 ពិនិត្យសមតុល្យ Balance' },
+      { command: 'expenses', description: '💸 ចំណាយ Hosting & Domain' },
+      { command: 'deposits', description: '📥 ប្រវត្តិដាក់លុយ Balance' },
+      { command: 'net', description: '📈 សរុបប្រាក់ចំណេញសុទ្ធ (Net Profit)' },
+      { command: 'orders', description: '📋 ការកម្ម៉ង់ចុងក្រោយ' },
+      { command: 'help', description: 'ℹ️ របៀបប្រើប្រាស់ Bot' }
+    ]
+  }).catch(() => {});
 
   pollUpdates().catch(err => {
     console.error('[TelegramBot] Polling loop error:', err.message);
