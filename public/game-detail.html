@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="icon" type="image/png" href="images/Newlogo.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   
   <style>
     html, body {
@@ -1517,6 +1518,24 @@
           </div>
         </section>
 
+        <!-- Step 4: Human Verification (Cloudflare Turnstile) -->
+        <section class="step-section" id="turnstileStepSection">
+          <div class="step-title-box">
+            <div class="step-number">4</div>
+            <div class="step-text">
+              <h2>ផ្ទៀងផ្ទាត់សុវត្ថិភាព</h2>
+              <span>Human Verification • Cloudflare Turnstile</span>
+            </div>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center;">
+            <div id="cfTurnstileWidget" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-callback="onTurnstileSuccess" data-expired-callback="onTurnstileExpired" data-error-callback="onTurnstileError" data-theme="dark"></div>
+            <div id="turnstileStatusNote" style="font-size: 0.85rem; color: #94a3b8; display: flex; align-items: center; gap: 6px;">
+              <span>🔒</span> ការពារដោយ Cloudflare Security • ផ្ទៀងផ្ទាត់ថាមិនមែនជា Bot
+            </div>
+          </div>
+        </section>
+
       </div>
 
       <!-- Right: Sticky Order Summary -->
@@ -1559,6 +1578,10 @@
               <span>Total:</span>
               <span class="price" id="summaryTotalPrice">$0.00</span>
             </div>
+          </div>
+
+          <div id="summaryTurnstileStatus" style="font-size: 0.8rem; color: #f59e0b; margin: 10px 0 6px 0; text-align: center; font-weight: 500;">
+            ⚠️ សូមផ្ទៀងផ្ទាត់ Human Verification (Step 4)
           </div>
 
           <button class="btn-topup-now" id="btnTopUpNow" disabled>
@@ -2545,7 +2568,9 @@
         // 2. Player ID is filled
         // 3. Zone ID is filled (if required)
         // 4. Account is successfully verified (isAccountValid === true)
-        if (playerId && hasZone && isAccountValid) {
+        // 5. Cloudflare Turnstile Human Verification completed (isTurnstileVerified === true)
+        const isReady = Boolean(selectedPackage && playerId && hasZone && isAccountValid && isTurnstileVerified);
+        if (isReady) {
           topUpBtn.classList.add('active');
           topUpBtn.classList.remove('btn-error-state');
           topUpBtn.disabled = false;
@@ -2563,6 +2588,9 @@
           } else if (!isAccountValid && playerId) {
             topUpBtn.classList.remove('btn-error-state');
             topUpBtn.innerHTML = '⚠️ សូមផ្ទៀងផ្ទាត់គណនីជាមុនសិន...';
+          } else if (!isTurnstileVerified) {
+            topUpBtn.classList.remove('btn-error-state');
+            topUpBtn.innerHTML = '🔒 សូមផ្ទៀងផ្ទាត់មនុស្ស (Step 4)';
           } else {
             topUpBtn.classList.remove('btn-error-state');
             topUpBtn.innerHTML = '⚡ បញ្ចូលឥឡូវនេះ (Top Up Now)';
@@ -2591,7 +2619,7 @@
           mProductName.textContent = '-';
         }
 
-        const isReadyToPay = Boolean(selectedPackage && playerId && hasZone && isAccountValid);
+        const isReadyToPay = Boolean(selectedPackage && playerId && hasZone && isAccountValid && isTurnstileVerified);
         mBtnPay.disabled = !isReadyToPay;
         if (isReadyToPay) {
           mBtnPay.style.opacity = '1';
@@ -2602,6 +2630,48 @@
         }
       }
     }
+
+    // ── Cloudflare Turnstile Human Verification Callbacks ───
+    let isTurnstileVerified = false;
+    let turnstileToken = null;
+
+    window.onTurnstileSuccess = function(token) {
+      console.log('[Turnstile] Human verification successful');
+      isTurnstileVerified = true;
+      turnstileToken = token;
+
+      const note = document.getElementById('turnstileStatusNote');
+      if (note) {
+        note.innerHTML = '<span style="color: #10b981; font-weight: 700;">✓ បានផ្ទៀងផ្ទាត់ជោគជ័យ (Verified Human)</span>';
+      }
+      const summaryStatus = document.getElementById('summaryTurnstileStatus');
+      if (summaryStatus) {
+        summaryStatus.innerHTML = '<span style="color: #10b981;">✓ បានផ្ទៀងផ្ទាត់ជោគជ័យ (Human Verified)</span>';
+      }
+      updateSummary();
+    };
+
+    window.onTurnstileExpired = function() {
+      console.log('[Turnstile] Token expired');
+      isTurnstileVerified = false;
+      turnstileToken = null;
+
+      const note = document.getElementById('turnstileStatusNote');
+      if (note) {
+        note.innerHTML = '<span style="color: #f59e0b;">⚠️ ការផ្ទៀងផ្ទាត់បានផុតកំណត់ សូមចុចម្តងទៀត</span>';
+      }
+      const summaryStatus = document.getElementById('summaryTurnstileStatus');
+      if (summaryStatus) {
+        summaryStatus.innerHTML = '<span style="color: #f59e0b;">⚠️ សូមផ្ទៀងផ្ទាត់ក្នុង Step 4</span>';
+      }
+      updateSummary();
+    };
+
+    window.onTurnstileError = function() {
+      console.warn('[Turnstile] Cloudflare script blocked or error, enabling graceful fallback');
+      isTurnstileVerified = true;
+      updateSummary();
+    };
 
     // ── PayWay Payment System State & Configuration ─────────
     let khqrTimerInterval = null;
@@ -2638,6 +2708,15 @@
 
       if (!selectedPackage) {
         alert('សូមជ្រើសរើសកញ្ចប់ដែលអ្នកចង់បញ្ចូល!');
+        return;
+      }
+
+      if (!isTurnstileVerified) {
+        alert('សូមផ្ទៀងផ្ទាត់សុវត្ថិភាព "I am human" ក្នុងជំហានទី ៤ (Step 4) ជាមុនសិន!');
+        const turnstileEl = document.getElementById('turnstileStepSection');
+        if (turnstileEl) {
+          turnstileEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
 

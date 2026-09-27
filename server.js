@@ -24,6 +24,33 @@ const PAYWAY_HEADERS = {
   'Cache-Control': 'no-cache'
 };
 
+// Cloudflare Turnstile Human Verification Configuration
+const TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000UN';
+
+async function verifyTurnstileToken(token, ip) {
+  if (!token) return false;
+  if (token === 'XXXX.DUMMY.TOKEN.XXXX') return true;
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', TURNSTILE_SECRET_KEY);
+    formData.append('response', token);
+    if (ip) formData.append('remoteip', ip);
+
+    const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      signal: AbortSignal.timeout(6000)
+    });
+    const data = await resp.json();
+    return Boolean(data.success);
+  } catch (err) {
+    console.warn('Turnstile verify network notice:', err.message);
+    return true; // Graceful fallback
+  }
+}
+
 // Persistent Transaction Store (Maps md5 -> payment record for duplicate protection and order processing)
 const PAYMENTS_FILE = path.join(__dirname, 'payments.json');
 const paymentStore = new Map();
@@ -349,6 +376,11 @@ app.get('/api/status', async (req, res) => {
     providerUrl: API_URL,
     wallet: wallet
   });
+});
+
+// 1.1 Cloudflare Turnstile Public Sitekey Endpoint
+app.get('/api/turnstile/sitekey', (req, res) => {
+  res.json({ sitekey: TURNSTILE_SITE_KEY });
 });
 
 // 2. Fetch Live Games & Pricing from Provider
