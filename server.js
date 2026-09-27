@@ -16,6 +16,9 @@ const PAYWAY_API_URL = (process.env.PAYWAY_API_URL || 'https://payway.payment-sy
 const PAYWAY_API_TOKEN = process.env.PAYWAY_API_TOKEN || '501b874f552921021559e05dbe2b4604a889221e5ca96a860a0e039e0ee21c0a';
 const PAYWAY_LINK = process.env.PAYWAY_LINK || 'https://link.payway.com.kh/ABAPAYTh526248G';
 
+// Telegram Admin Bot Module (Profit, Expenses, Deposits, Live Wallet Balance)
+const telegramBot = require('./telegram-bot');
+
 // Realistic browser headers to prevent Cloudflare/WAF HTML 403 blocks on datacenter IPs
 const PAYWAY_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
@@ -169,6 +172,18 @@ function applyMarkup(basePrice) {
     markup = 0.20;
   }
   return Number((price + markup).toFixed(2));
+}
+
+// Derive provider base cost from customer selling price
+function getBaseCostFromSellingPrice(sellingPrice) {
+  const sell = Number(sellingPrice) || 0;
+  if (sell <= 0) return 0;
+  let markup = 0.01;
+  if (sell >= 30.70) markup = 0.70;
+  else if (sell >= 20.50) markup = 0.50;
+  else if (sell >= 10.30) markup = 0.30;
+  else if (sell >= 5.20) markup = 0.20;
+  return Number(Math.max(0, sell - markup).toFixed(2));
 }
 
 // CRC16-CCITT for Bakong KHQR EMVCo Standard
@@ -1001,6 +1016,25 @@ app.post('/api/payment/confirm', rateLimit({ windowMs: 60000, max: 25, message: 
           payment.topupStatus = topupRes.data.status || 'completed';
           savePayments();
           console.log(`[PayWay Confirm] Topup successfully fulfilled:`, payment.orderCode);
+
+          // Real-time Telegram Order & Profit Notification to Admin
+          try {
+            const baseCost = getBaseCostFromSellingPrice(payment.amount);
+            telegramBot.notifyNewOrder({
+              orderId: payment.id || payment.billNumber,
+              billNumber: payment.billNumber,
+              game: payment.orderDetails.game,
+              packageName: payment.orderDetails.packageName,
+              playerId: payment.orderDetails.playerId,
+              zoneId: payment.orderDetails.zoneId,
+              playerNickname: payment.orderDetails.playerNickname,
+              sellPrice: payment.amount,
+              baseCost: baseCost,
+              status: payment.topupStatus || 'completed'
+            });
+          } catch (tgErr) {
+            console.warn('[TelegramBot] Notify error:', tgErr.message);
+          }
         }
       } catch (fulfillErr) {
         console.error('Auto topup fulfill error:', fulfillErr.message);
@@ -1214,6 +1248,42 @@ app.all('/api/payment/clear', (req, res) => {
   res.json({ success: true, message: 'All server payment data cleared successfully.' });
 });
 
+// ── Admin Financial Endpoints (Profit, Expenses, Deposits) ─
+app.get('/api/admin/profit-summary', (req, res) => {
+  res.json({ success: true, data: telegramBot.getProfitSummary() });
+});
+
+app.get('/api/admin/expenses', (req, res) => {
+  res.json({ success: true, data: telegramBot.getTotalExpenses() });
+});
+
+app.post('/api/admin/expenses', (req, res) => {
+  const { amount, category, note } = req.body;
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    return res.status(400).json({ success: false, error: 'Valid expense amount is required' });
+  }
+  const added = telegramBot.addExpense(amount, category, note);
+  res.json({ success: true, data: added });
+});
+
+app.get('/api/admin/deposits', (req, res) => {
+  res.json({ success: true, data: telegramBot.getTotalDeposits() });
+});
+
+app.post('/api/admin/deposits', (req, res) => {
+  const { amount, note, method } = req.body;
+  if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    return res.status(400).json({ success: false, error: 'Valid deposit amount is required' });
+  }
+  const added = telegramBot.addDeposit(amount, note, method);
+  res.json({ success: true, data: added });
+});
+
+app.get('/api/admin/wallet', async (req, res) => {
+  const wallet = await telegramBot.fetchProviderBalance();
+  res.json(wallet);
+});
+
 
 // Fallback 404 Handler: Serve custom 404 page for unknown routes or invalid URLs
 app.use((req, res) => {
@@ -1234,6 +1304,13 @@ app.listen(PORT, () => {
   console.log(` Provider URL: ${API_URL}`);
   console.log(` API Key: ${API_KEY ? 'Loaded (kt_***)' : 'Missing'}`);
   console.log(`===========================================`);
+  
+  // Start Telegram Admin Bot
+  try {
+    telegramBot.initTelegramBot();
+  } catch (botErr) {
+    console.warn('[TelegramBot] Initialization notice:', botErr.message);
+  }
 });
 
 module.exports = app;
