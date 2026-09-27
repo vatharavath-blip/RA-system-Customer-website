@@ -2985,18 +2985,23 @@
             const directData = await directResp.json();
             if (directData && Number(directData.responseCode) === 0) {
               console.log('[PayWay Direct Client] Payment confirmed directly by browser:', directData);
-              // Notify backend server to trigger Khmer Top-Up fulfillment asynchronously without blocking UI
-              fetch('/api/payment/confirm', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  md5: currentPaymentData.md5,
-                  hash: directData.data ? directData.data.hash : null,
-                  download_receipt: directData.data ? directData.data.download_receipt : null,
-                  txData: directData.data,
-                  orderDetails: currentOrderMeta
-                })
-              }).catch(e => console.warn('Confirm sync notice:', e.message));
+              // Notify backend server to trigger Khmer Top-Up fulfillment (awaited with keepalive so page redirect does not cancel it)
+              try {
+                await fetch('/api/payment/confirm', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  keepalive: true,
+                  body: JSON.stringify({
+                    md5: currentPaymentData.md5,
+                    hash: directData.data ? directData.data.hash : null,
+                    download_receipt: directData.data ? directData.data.download_receipt : null,
+                    txData: directData.data,
+                    orderDetails: currentOrderMeta
+                  })
+                });
+              } catch (confirmSyncErr) {
+                console.warn('Confirm sync notice:', confirmSyncErr.message);
+              }
 
               resData = {
                 status: 'success',

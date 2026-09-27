@@ -606,6 +606,23 @@
       // Check if already completed in localStorage or URL parameter
       if (localOrder && (localOrder.status === 'success' || localOrder.status === 'completed')) {
         renderSuccessReceipt(localOrder);
+        
+        // Safety net: Guarantee backend triggered Khmer Top-Up fulfillment
+        if (localOrder.md5 && !localOrder.fulfillmentConfirmed) {
+          fetch('/api/payment/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            keepalive: true,
+            body: JSON.stringify({
+              md5: localOrder.md5,
+              hash: localOrder.transactionHash || 'CONFIRMED',
+              orderDetails: localOrder
+            })
+          }).then(() => {
+            localOrder.fulfillmentConfirmed = true;
+            try { localStorage.setItem('currentOrder', JSON.stringify(localOrder)); } catch (e) {}
+          }).catch(e => console.warn('Order fulfillment sync warning:', e.message));
+        }
       } else {
         // Run immediate check
         checkOrderStatus(false);
